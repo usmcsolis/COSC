@@ -266,4 +266,88 @@ Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser  # Sets the
 
 ```
 
+## Comments
+
+```
+
+Get-Process # comment                                           # Creates a comment beside cmdlet
+<# comment                                                      # Begins a multiline comment
+|
+|
+comment #>                                                      # Ends the multiline comment
+```
+
+
+## Profiles
+
+Profile that will load anytime PS is loaded including settings and environemt
+
+```
+All User, All Hosts
+All User, Current Host
+Current User, All Hosts
+Current Users, Current Host
+
+$PsHome\Profile.ps1
+$PsHome\Microsoft.PowerShell_profile.ps1
+$Home\[My]Documents\Profile.ps1
+$Home\[My ]Documents\WindowsPowerShell\Profile.ps1
+```
+Testing the Profiles
+```
+Test-Path -Path $profile.currentUsercurrentHost
+Test-Path -Path $profile.currentUserAllHosts
+Test-Path -Path $profile.AllUsersAllHosts
+Test-Path -Path $profile.AllUserscurrentHost
+
+
+```
+
+## Building Powershell Profile
+
+```
+function Color-Console {
+  $Host.ui.rawui.backgroundcolor = "black"
+  $Host.ui.rawui.foregroundcolor = "green"
+  $hosttime = (Get-ChildItem -Path $PSHOME\PowerShell.exe).CreationTime
+  $hostversion="$($Host.Version.Major)`.$($Host.Version.Minor)"
+  $Host.UI.RawUI.WindowTitle = "PowerShell $hostversion ($hosttime)"
+  Clear-Host
+}
+Color-Console
+```
+
+
+## Transcript
+History of everything that was entered
+
+```
+start-transcript
+start-transcript | out-null                       # Pipe to out-null so users don't see that commands are being recorded
+
+Start-Transcript C:\MyWork.txt                    # Starts to log commands into the c:\mywork.txt file
+Get-Service                                       # Run get-service command and inputs that and the results into the transcript.
+Stop-Transcript                                   # End the transcript
+notepad c:\MyWork.txt                             # View the contents of the created transcript
+
+```
+
+Allows you to track everything youve done so if something changes you can say you didnt do it
+
+
+## Download File (PS)
+
+```
+$url = "http://downloads.volatilityfoundation.org/releases/2.6/volatility_2.6_win64_standalone.zip"
+$output = "$PSScriptRoot\volatility_2.6_win64_standalone.zip"
+$start_time = Get-Date
+
+$wc = New-Object System.Net.WebClient 
+$wc.DownloadFile($url, $output) 
+
+
+(New-Object System.Net.WebClient).DownloadFile($url, $output)
+
+```
+
 
