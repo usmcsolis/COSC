@@ -11,6 +11,12 @@ Stack 8 : 10.50.35.48
 ```
 
 ## Remote Connection Instructions
+
+```
+xfreerdp /u:student /v:10.50.35.48 /dynamic-resolution +glyph-cache +clipboard
+
+
+```
 ```
 USER=
 IP_ADDRESS=
