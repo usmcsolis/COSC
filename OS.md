@@ -8,6 +8,11 @@ http://10.50.22.197:8000/http://10.50.22.197:8000/
 ## Stack 8
 ```
 Stack 8 : 10.50.35.48
+
+File Server:
+10.8.0.3
+student
+password
 ```
 
 ## Remote Connection Instructions
