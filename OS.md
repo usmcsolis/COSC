@@ -19,9 +19,10 @@ IP_ADDRESS=
 ssh -X ${USER}@${IP_ADDRESS}
 
 ```
+```
 student
 password
-
+```
 
 ## Mission Command Console
 ```
@@ -38,5 +39,7 @@ Join Class:
 M24005
 password
 ```
+
+
 
 
