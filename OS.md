@@ -1,4 +1,3 @@
-# Day 1
 ## Important 
 
 https://os.cybbh.io/public/os/latest/index.html
