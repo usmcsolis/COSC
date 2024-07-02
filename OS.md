@@ -1,5 +1,5 @@
 # Day 1
-
+## Important 
 https://os.cybbh.io/public/os/latest/index.html
 http://10.50.22.197:8000/
 
@@ -23,22 +23,20 @@ student
 password
 
 
-## Mission Command Console Webpage
+## Mission Command Console
 ```
 http://10.50.22.197:8000/
 ```
 
-
+```
 Username: MASO-M-005
-First 2 Letters of First Name
-First 2 Letters of Last Name
-Class - M-005
-
 Password: 1558758836Abc__1558758836Abc_
+```
 
 Join Class:
-
+```
 M24005
 password
+```
 
 
