@@ -89,5 +89,181 @@ Get-Process | Select-Object Name, ID, path           # Displays the Get-Process 
 
 ```
 
+## Where-Object
+
+```
+Get-Process | Get-Member | Where-Object {$_.Membertype -match "Method"}       # Displays all objects with Method in their name from the results from Get-Member of the Get-Process cmdlet
+```
+
+## .kill()
+
+```
+Start-Process calc                              # Open an instance of calculator
+(Get-Process calculator*).kill()                # Stops a named process using the kill() method directly
+Stop-Process -name calculator*                  # Uses a cmdlet to call the Process.Kill method
+
+```
+
+## CIM
+
+Returns System Information
+
+API CALLS
+
+WMI and CIM classes are almost the same thing
+
+CIM is newer
+
+
+```
+Get-Cimclass *                                                                  # Lists all CIM Classes
+Get-CimInstance –Namespace root\securitycenter2 –ClassName antispywareproduct   # Lists the antispywareproduct class from the root/security instance
+Get-CimInstance -ClassName Win32_LogicalDisk -Filter “DriveType=3” | gm         # Shows properties and methods for this Instance
+Get-WmiObject -Class Win32_LogicalDisk -Filter “DriveType=3”                    # Using the Windows Management Instrumentation method
+
+```
+
+## Do-While
+do {<statement list>} while (<condition>)
+```
+do { Write-Host "----------";
+Write-Host "Count = $count";
+Write-Host "a = $a";
+Write-Host "x=",$x[$a];
+$count++; $a++; } while ($x[$a] -ne 0)
+
+
+Count = 0
+a = 0
+x= 1
+----------
+Count = 1
+a = 1
+x= 2
+----------
+Count = 2
+a = 2
+x= 78
+```
+
+
+## Do-Until
+do {<statement list>} until (<condition>)
+```
+do { Write-Host "----------";
+Write-Host "Count = $count";
+Write-Host "a = $a";
+Write-Host "x =",$x[$a];
+$count++; $a++; } until ($x[$a] -eq 0)
+
+
+Count = 0
+a = 0
+x = 1
+----------
+Count = 1
+a = 1
+x = 2
+----------
+Count = 2
+a = 2
+x = 78
+```
+
+## For Loop
+```
+for (<Init>; <Condition>; <Repeat>)
+{
+    <Statement list>
+}
+```
+
+```
+$array = ("item1", "item2", "item3")
+for($i = 0; $i -lt $array.length; $i++){ $array[$i] }
+item1
+item2
+item3
+
+```
+
+## For Each
+```
+$letterArray = "a","b","c","d"
+foreach ($letter in $letterArray)
+{
+  Write-Host $letter
+}
+```
+```
+foreach ($file in Get-ChildItem)
+{
+  Write-Host $file
+}
+```
+
+## While Loop
+
+```
+
+
+while (<condition>){<statement list>}
+
+
+
+```
+
+
+```
+
+while($val -ne 3)
+{
+    $val++
+    Write-Host $val
+}
+#or
+while($val -ne 3){$val++; Write-Host $val}
+```
+
+
+## Error Messaging
+
+```
+Remove-Item does_not_exist.txt                                         # Displays errors in red
+Remove-Item does_not_exist.txt -ErrorAction SilentlyContinue           # Hides any errors
+New-Item -Type File it_exists.txt                                      # Creates a new file called 'it_exists.txt'
+Remove-Item it_exists.txt -Verbose                                     # Returns a message notifying that it was deleted
+```
+
+## Execution Policy
+Is what is allowed to run on the powershell
+
+
+```
+Get-ExecutionPolicy -list                                             # Lists all of the Scopes and ExecutionPolicies on the system
+Get-ExecutionPolicy                                                   # Gets the current user's ExecutionPolicy
+Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser  # Sets the ExecutionPolicy for the CurrentUser to Unrestricted
+
+```
+
+## Comparison 
+
+ Equality
+	Matching
+	Replacement
+	Containment
+	Type
+
+```
+-lt
+-le
+-gt
+-ge
+-eq
+-ne
+-like
+-match
+
+```
 
 
