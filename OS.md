@@ -588,4 +588,63 @@ Notice the s in the users field? What permissions does this executable effective
 
 ```
 
+## Grep
+
+```
+student@linux-opstation-kspt:~$ ls -Rlisa /etc | grep password 
+ 1137 4 -rw-r--r--   1 root root 1440 Jan 31  2020 common-password
+ 1156 4 -rw-r--r--   1 root root 1160 Oct  9  2018 gdm-password
+ls: cannot open directory '/etc/polkit-1/localauthority': Permission denied 
+ls: cannot open directory '/etc/ssl/private': Permission denied
+ls: cannot open directory '/etc/sudoers.d': Permission denied
+
+
+```
+
+## Awk
+
+```
+student@linux-opstation-kspt:~$ ls -l /etc 
+drwxr-xr-x  7 root root       4096 Feb  4  2020 NetworkManager
+drwxr-xr-x  2 root root       4096 Feb  4  2020 PackageKit
+drwxr-xr-x  2 root root       4096 Feb  4  2020 UPower
+_truncated_
+
+student@linux-opstation-kspt:~$ ls -l /etc | awk -F " " '{print$3","$4","$9}' > files.csv 
+student@linux-opstation-kspt:~$ cat files.csv
+root,root,NetworkManager
+root,root,PackageKit
+root,root,UPower
+_truncated_
+
+```
+
+
+## Sed 
+edits
+
+```
+student@linux-opstation-kspt:~$ cat /etc/passwd | grep root 
+root:x:0:0:root:/root:/bin/bash
+
+student@linux-opstation-kspt:~$ cat /etc/passwd | grep root | sed s/root/bacon/g 
+bacon:x:0:0:bacon:/bacon:/bin/bash
+
+
+
+```
+
+
+## Regex
+
+-P Perl regex
+
+```
+student@linux-opstation-kspt:~$ grep -P '\b\d{3}-\d{2}-\d{4}\b' results.txt
+629-75-1985
+386-67-7872
+478-71-4964
+
+```
+
 
