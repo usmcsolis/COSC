@@ -361,4 +361,231 @@ $wc.DownloadFile($url, $output)
 
 ```
 
+# Linux Essentials (Day 2)
+
+## PWD 
+```
+student:~$ pwd 
+/home/student 
+```
+
+## Situational Awareness
+```
+hostname or uname -a displays the name of the host you are currently on.
+
+whoami shows the user you are currently logged in as (useful after gaining access through service exploitation).
+
+w or who shows who else is logged in.
+
+ip addr or ifconfig displays network interfaces and configured IP addresses.
+
+ip neigh or arp displays MAC addresses of devices observed on the network.
+
+ip route or route shows where packets will be routed for a particular destination address.
+
+ss or netstat will show network connections, with the appropriate flags will show listening ports
+
+nft list tables or iptables -L to view firewall rules. (FIREWALL RULES)
+
+sudo -l displays commands the user may run with elevated permissions.
+
+```
+
+
+## Help
+
+```
+help
+
+--help
+
+man
+
+```
+
+
+## Variables
+
+Assigning 
+```
+
+a = 100
+echo $a
+
+```
+
+$ is used to call your variable
+
+## Command Substitution
+
+```
+student:~$ directories=$(ls /) 
+student:~$ echo $directories 
+bin   dev  home        initrd.img.old  lib64       media  opt   root  sbin  srv  tmp  var      vmlinuz.old
+boot  etc  initrd.img  lib             lost+found  mnt    proc  run   snap  sys  usr  vmlinuz
+
+```
+
+
+## Redirection
+
+standard input 0 ←--- the default for a command arguments
+
+standard output 1 ←--- the default for successful command output
+
+standard error 2 ←--- the default for failed commands or errors
+
+
+```
+
+student:~$ ls bacon 
+ls: cannot access 'bacon': No such file or directory
+
+workstation21:$ ls bacon 2> errorfile 
+workstation21:$ cat errorfile 
+ls: cannot access 'bacon': No such file or directory
+
+```
+
+
+## For Loop
+
+```
+student:~$ for item in $objects; do echo $item; done 
+/etc/NetworkManager
+/etc/PackageKit
+/etc/UPower
+/etc/X11
+/etc/acpi
+/etc/adduser.conf
+/etc/alternatives
+/etc/anacrontab
+/etc/apg.conf
+/etc/apm
+_truncated_
+
+```
+
+## If
+
+
+```
+student:~$ for object in $objects; \ 
+do if [ -d $object ]; then echo "$object is a directory"; \ 
+else echo "$object is file" ; \ 
+fi ; \ 
+done 
+
+/etc/X11 is a directory
+/etc/acpi is a directory
+/etc/adduser.conf is a file
+/etc/alternatives is a directory
+/etc/anacrontab is a file
+/etc/apg.conf is a file
+/etc/apm is a directory
+/etc/apparmor is a directory
+
+student:~$ for object in $objects; do if [ -d $object ]; then echo "$object is a directory"; else echo "$object is a file" ; fi ; done 
+```
+
+## While
+
+```
+curtime=$(date +"%s") 
+echo $curtime
+
+exittime=$(expr $curtime + 3) 
+echo $exittime
+
+while [ $exittime -ge $curtime ]; do echo "To Infinity and Beyond?" ; curtime=$(date +"%s") ; done 
+To Infinity and Beyond?
+To Infinity and Beyond?
+To Infinity and Beyond?
+To Infinity and Beyond?
+_Truncated_ #It goes for three seconds
+
+```
+
+
+## File
+
+Can allow you to see what type of file your file are.
+elf binary
+
+
+## /etc/passwd
+
+```
+
+student@linux-opstation-kspt:/bin$ cat /etc/passwd | grep student 
+student:x:1001:1001::/home/student:/bin/bash 
+ (1)   (2) (3) (4) (5)   (6)          (7)
+
+
+cmd line: Execute cat /etc/passwd and pipe it to grep to filter on student.
+cmd output: Student entry in the /etc/passwd file.
+
+
+
+Sections of output lines
+Username
+Password. An x character indicates that an encrypted password is stored in /etc/shadow file.
+UID Value
+GUID Value
+User ID Info (GECOS). The comment field
+Homeome Directory.
+Command/Shell /bin/bash
+
+```
+
+## Permissions
+
+Read
+Read contents (File)
+List contents of dir (Dir)
+
+Write
+Write contents (File)
+Create/Delete in the dir (Dir)
+
+Exe 
+Run file as an executable (File)
+Move into the dir (Dir)
+
+```
+chmod 755
+student@linux-opstation-kspt:/bin$ ls -lisa /bin/dd 
+student@linux-opstation-kspt:/bin$ 130341 76 -rwx r-x r-x 1 root root 76000 Jan 18  2018 /bin/dd
+                                             (2)  (3) (4)   (5)   (6)
+
+Showing permissions.
+2 The Owner has Read, Write, and Execute permissions.
+3 The Group has Read and Execute permissions.
+4 Anyone who is not the User/Owner or belonging to the Group has Read and Execute permissions.
+5 The file’s Owner.
+6 The files' Group.
+```
+
+## Sticky Bit
+
+Only the owner of the sticky bit can delete the file
+If a user has write access to a directory, they can delete any file from it. That may cause problems though in some directories like /var/tmp. To address this Linux has what is known as the sticky bit. The sticky bit removes the ability to delete files unless the user attempting is the owner of the file.
+
+
+
+## Special Permisions
+
+```
+SUID or GUID Bit
+
+SUID and SGID Demo
+student@linux-opstation-kspt:~$ ls -l /bin/ping 
+-rwsr-xr-x 1 root root 64424 Jun 28  2019 /bin/ping 
+
+Execute ls -l on /bin/ping.
+Notice the s in the users field? What permissions does this executable effectively have?
+
+
+```
+
 
