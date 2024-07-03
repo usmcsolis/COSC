@@ -20,12 +20,15 @@ password
 ```
 Admin_station
 xfreerdp /u:student /v:10.50.35.48 /dynamic-resolution +glyph-cache +clipboard
+student : password
 
 File Server (windows)
 ssh -X student@10.8.0.3
+student : password
 
 Terra (linux)
 ssh -X student@10.8.0.6
+garviel : luna
 
 
 ```
