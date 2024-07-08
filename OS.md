@@ -659,3 +659,69 @@ student@linux-opstation-kspt:~$ grep -P '\b\d{3}-\d{2}-\d{4}\b' results.txt
 
 
 6cebf155e9c8f49d76ae1268214ff0b5
+
+# Windows Registry Keys (Day 3)
+
+## Structure
+
+Hive
+Key
+Subkeys
+Values
+
+## Registry Hive or ROOT Keys
+
+LM
+HKEY_LOCAL_MACHINE
+U
+HKEY_USERS
+CU
+HKEY_CURRENT_USERS
+CC
+HKEY_CURRENT_CONFIG
+CR
+HKEY_CLASSES_ROOT
+
+## KHLM_Local_Machine
+
+HARDWARE - contains a database of installed devices along with their drivers
+
+SAM - Security Account Manager stores user and group accounts along with NTLM hashes of passwords
+
+Security - Local Security policy accessed by lsass.exe used to determine rights and permissions for users on the machine
+
+System - Contains keys pertaining to system startup such as programs started on boot or driver load order.
+
+## HKLM_USERS
+
+User Environment settings for the desktop
+
+Shortcuts
+
+File associations
+
+## HKLM_CURRENT_USER
+
+HKEY_CURRENT_USER is the copy of the logged in user’s registry key based on thier SID from HKEY_USERS.
+
+## HKLM_Current_Config
+
+HKEY_CURRENT_CONFIG is a symbolic link (pointer or shortcut or alias) to the following registry key:
+
+```
+HKEY_Local_Machine (HIVE)
+              └──SYSTEM (Key)
+                      └──CurrentControlSet (Subkey)
+                                    └── Hardware Profiles (Subkey)
+                                                └── Current (Subkey)
+```
+
+## HKLM_Classes_Root
+
+HKEY_CLASSES_ROOT is a symbolic link (pointer or shortcut or alias) to the following registry key:
+```
+HKEY_Local_Machine (HIVE)
+              └──Software (Key)
+                      └──Classes (Subkey)
+
+```
