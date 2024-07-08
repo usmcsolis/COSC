@@ -863,6 +863,71 @@ The Root, that is, the path to the root of the new drive.
 
 
 
+## Foresically Relevant Keys
+
+https://drive.google.com/file/d/1XzThO4pyhlm86Qxzu--6_5XlYpfldeZu/view
+
+Windows Registry Cheat Sheet
+Microsoft Edge Internet URL history and Browser Artifacts and Forensics
+
+HKEY_CLASSES_ROOT\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppContainer\Storage\microsoft.microsoftedge_8wekyb3d8bbwe\Children\001\Internet Explorer\DOMStorage
 
 
+```
+USB history / USB Forensics
 
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Enum\USB
+
+This registry key contains information about all USB devices that have been connected to the system at some point, regardless of whether they are currently connected or not. It includes information about the USB controllers, hubs, and individual devices. Each device is typically identified by a unique identifier (like a device instance path or hardware ID).
+
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Enum\USBSTOR
+
+This registry key specifically deals with USB storage devices, such as USB flash drives, external hard drives, etc. It contains information about connected USB storage devices, including details like device instance paths, hardware IDs, and other configuration information.
+```
+
+```
+Recent MRU history / MRU in forensics
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\ComDlg32\OpenSavePidlMRU
+
+MRU is the abbreviation for most-recently-used.
+
+This key maintains a list of recently opened or saved files via typical Windows Explorer-style common dialog boxes (i.e. Open dialog box and Save dialog box).
+
+For instance, files (e.g. .txt, .pdf, htm, .jpg) that are recently opened or saved files from within a web browser (including IE and Firefox) are maintained.
+```
+
+```
+Recent Files with LNK files
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\RecentDocs
+```
+
+```
+Windows User Profiles User Account Forensics
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList
+```
+
+```
+Saved Network Profiles and How to decode Network history
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\NetworkList\Profiles
+```
+
+```
+Windows Virtual Memory and why it is important
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management
+
+This key maintains Windows virtual memory (paging file) configuration.
+
+The paging file (usually C:\pagefile.sys) may contain evidence/important information that could be removed once the suspect computer is shutdown.
+```
+
+```
+Recent search terms using Windows default search and Cortana
+HKEY_CURRENT_USER\Software\Microsoft\Windows Search\ProcessedSearchRoots
+
+Index of Search results by SID
+
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Search
+
+Recent files searched
+```
