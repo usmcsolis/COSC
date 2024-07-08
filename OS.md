@@ -3,7 +3,9 @@
 https://os.cybbh.io/public/os/latest/index.html
 
 
-http://10.50.22.197:8000/http://10.50.22.197:8000/
+http://10.50.22.197:8000
+
+/http://10.50.22.197:8000/
 
 ## Stack 8
 ```
@@ -851,7 +853,11 @@ Set-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run -Name Test 
 
 ```
 Get-PSDrive
+
+
 ```
+
+
 To create a new Windows PowerShell drive, you must supply three parameters:
 
 A Name for the drive (you can use any valid Windows PowerShell name)
@@ -951,3 +957,147 @@ HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders
 HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders
 
 HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon
+
+
+
+# Alternate Data Streams (Day 2 Continued)
+ADS Does not change the MD5 hash so you can hide data
+
+## Regular Data Stream on a File (CLI)
+```
+C:\windows\system32>echo Always try your best > reminder.txt 
+
+C:\windows\system32>dir reminder.txt 
+ Directory of C:\windows\system32
+ 02/27/2021 07:13 PM                 25 reminder.txt
+                1 File(s)            25 bytes
+                0 Dir(s) 20,060,768,688 bytes free
+
+C:\windows\system32>type reminder.txt 
+Always try your best
+```
+
+
+
+
+## Creating ADS on a FILE (CLI)
+```
+C:\windows\system32>echo social security numbers > reminder.txt:secret.info 
+
+C:\windows\system32>dir reminder.txt 
+ Directory of C:\windows\system32
+ 02/27/2021 07:13 PM                  23 reminder.txt
+                 1 File(s)            23 bytes
+                 0 Dir(s) 20,060,712,960 bytes free
+
+C:\windows\system32>type reminder.txt 
+Always try your best
+```
+
+## Viewing ADS  (CLI)
+
+```
+C:\windows\system32>more < reminder.txt:secret.info 
+social security numbers
+
+C:\windows\system32>notepad reminder.txt:secret.info 
+
+C:\windows\system32>dir /R reminder.txt 
+ Directory of C:\windows\system32
+ 02/27/2021 07:13 PM                   23 reminder.txt
+                                       26 reminder.txt:secret.info:$DATA
+                1 File(s)              23 bytes
+                0 Dir(s)   20,060,557,312 bytes free
+
+C:\windows\system32>type reminder.txt:secret.info 
+The filename, directory name, or volume label syntax is incorrect.
+
+```
+
+
+
+
+## Regular Data Stream on a File (Powershell)
+```
+PS C:\windows\system32>echo "Always do your best" > reminder.txt 
+
+PS C:\windows\system32>Get-ChildItem .\reminder.txt 
+    Directory: C:\windows\system32
+Mode                LastWriteTime        Length  name
+----                -------------        ------  ----
+-a----           2/28/2021  2:40 AM          44   reminder.txt
+
+PS C:\windows\system32>Get-Content reminder.txt 
+Always do your best
+```
+
+
+
+
+## Creating ADS on a FILE (Powershell)
+```
+PS C:\windows\system32>Set-Content .\reminder.txt -Value "social security numbers" -Stream secret.info 
+
+PS C:\windows\system32>Get-Childitem reminder.txt 
+    Directory: C:\windows\system32
+Mode                LastWriteTime        Length  name
+----                -------------        ------  ----
+-a----           2/28/2021  2:41 AM          44   reminder.txt
+
+PS C:\windows\system32>Get-Content reminder.txt 
+Always do your best
+```
+
+## Viewing ADS  (Powershell)
+
+```
+PS C:\windows\system32>Get-Item reminder.txt -Stream * 
+PSPath        : Microsoft.PowerShell.Core\FileSystem::C:\windows\system32\reminder.txt::$DATA
+PSParentPath : Microsoft.PowerShell.Core\FileSystem::C:\windows\system32
+PSChildName : reminder.txt::$DATA
+PSDrive       : C
+PSProvider    : Microsoft.PowerShell.Core\FileSystem
+PSIsContainer : False
+FileName      : C:\windows\system32\reminder.txt 
+Stream        : :$DATA 
+Length        : 44PS C:\windows\system32>Get-Item reminder.txt -Stream * 
+PSPath        : Microsoft.PowerShell.Core\FileSystem::C:\windows\system32\reminder.txt::$DATA
+PSParentPath : Microsoft.PowerShell.Core\FileSystem::C:\windows\system32
+PSChildName : reminder.txt::$DATA
+PSDrive       : C
+PSProvider    : Microsoft.PowerShell.Core\FileSystem
+PSIsContainer : False
+FileName      : C:\windows\system32\reminder.txt 
+Stream        : :$DATA 
+Length        : 44
+
+PSPath        : Microsoft.PowerShell.Core\FileSystem::C:\windows\system32\reminder.txt:secret.info
+PSParentPath  : Microsoft.PowerShell.Core\FileSystem::C:\windows\system32
+PSChildName  : reminder.txt:secret.info
+PSDrive       : C
+PSProvider    : Microsoft.PowerShell.Core\FileSystem
+PSIsContainer : False
+FileName      : C:\windows\system32\reminder.txt
+Stream        : secret.info 
+Length        : 25
+
+PS C:\windows\system32>Get-Content reminder.txt -Stream secret.info 
+social security numbers
+
+PSPath        : Microsoft.PowerShell.Core\FileSystem::C:\windows\system32\reminder.txt:secret.info
+PSParentPath  : Microsoft.PowerShell.Core\FileSystem::C:\windows\system32
+PSChildName  : reminder.txt:secret.info
+PSDrive       : C
+PSProvider    : Microsoft.PowerShell.Core\FileSystem
+PSIsContainer : False
+FileName      : C:\windows\system32\reminder.txt
+Stream        : secret.info 
+Length        : 25
+
+PS C:\windows\system32>Get-Content reminder.txt -Stream secret.info 
+social security numbers
+```
+
+
+
+
