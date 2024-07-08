@@ -858,7 +858,7 @@ Set-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run -Name Test 
 ```
 Get-PSDrive
 
-
+New-PSDrive -Name HKU -PSProvider Registry -Root HKEY_USERS
 ```
 
 
