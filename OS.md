@@ -32,6 +32,10 @@ Terra (linux)
 ssh -X student@10.8.0.6
 garviel : luna
 
+Workstation2 (Windows)
+ssh -X student@10.8.0.4
+andy.dwyer : BurtMacklinFBI
+
 
 ```
 ```
