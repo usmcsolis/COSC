@@ -682,7 +682,7 @@ HKEY_CURRENT_CONFIG
 CR
 HKEY_CLASSES_ROOT
 
-## KHLM_Local_Machine
+## KHLM_Local_Machine (HKLM)
 
 HARDWARE - contains a database of installed devices along with their drivers
 
@@ -692,7 +692,7 @@ Security - Local Security policy accessed by lsass.exe used to determine rights 
 
 System - Contains keys pertaining to system startup such as programs started on boot or driver load order.
 
-## HKLM_USERS
+## HKLM_USERS (HKU)
 
 User Environment settings for the desktop
 
@@ -700,11 +700,13 @@ Shortcuts
 
 File associations
 
-## HKLM_CURRENT_USER
+
+## HKLM_CURRENT_USER (HKCU)
 
 HKEY_CURRENT_USER is the copy of the logged in user’s registry key based on thier SID from HKEY_USERS.
 
-## HKLM_Current_Config
+
+## HKLM_Current_Config (HKCC)
 
 HKEY_CURRENT_CONFIG is a symbolic link (pointer or shortcut or alias) to the following registry key:
 
@@ -716,7 +718,7 @@ HKEY_Local_Machine (HIVE)
                                                 └── Current (Subkey)
 ```
 
-## HKLM_Classes_Root
+## HKLM_Classes_Root (HKCR)
 
 HKEY_CLASSES_ROOT is a symbolic link (pointer or shortcut or alias) to the following registry key:
 ```
@@ -725,3 +727,142 @@ HKEY_Local_Machine (HIVE)
                       └──Classes (Subkey)
 
 ```
+
+
+## Extension Types
+
+No extension = Actual Hive File
+
+.alt extension = Backup copy of hive, used in Windows 2000
+
+.log extension = Transaction log of changes to a hive
+
+.sav extension = Backup copy of hive created at the end of text-mode (console)
+
+
+## Registry Manipulation (Regedit)
+
+via GUI - regedit.exe
+
+```
+Using Regedit.exe to query the Registry
+Click on the search bar and type in regedit.exe
+If prompted by UAC, click yes
+Click on the drop down for HKEY_CURRENT_USER
+Click the drop down for Software
+Click the drop down for Microsoft
+Click the drop down for Windows
+Click the drop down for CurrentVersion
+Click the drop down for Run
+We have successfully queried a key using regedit.exe
+
+```
+
+rex.exe
+
+```
+reg.exe
+
+CLI
+
+Located at C:\Windows\System32\reg.exe
+
+Can connect to a remote registry, using the PC’s NetBios Name or IP address
+
+Does not have to be in workgroup/domain. Only need username/password
+
+Needs the RemoteRegistry Service (svchost.exe / regsvc.dll) to be running to work
+
+Can load hives files from disk to the active registry
+
+Available in XP and beyond
+
+Can only export text .reg files
+
+Can only query HKLM and HKU remotely
+```
+
+```
+reg /?                    #Displays help for all of the reg.exe commands
+reg query /?              #Displays help for the `reg query`
+reg add /?                #Displays help for `reg add`
+reg delete /?             #Displays help for `reg delete`
+
+/v stands for Value; In this case the name of this Key Value.
+/t stands for Type; Types can be any of the Data Types that we went over earlier.
+/d stands for Data; Is what is the actual Data or in this case a command to open a file every time the system is ran.
+
+reg query HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
+reg add HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v testme /t REG_SZ /d C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+reg delete HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v testme
+
+
+```
+
+## Registry Manipulation (Powershell)
+
+```
+Query
+
+Get-ChildItem cmdlet gets the items in one or more specified locations.
+
+Get-ItemProperty cmdlet gets the items in one or more specified locations.
+
+Get-Item cmdlet gets the item at the specified location. It doesn’t get the contents of the item at the location unless you use a wildcard character (*) to request all the contents of the item.
+
+
+Modify
+
+Set-ItemProperty cmdlet changes the value of the property of the specified item. example, changing setting to :true or :false.
+
+Remove-ItemProperty cmdlet to delete registry values and the data that they store.
+
+
+Create
+
+New-Item cmdlet creates a new item and sets its value. In the registry, New-Item creates registry keys and entries.
+
+New-Itemproperty cmdlet creates a new property for a specified item and sets its value. Typically, this cmdlet is used to create new registry values, because registry values are properties of a registry key item.
+
+
+```
+
+
+```
+Get-ChildItem HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run 
+Get-ChildItem HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\ 
+Get-item HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
+
+
+
+New-Item "HKLM:\Software\Microsoft\Office\14.0\Security\Trusted Documents\TrustRecords" -Force
+New-ItemProperty "HKLM:\Software\Microsoft\Office\14.0\Security\Trusted Documents\TrustRecords" -Name "%USERPROFILE%Downloads/test-document.doc" -PropertyType Binary -Value ([byte[]](0x30,0x31,0xFF)) 
+New-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run -Name Test -PropertyType String -Value C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+
+
+Rename-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run -Name SecurityHealth -NewName Test
+Remove-ItemProperty -Path "HKLM:\Software\Microsoft\Office\14.0\Security\Trusted Documents\TrustRecords" -Name "%USERPROFILE%Downloads/test-document.doc"
+Set-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run -Name Test -Value Bacon.exe
+```
+
+
+
+## Powershell PSDrives
+
+```
+Get-PSDrive
+```
+To create a new Windows PowerShell drive, you must supply three parameters:
+
+A Name for the drive (you can use any valid Windows PowerShell name)
+
+The PSProvider (use "FileSystem" for file system locations, "Registry" for registry locations, and it could also be a shared folder on a remote server.)
+
+The Root, that is, the path to the root of the new drive.
+
+
+
+
+
+
+
