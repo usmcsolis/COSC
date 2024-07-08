@@ -931,3 +931,23 @@ HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Search
 
 Recent files searched
 ```
+
+
+
+## Keys for Persistence
+
+HKLM\Software\Microsoft\Windows\CurrentVersion\Run
+
+HKLM\Software\Microsoft\Windows\CurrentVersion\RunOnce
+
+HKU\<SID>\Software\Microsoft\Windows\CurrentVersion\Run
+
+HKU\<SID>\Software\Microsoft\Windows\CurrentVersion\RunOnce
+
+HKLM\SYSTEM\CurrentControlSet\services
+
+HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders
+
+HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders
+
+HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon
