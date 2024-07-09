@@ -1177,7 +1177,7 @@ bcdedit | findstr /i winload
 
 
 
-# Windows System Intialization
+## Windows System Intialization
 This is a simplified version of the Windows Boot Process from the kernel (ntoskrnl.exe) to the execution of LogonUi.exe (the process that prompts for user interaction). It is broken into five steps.
 ```
 Loading the Operating System Kernel
@@ -1244,7 +1244,7 @@ Once the kernel is done loading it spawns System which hosts threads that only r
 ```
 
 
-# Starting Subsystems
+## Starting Subsystems
 ```
 smss.exe (Session Manager Subsystem) does the following tasks:
 
@@ -1367,7 +1367,7 @@ Spawn userinit.exe which creates an account token and creates a custom environme
 Spawn explorer.exe as the customized graphical environment.
 ```
 
-# Windows BCEdit Demo
+## Windows BCEdit Demo
 `https://os.cybbh.io/public/os/latest/006_windows_boot_process/winboot_fg.html'
 
 
