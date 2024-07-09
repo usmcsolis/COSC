@@ -964,7 +964,7 @@ HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon
 
 
 
-# Alternate Data Streams (Day 2 Continued)
+# Alternate Data Streams (Day 3 Continued)
 ADS Does not change the MD5 hash so you can hide data
 
 ## Regular Data Stream on a File (CLI)
@@ -1101,6 +1101,13 @@ Length        : 25
 PS C:\windows\system32>Get-Content reminder.txt -Stream secret.info 
 social security numbers
 ```
+
+
+
+# Windows Boot Process (Day 4)
+
+http://1.bp.blogspot.com/-MaRtDTHH1Vo/UysJF8KXNbI/AAAAAAAAALo/D6Kt2f8Gpmo/s1600/Walkthrough_Diagram.jpg
+
 
 
 
