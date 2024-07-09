@@ -1529,6 +1529,6 @@ bootmenupolicy          Standard
 
 bcdedit /deletevalue {current} safeboot (1)
 bcdedit /set {bootmgr} timeout 29 (2)
-
+bcdedit /delete {ntldr} -f
 ```
 
