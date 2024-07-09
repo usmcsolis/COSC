@@ -1373,4 +1373,162 @@ Spawn explorer.exe as the customized graphical environment.
 
 
 
+Q: What can I do if the Windows boot settings became corrupted?
+
+A: Fix it with the bcdedit command
+BCDEdit command help
+```
+c:\demo>bcdedit /?
+```
+
+
+
+
+
+## What does a normal bcdedit output look like?
+
+```
+c:\demo>bcdedit
+
+Windows Boot Manager
+--------------------
+identifier              {bootmgr}
+device                  partition=C:
+description             Windows Boot Manager
+locale                  en-US
+inherit                 {globalsettings}
+default                 {current}
+resumeobject            {2bd08882-0f8f-11e9-94b6-0002c9550dce}
+displayorder            {current}
+toolsdisplayorder       {memdiag}
+timeout                 29
+
+Windows Boot Loader
+-------------------
+identifier              {current}
+device                  partition=C:
+path                    \windows\system32\winload.exe
+description             Windows 7 - Tiger Paw
+locale                  en-US
+inherit                 {bootloadersettings}
+recoverysequence        {91061b50-0fa8-11e9-aa6e-00155d49334a}
+displaymessageoverride  Recovery
+recoveryenabled         Yes
+allowedinmemorysettings 0x15000075
+osdevice                partition=C:
+systemroot              \windows
+resumeobject            {2bd08882-0f8f-11e9-94b6-0002c9550dce}
+nx                      OptIn
+bootmenupolicy          Standard
+```
+
+## Backup and Restore
+
+```
+c:\demo>bcdedit /export C:\Lion_BCD
+c:\demo>bcdedit /import C:\Lion_BCD
+
+```
+
+## Modify Decription
+
+```
+c:\demo>bcdedit /set {<identifier>} description "Windows 7 - Lion Den" (1)
+
+```
+
+## Create new partition
+```
+c:\demo>bcdedit /create {ntldr} /d "Windows XP Pro SP2 - Tiger Paw"
+
+
+-Specify the Partition
+
+c:\demo>bcdedit /set {ntldr} device partition=C:
+
+
+-Specify the Path to ntldr
+
+c:\demo>bcdedit /set {ntldr} path \ntldr
+
+
+-Specify the Display Order
+
+c:\demo>bcdedit /displayorder {ntldr} /addfirst
+```
+
+## Show added Partition
+
+```
+c:\demo>bcdedit
+
+Windows Boot Manager
+--------------------
+identifier              {bootmgr}
+device                  partition=C:
+description             Windows Boot Manager
+locale                  en-US
+inherit                 {globalsettings}
+default                 {current}
+resumeobject            {2bd08882-0f8f-11e9-94b6-0002c9550dce}
+displayorder            {ntldr}
+                        {current}
+toolsdisplayorder       {memdiag}
+timeout                 29
+
+Windows Legacy OS Loader
+------------------------
+identifier              {ntldr}
+device                  partition=C:
+path                    \ntldr
+description             Windows XP Pro SP2 - Tiger Paw
+
+Windows Boot Loader
+-------------------
+identifier              {current}
+device                  partition=C:
+path                    \windows\system32\winload.exe
+description             Windows 7 - Lion Den
+locale                  en-US
+inherit                 {bootloadersettings}
+recoverysequence        {91061b50-0fa8-11e9-aa6e-00155d49334a}
+displaymessageoverride  Recovery
+recoveryenabled         Yes
+allowedinmemorysettings 0x15000075
+osdevice                partition=C:
+systemroot              \windows
+resumeobject            {2bd08882-0f8f-11e9-94b6-0002c9550dce}
+nx                      OptIn
+bootmenupolicy          Standard
+
+```
+
+## Add, Remove, Change Values Options
+
+```
+_Output_Truncated_
+Windows Boot Loader
+-------------------
+identifier              {current}
+device                  partition=C:
+path                    \windows\system32\winload.exe
+description             Windows 7 - Tiger Paw
+locale                  en-US
+inherit                 {bootloadersettings}
+recoverysequence        {91061b50-0fa8-11e9-aa6e-00155d49334a}
+displaymessageoverride  Recovery
+recoveryenabled         Yes
+allowedinmemorysettings 0x15000075
+osdevice                partition=C:
+systemroot              \windows
+resumeobject            {2bd08882-0f8f-11e9-94b6-0002c9550dce}
+nx                      OptIn
+safeboot                Minimal
+bootmenupolicy          Standard
+
+
+bcdedit /deletevalue {current} safeboot (1)
+bcdedit /set {bootmgr} timeout 29 (2)
+
+```
 
