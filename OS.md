@@ -1532,3 +1532,544 @@ bcdedit /set {bootmgr} timeout 29 (2)
 bcdedit /delete {ntldr} -f
 ```
 
+
+# Linux Boot Process (Day 5)
+
+```
+	 Computer Turns ON
+
+BIOS		or		UEFI
+
+MBR 		or 		GPT
+
+grub		or 		grub.efi
+
+	   Linux Kernel
+
+	       Init
+
+ Sysv Init 	or 		Systemd Init
+ /sbin/init			/lib/systemd/systemd
+executes runlevels 		executes *.units
+
+	Brings the system to login state
+ 
+```
+
+## MBR Layout
+
+
+```
+The first 512 bytes of a hard drive contains the Master Boot Record. It contains the following information:
+
+    Bootstrap Code		446
+
+    Partition entry 1		16
+
+    Partition entry 2		16
+
+    Partition entry 3		16
+
+    Partition entry 4		16
+
+    Boot signature		2
+----------------------------------------------------
+				512 Total Bytes
+
+```
+
+Each Partition is 16 bytes and you can have 4 partitions per MBR
+
+## Locate the Harddrive and Partition
+
+```
+student@linux-opstation-kspt:~$ lsblk 
+
+NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+loop0    7:0    0 31.1M  1 loop /snap/snapd/10707
+loop1    7:1    0 55.4M  1 loop /snap/core18/1944
+loop2    7:2    0 44.7M  1 loop /snap/openstackclients/38
+loop3    7:3    0 55.5M  1 loop /snap/core18/1988
+loop4    7:4    0 31.1M  1 loop /snap/snapd/11036
+sr0     11:0    1  514K  0 rom  /media/student/config-2
+vda    252:0    0  128G  0 disk 
+└─vda1 252:1    0  128G  0 part / 
+```
+
+A block device is a special file that refers to a device
+
+
+
+
+
+## Examining MBR Contents
+
+
+```
+
+student@linux-opstation-kspt:~$ sudo xxd -l 512 -g 1 /dev/vda
+
+00000000: eb 63 90 00 00 00 00 00 00 00 00 00 00 00 00 00  .c.............. 
+00000010: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+_truncated_
+000001b0: cd 10 ac 3c 00 75 f4 c3 fa b7 12 e6 00 00 80 00  ...<.u.......... 
+000001c0: 21 02 83 0f 2e 40 00 08 00 00 df f7 ff 0f 00 00  !....@.......... 
+000001d0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+000001e0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+000001f0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 55 aa  ..............U.
+
+	Execute xxd to hexdump 512 bytes in separated by 1 byte from /dev/vda to the screen
+	The start of the hard drive shown by the code eb 63. File signature for an MBR.
+	The first partition of the hard drive in 0x01be shown as 80
+	The second partition entry is blank!
+
+```
+
+## Make MRB Copy Byte for Byte
+
+```
+
+student@linux-opstation-kspt:~$ dd if=/dev/vda of=MBRcopy bs=512 count=1 
+dd: failed to open '/dev/vda': Permission denied 
+
+student@linux-opstation-kspt:~$ sudo !! 
+1+0 records in
+1+0 records out
+512 bytes copied, 0.00026952 s, 1.9 MB/s
+student@linux-opstation-kspt:~$ file MBRcopy 
+MBRcopy: DOS/MBR boot sector
+
+Execute dd which copies 512 bytes once from /dev/vda to a file in my current directory called MBR
+Notice, dd failed to run
+!! represents the previous command. Run it with sudo permissions.
+Execute file to read the file signature from the MBR file
+
+```
+
+## GUID Partition Table (GPT)
+
+GPT is a newer version of MBR
+
+```
+    GPT Only works with UEFI Firmware
+
+    GPT has many boot sectors stored around the disk as redundancy so an issue in one will not deadline the entire machine
+
+    GPT supports 128(and more depending on Operating System) separate physical partitions, while MBR supports only 4
+
+    GPT Supports partitions up to 9 zettabytes. Which is ridiculous.
+```
+
+
+## Second Stage Bootloader (GRUB)
+
+The MBR in Grub Stage 1 loads the 2nd stage bootloader, named Grub Stage 2 or GRUB. GRUB Stage 2 rests inside the selected active partition mounted in /boot or in a completely separate partition.
+
+
+## Grand Unified Bootloader (GRUB)
+
+GRUB(Grand Unified Bootloader) has one purpose - to load the Linux Kernel a user choses from a location in the hard drive. The GRUB has two stages which load it from two separate locations.
+
+
+## BIOS --> MBR --> GRUB
+```
+    Stage 1 : boot.img located in the first 440 bytes of the MBR loads…​
+
+    Stage 1.5 : core.img located in the MBR between the bootstrap and first partition. It loads…​
+
+    Stage 2 : /boot/grub/i386-pc/normal.mod which loads the grub menu and then reads
+
+        /boot/grub/grub.cfg Which displays a list of Linux kernels available to load on the system
+
+```
+
+
+## UEFI --> GPT --> GRUB
+```
+
+
+    Stage 1 : grubx64.efi Located on an EFI partition or in /boot loads…​
+
+    Stage 2 : /boot/grub/x86_64-efi/normal.mod
+
+        /boot/grub/grub.cfg Which displays a list of Linux kernels available to load on the system
+
+
+```
+
+## Looking at GRUB to find Kernel
+
+```
+student@linux-opstation-kspt:/$ cat /boot/grub/grub.cfg 
+_truncated_
+set linux_gfx_mode=auto
+export linux_gfx_mode
+menuentry 'Ubuntu' --class ubuntu --class gnu-linux --class gnu --class os $menuentry_id_option 'gnulinux-simple-LABEL=cloudimg-rootfs' {
+        recordfail
+        load_video
+        gfxmode $linux_gfx_mode
+        insmod gzio
+        if [ x$grub_platform = xxen ]; then insmod xzio; insmod lzopio; fi
+        insmod part_msdos
+        insmod ext2
+        if [ x$feature_platform_search_hint = xy ]; then
+          search --no-floppy --fs-uuid --set=root  6c0fba3b-b236-4b3a-b999-db7359c5d220
+        else
+          search --no-floppy --fs-uuid --set=root 6c0fba3b-b236-4b3a-b999-db7359c5d220
+        fi
+        linux   /boot/vmlinuz-4.15.0-76-generic root=LABEL=cloudimg-rootfs ro  console=tty1 console=ttyS0 
+        initrd  /boot/initrd.img-4.15.0-76-generic
+_truncated_
+
+```
+
+
+## Linux Kernel
+The Kernel is the heart of a Operating System. It has complete control on everything within it such as memory management, device management, Input/output Device request control, and managing process scheduling with the Central processing unit.
+
+
+
+
+The Linux Kernel originated from the Unix kernel and is unique from Windows in that it is :
+1. A Monolithic Kernel
+
+    System calls all functionality to the user such as CPU scheduling, memory management, and file management. A systemcall is a way in which a program requests services from the kernel. Everything that occurs on the system occurs through a systemcall
+
+2. Modular
+
+    Modules are extensions to base functionality of the Linux Operating System. This modularity allows for modifications baseline system functionality without rebuilding the kernel and failures will not stop the machine from starting.
+
+
+## System Calls in Linux
+
+```
+student@linux-opstation-kspt:/$ ltrace -S cat /etc/passwd 
+_truncated_
+open("/etc/passwd", 0, 037777402000 <unfinished ...>  
+SYS_openat(0xffffff9c, 0x7ffcbb66d68c, 0, 0)       = 3
+<... open resumed> )                               = 3
+__fxstat(1, 3, 0x7ffcbb66be40 <unfinished ...>
+SYS_fstat(3, 0x7ffcbb66be40)                       = 0
+<... __fxstat resumed> )                           = 0
+posix_fadvise(3, 0, 0, 2 <unfinished ...>
+SYS_fadvise64(3, 0, 0, 2)                          = 0
+<... posix_fadvise resumed> )                      = 0
+malloc(135167 <unfinished ...>
+SYS_mmap(0, 0x22000, 3, 34)                        = 0x7f0b09df0000
+<... malloc resumed> )                             = 0x7f0b09df0010
+read(3 <unfinished ...>
+SYS_read(3, "root:x:0:0:root:/root:/bin/bash\n"..., 131072) = 1875
+<... read resumed> , "root:x:0:0:root:/root:/bin/bash\n"..., 131072) = 1875 
+write(1, "root:x:0:0:root:/root:/bin/bash\n"..., 1875 <unfinished ...> 
+
+
+
+	Execute ltrace to track the systemcalls occurring when running cat /etc/passwd.
+	open systemcall on /etc/passwd returns a file descriptor of 3.
+	read systemcall on file descriptor of 3 returns the amount of bytes in the file.
+	write systemcall to write all the 1875 bytes from /etc/passwd to stdout.
+```
+
+
+## Modules in Linux
+
+```
+student@linux-opstation-kspt:/$ ltrace -S lsmod  
+
+Module                  Size  Used by
+aesni_intel           188416  0
+aes_x86_64             20480  1 aesni_intel 
+crypto_simd            16384  1 aesni_intel
+glue_helper            16384  1 aesni_intel
+cryptd                 24576  3 crypto_simd,ghash_clmulni_intel,aesni_intel
+psmouse               151552  0
+ip_tables              28672  0
+virtio_blk             20480  2 
+virtio_net             49152  0
+virtio_rng             16384  0
+virtio_gpu             53248  3
+
+ 	Execute lsmod to list modules in Linux
+	Module required to use AES Encryption
+	Modules for Virtual Input / Output Devices used in Openstack instances.
+
+```
+
+## INIT
+The kernel, once loaded, is hard coded to reach out and execute /sbin/init. This starts the process of bringing the system to a desired level of functionality using Initialization Daemons. There are two main initialization daemons now : Systemd and SysV.
+
+Systemd and SysV are two main INIT Daemons
+
+A term used in Init is a Run Level. A Run Level defines the state of a machine after it has completed booting and is prompting for a user login. Run levels numbered from zero(0) to six(6) have special meaning, but they are not rigid in definition.
+
+## Run Levels
+Run Levels in SysV are a series of scripts that start or kill background processes on Linux at specific run levels. The scripts have a specific naming scheme that determine how the init process interacts with them.
+
+
+The first letter K or S means Kill or Start the process that that script handles
+
+The two digit number that follows K or S dictates the order the scripts execute
+
+```
+student@linux-opstation-kspt:/etc/rc3.d$ ls -l /etc/rc3.d/ 
+
+lrwxrwxrwx 1 root root 15 Jan 31  2020 S01acpid -> ../init.d/acpid 
+lrwxrwxrwx 1 root root 17 Feb  4  2020 S01anacron -> ../init.d/anacron
+lrwxrwxrwx 1 root root 16 Jan 31  2020 S01apport -> ../init.d/apport
+lrwxrwxrwx 1 root root 13 Jan 31  2020 S01atd -> ../init.d/atd
+lrwxrwxrwx 1 root root 26 Jan 31  2020 S01console-setup.sh -> ../init.d/console-setup.sh
+lrwxrwxrwx 1 root root 14 Jan 31  2020 S01cron -> ../init.d/cron
+lrwxrwxrwx 1 root root 14 Jan 31  2020 S01dbus -> ../init.d/dbus
+lrwxrwxrwx 1 root root 14 Feb  4  2020 S01gdm3 -> ../init.d/gdm3
+
+
+student@linux-opstation-kspt:/etc/rc3.d$ ls -l /etc/rc1.d/ 
+
+lrwxrwxrwx 1 root root 20 Feb  4  2020 K01alsa-utils -> ../init.d/alsa-utils
+lrwxrwxrwx 1 root root 13 Jan 31  2020 K01atd -> ../init.d/atd
+lrwxrwxrwx 1 root root 20 Jan 31  2020 K01cryptdisks -> ../init.d/cryptdisks
+lrwxrwxrwx 1 root root 26 Jan 31  2020 K01cryptdisks-early -> ../init.d/cryptdisks-early
+lrwxrwxrwx 1 root root 18 Jan 31  2020 K01ebtables -> ../init.d/ebtables
+lrwxrwxrwx 1 root root 14 Feb  4  2020 K01gdm3 -> ../init.d/gdm3 
+```
+
+Run-Levels 
+```
+0		HALT
+	
+1		Single User
+
+2		Multi-user Mode
+
+3		Multi-user with Networking
+
+4		Not Used/ User-defined
+
+5		Multi-user Mode with Networking and GUI Desktop
+
+6		Reboot
+	
+
+```
+
+## SysV 
+SysV initialization is a legacy system initialization method, but it is still used today in many older systems Linux systems or Unix machines like Oracle’s Solaris. It starts with the kernel executing the first process on the machine, or the Initialization daemon. In SysV machines it is the /etc/init program. Then, init reads /etc/inittab to start creating processes in groups called Run Levels. The processes that each Run Level starts are defined in /etc/rc*.d
+
+```
+cat /etc/inittab
+
+is:5:initdefault: 
+
+
+l0:0:wait:/etc/rc0.d
+l1:1:wait:/etc/rc1.d
+l2:2:wait:/etc/rc2.d
+l3:3:wait:/etc/rc3.d
+l4:4:wait:/etc/rc4.d 
+l5:5:wait:/etc/rc5.d
+l6:6:wait:/etc/rc6.d
+
+```
+
+## Systemd
+Systemd is the modern initialization method. It starts with the kernel spawning /sbin/init which is symbolically linked to /lib/systemd/system. systemd interacts with flat configuration files called units. There are many types, but the target and service units determine system initialization.
+
+The kernel spawns /usr/lib/systemd/system as the first process on the system. It then executes configurations starting at mounting the local file system to bringing the system to a desired state specified in the default target unit. Targets in systemd are like runlevels in SysV. The name of the default target is default.target and located in /lib/systemd/system.
+
+
+Systemd uses TARGETS instead of Run Levels
+
+Showing Default Target Unit
+
+```
+student@linux-opstation-kspt:/$ ls -lisa /lib/systemd/system/default.target
+
+lrwxrwxrwx 1 root root 16 May  3 11:30 default.target -> graphical.target 
+
+
+Symbolically linked default.target to graphical.target unit.
+The system will, by default, try to run the system to the specifics set by graphical.target.
+```
+
+
+Target Units 
+Systemd target units are a set of value=data pairs to create processes in a set order on the system. But, they are simple to understand at a functional level by understanding the value=data fields within each.
+
+
+Default target is GRAPHICAL TARGET
+```
+student@linux-opstation-kspt:/$ ls -lisa /lib/systemd/system/default.target
+
+lrwxrwxrwx 1 root root 16 May  3 11:30 default.target -> graphical.target
+```
+
+Run-levels vs Targets
+
+```
+0		HALT							poweroff.target
+	
+1		Single User						rescue.target
+
+2		Multi-user Mode						multi-user.target
+
+3		Multi-user with Networking				multi-user.target
+
+4		Not Used/ User-defined					multi-user.target
+
+5		Multi-user Mode with Networking and GUI Desktop		graphical.target
+
+6		Reboot							reboot.target
+
+```
+Examining Contents of graphical.target
+```
+cat /lib/systemd/system/default.target | tail -n 8
+
+Description=Graphical Interface
+Documentation=man:systemd.special(7)
+Requires=multi-user.target
+Wants=display-manager.service 
+Conflicts=rescue.service rescue.target
+After=multi-user.target rescue.service rescue.target display-manager.service 
+AllowIsolate=yes
+
+wants=display-manager.service attempts to start other units. If they fail to start, the calling target unit will still execute.
+requires=multi-server.target attempts to start other units. If they fail to start, the calling target unit will fail to execute.
+
+
+```
+
+Target.unit want and requires dependencies search locations
+
+    /etc/systemd/system/*
+
+    /lib/systemd/system/*
+
+    /run/systemd/generator/*
+
+    More found in System Unit Man Page
+
+
+Showing more wants and requires to graphical.target
+
+```
+student@linux-opstation-kspt:/$ ls -l /etc/systemd/system/ | grep graphical
+drwxr-xr-x 2 root root 4096 Feb  4  2020 graphical.target.wants 
+
+student@linux-opstation-kspt:/$ ls -l /etc/systemd/system/graphical.target.wants/
+total 0
+lrwxrwxrwx 1 root root 43 Jan 31  2020 accounts-daemon.service -> /lib/systemd/system/accounts-daemon.service  
+lrwxrwxrwx 1 root root 35 Feb  4  2020 udisks2.service -> /lib/systemd/system/udisks2.service 
+
+student@linux-opstation-kspt:/$ ls -l /lib/systemd/system | grep graphical
+lrwxrwxrwx 1 root root   16 Nov 15  2019 default.target -> graphical.target
+-rw-r--r-- 1 root root  598 Jan 28  2018 graphical.target
+drwxr-xr-x 2 root root 4096 Jan 31  2020 graphical.target.wants 
+lrwxrwxrwx 1 root root   16 Nov 15  2019 runlevel5.target -> graphical.target
+
+student@linux-opstation-kspt:/$ ls -l /lib/systemd/system/graphical.target.wants/
+total 0
+lrwxrwxrwx 1 root root 39 Nov 15  2019 systemd-update-utmp-runlevel.service -> ../systemd-update-utmp-runlevel.service 
+
+
+A graphical.target wants directory in /etc/systemd/system/
+graphical.target also target wants udisks2.service and accounts-daemon.service
+Yet another graphical.target wants directory in /lib/systemd/system/
+graphical.target also wants systemd-update-utmp-runlevel.service
+```
+
+## Systemd Dependencies
+
+```
+systemctl list-dependencies graphical.target
+
+graphical.target
+● ├─accounts-daemon.service
+● ├─apport.service
+● ├─gdm.service 
+● ├─grub-common.service
+● ├─qemu-guest-agent.service
+● ├─systemd-update-utmp-runlevel.service
+● ├─udisks2.service 
+● ├─ureadahead.service
+● └─multi-user.target 
+●   ├─anacron.service
+
+```
+
+## /etc/environment
+The /etc/environment file sets Global Variables. Global Variables are accessible by every user or process on the system. It is read once when the machine completes Init. Any changes to the file require a system restart for them to apply.
+
+```
+cat /etc/environment
+
+PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games" 
+```
+
+## /etc/profile
+/etc/profile is a script that executes whenever a user logs into an interactive shell on Linux. its functionality depends entirely on the version of Linux being used. Ubuntu Linux uses it to set the BASH shell prompt by executing /etc/bash.bashrc and execute any script named *.sh in /etc/profile.d.
+
+```
+
+student@linux-opstation-kspt:~$ cat /etc/profile
+
+# /etc/profile: system-wide .profile file for the Bourne shell (sh(1))
+# and Bourne compatible shells (bash(1), ksh(1), ash(1), ...).
+
+if [ "${PS1-}" ]; then
+  if [ "${BASH-}" ] && [ "$BASH" != "/bin/sh" ]; then 
+    # The file bash.bashrc already sets the default PS1.
+    # PS1='\h:\w\$ '
+    if [ -f /etc/bash.bashrc ]; then 
+      . /etc/bash.bashrc  
+    fi
+_truncated_
+if [ -d /etc/profile.d ]; then
+  for i in /etc/profile.d/*.sh; do
+    if [ -r $i ]; then
+      . $i 
+    fi
+  done
+  unset i
+fi
+
+
+If the variable $BASH is set and does not equal /bin/sh then execute
+if the /etc/bash.bashrc exists, execute it.
+/etc/bash.bashrc creates the bash prompt student@linux-opstation-kspt:~$
+If the directory /etc/profile.d exists, execute any script named *.sh in that directory.
+```
+
+## .bash_profile / .bashrc
+They execute on a per user basis for interactive logins only. Both files are located every user’s /home directory. They are user specific configurations and freely editable by the owning user or root.
+If a shell is created it executes the file
+
+
+Example of Login and Non-Login Shell
+```
+student@linux-opstation-kspt:~$ echo "echo 'Im in `~/.profile`'" >> .profile 
+student@linux-opstation-kspt:~$ echo "echo 'Im in ~/.bashrc'" >> .bashrc 
+
+student@linux-opstation-kspt:~$ bash
+student@linux-opstation-kspt:~$ Im in ~/.bashrc
+student@linux-opstation-kspt:~$ exit 
+student@linux-opstation-kspt:~$ exit 
+
+#Log back into same Linux machine
+Last login: Fri Feb 26 12:55:13 2021 from 10.250.0.20
+Im in ~/.bashrc
+Im in /etc/profile 
+student@linux-opstation-kspt:~$
+
+
+
+
+Echo a phrase into .profile and .bashrc
+Create a Non-Login interactive shell by spawning a new bash session
+Exit the new session AND logout of the machine
+Logins create an interactive login shell; therefore,
+```
+
+
+
+
