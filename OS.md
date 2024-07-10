@@ -1725,6 +1725,9 @@ menuentry 'Ubuntu' --class ubuntu --class gnu-linux --class gnu --class os $menu
         initrd  /boot/initrd.img-4.15.0-76-generic
 _truncated_
 
+
+ 	Concatenate the contents of /boot/grub/grub.cfg to the screen.
+	The kernel is loaded with the command linux. The file /boot/vmlinuz-4.15.0-76-generic contains the Linux Kernel.
 ```
 
 
