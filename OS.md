@@ -36,6 +36,10 @@ Workstation2 (Windows)
 ssh -X student@10.8.0.4
 andy.dwyer : BurtMacklinFBI
 
+Minas_Tirith
+ssh -X bombadil@10.8.0.7
+bombadil : jolly
+
 
 ```
 ```
