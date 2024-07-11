@@ -29,11 +29,11 @@ ssh -X student@10.8.0.3
 student : password
 
 Terra (linux)
-ssh -X student@10.8.0.6
+ssh -X garviel@10.8.0.6
 garviel : luna
 
 Workstation2 (Windows)
-ssh -X student@10.8.0.4
+ssh -X andy@10.8.0.4
 andy.dwyer : BurtMacklinFBI
 
 Minas_Tirith
