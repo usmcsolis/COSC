@@ -2170,7 +2170,7 @@ What is a Service?
 
 
 
-## Viewing Processes in PS
+## Processes in PS
 
 ```
 Powershell: Get-Process
@@ -2355,7 +2355,7 @@ BrokerInfrastructure                                        1172 C:\WINDOWS\syst
 
 
 
-## Viewing Processes in CMD
+## Processes in CMD
 
 
 ```
@@ -2557,7 +2557,7 @@ lsass.exe                     1028 Services                   0     17,984 K
 
 ```
 
-## Viewing Processes in GUI
+## Processes in GUI
 
 
 
@@ -2570,26 +2570,7 @@ Procexp.exe
     We’ll go over it in Sysinternal Tools Lesson
 
 
-## Viewing Services
-
-
-
-Q: Which Windows commands let us view information on services?
-
-In Powershell:
-
-Get-Ciminstance - Microsoft Reference
-
-Get-Service - Microsoft Reference
-
-In Command Prompt:
-
-net start - Shows currently running services
-
-sc query - Microsoft Reference
-
-
-## Viewing Services in PS
+## Services in PS
 
 
 ```
@@ -2683,7 +2664,7 @@ Running  BFE                Base Filtering Engine
 ```
 
 
-## Viewing Services in CMD
+## Services in CMD
 
 ```
     iew Services
@@ -2787,7 +2768,7 @@ These Windows services are started:
 ```
 
 
-## Viewing Services in GUI
+## Services in GUI
 
 ```
 
@@ -2842,7 +2823,7 @@ CimSystemProperties   : Microsoft.Management.Infrastructure.CimSystemProperties
 ```
 
 
-## Viewing Scheduled Task IN CMD
+## Scheduled Task IN CMD
 
 ```
 schtasks /query /tn "IchBinBosh" /v /fo list
@@ -2933,7 +2914,17 @@ What are some Registry keys that can be used for autoruns?
 
 
 
-## Viewing NetConnections in PS
+## Ne
+
+    A: High PID duplicate, unfamiliar process name, and misspelling.
+
+        Two smss.exe, one with a high PID of 8972
+
+        bad.exe
+
+        reqedit.exe
+
+tConnections in PS
 
 ```
 
@@ -2945,7 +2936,7 @@ LocalAddress        LocalPort RemoteAddress      RemotePort State       AppliedS
 10.23.0.2           22        10.250.0.15        59038      Established Internet       2944
 ```
 
-## Viewing NetConnections in CMD
+## NetConnections in CMD
 
 ```
 
