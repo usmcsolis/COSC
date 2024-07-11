@@ -2914,8 +2914,6 @@ What are some Registry keys that can be used for autoruns?
 
 
 
-## Ne
-
     A: High PID duplicate, unfamiliar process name, and misspelling.
 
         Two smss.exe, one with a high PID of 8972
@@ -2923,8 +2921,7 @@ What are some Registry keys that can be used for autoruns?
         bad.exe
 
         reqedit.exe
-
-tConnections in PS
+## NetConnections in PS
 
 ```
 
@@ -2981,7 +2978,7 @@ Active Connections
 
 ```
 
-## Viewing NetConnections in GUI
+## NetConnections in GUI
 
 ```
 TCPView
