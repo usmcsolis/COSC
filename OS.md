@@ -2081,7 +2081,7 @@ Logins create an interactive login shell; therefore,
 
 
 
-## Windows Process Validity (Day 6)
+# Windows Process Validity (Day 6)
 
 What is process validity?
 
