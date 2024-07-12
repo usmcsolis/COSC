@@ -4849,7 +4849,7 @@ Other advanced usage....
 
 This information and more available in the lsof man page.
 
-# - The number in front of flag(s) is the file descriptor number used by the process associated with the file
+ - The number in front of flag(s) is the file descriptor number used by the process associated with the file
 u - File open with Read and Write permission
 r - File open with Read permission
 w - File open with Write permission
