@@ -4904,3 +4904,91 @@ mem - Memory mapped file, usually for share library
 
 
 
+
+# Windows Auditing and Logging (Day 8)
+
+## Artifacts
+
+Are objects wiuthin a computer system that contain important information relevant to the activities performed on the system by the user
+
+## Security Identifer (SID)
+
+
+```
+PS C:\> Get-LocalUser | select Name,SID 
+Name               SID
+----               ---
+Admin              S-1-5-21-1584283910-3275287195-1754958050-1000
+Administrator      S-1-5-21-1584283910-3275287195-1754958050-500
+cloudbase-init     S-1-5-21-1584283910-3275287195-1754958050-1002
+DefaultAccount     S-1-5-21-1584283910-3275287195-1754958050-503
+Guest              S-1-5-21-1584283910-3275287195-1754958050-501
+andy.dwyer         S-1-5-21-1584283910-3275287195-1754958050-1005
+sshd               S-1-5-21-1584283910-3275287195-1754958050-1003
+student            S-1-5-21-1584283910-3275287195-1754958050-1004
+WDAGUtilityAccount S-1-5-21-1584283910-3275287195-1754958050-504
+
+PS C:\> Get-WmiObject win32_useraccount | select name,sid 
+name               sid
+----               ---
+Admin              S-1-5-21-1584283910-3275287195-1754958050-1000
+Administrator      S-1-5-21-1584283910-3275287195-1754958050-500
+cloudbase-init     S-1-5-21-1584283910-3275287195-1754958050-1002
+DefaultAccount     S-1-5-21-1584283910-3275287195-1754958050-503
+Guest              S-1-5-21-1584283910-3275287195-1754958050-501
+andy.dwyer         S-1-5-21-1584283910-3275287195-1754958050-1005
+sshd               S-1-5-21-1584283910-3275287195-1754958050-1003
+student            S-1-5-21-1584283910-3275287195-1754958050-1004
+WDAGUtilityAccount S-1-5-21-1584283910-3275287195-1754958050-504
+_Output_Truncated_
+```
+Get-LocalUser will show local Users and SID on a system
+Get-WmiObject will show local and domain Users and SID
+
+{empty} +
+
+
+Command Line SID
+```
+C:\windows\system32>wmic UserAccount get name,sid 
+Name                SID
+Admin               S-1-5-21-1584283910-3275287195-1754958050-1000
+Administrator       S-1-5-21-1584283910-3275287195-1754958050-500
+cloudbase-init      S-1-5-21-1584283910-3275287195-1754958050-1002
+DefaultAccount      S-1-5-21-1584283910-3275287195-1754958050-503
+Guest               S-1-5-21-1584283910-3275287195-1754958050-501
+andy.dwyer          S-1-5-21-1584283910-3275287195-1754958050-1005
+sshd                S-1-5-21-1584283910-3275287195-1754958050-1003
+student             S-1-5-21-1584283910-3275287195-1754958050-1004
+WDAGUtilityAccount  S-1-5-21-1584283910-3275287195-1754958050-504
+```
+wmic useraccount get name,sid will show local Users and SID
+
+
+## UserAssist
+
+Tracks GUI based programming that were ran by a particular user
+
+
+They are located in 
+```
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{GUID}\Count\ *
+```
+they are encoded in ROT13
+
+The GUID represents a particular file extension.
+
+CEBFF5CD-ACE2-4F4F-9178-9926F41749EA A list of applications, files, links, and other objects that have been accessed
+
+F4E57C4B-2036-45F0-A9AB-443BCFE33D9F Lists the Shortcut Links used to start programs
+
+
+## Windows Background ACtivity Moderator (BAM)
+
+
+BAM Provides the following:
+
+full path of an executable
+
+last execution date/time
+
