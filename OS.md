@@ -5337,6 +5337,427 @@ Shows and converts all of the text files located in the Recent Files Registry lo
 
 ## Browser Artifacts
 
+Stores details for each user account. Records number of times a site is visited (frequency). History will record the access to the file on the website that was accessed via a link. Many sites in history will list the files that were opened from remote sites and downloaded to the local system.
+```
+%USERPROFILE%\AppData\Local\Google\Chrome\User Data\Default\history
+C:\Users\andy.dwyer\AppData\Local\Google\Chrome\User Data\Default\
+
+```
 
 
+Areas of Interest
+1. URLS
+The urls table contains the basic browsing history for Chrome. This will include a single instance for all the URLs visited, a timestamp for the last time visited, and a counter for the number of times visited.
+
+2. Current Session/Tabs
+If you are examining a system that still has an active session available, Chrome will store the browsing activity here under current session and if there are multiple tabs open it will store it under current tabs.
+
+3. Top Sites
+Chrome shows the user their most frequently visited sites in panels on a homepage, which allows the user to quickly click on a frequently visited site. We recover the data around any URL that is listed as a “Top Site” in Chrome.
+
+
+Searching
+```
+# Frequency
+PS C:\> Z:\strings.exe 'C:\users\andy.dwyer\AppData\Local\Google\Chrome\User Data\Default\History' -accepteula 
+_Output_Truncated_
+https://git.cybbh.space/users/sign_in
+https://git.cybbh.space/users/auth/ldapmain/callback
+https://git.cybbh.space/os/public/-/jobs/artifacts/master/file/os/modules/015_windows_sysinternals/pages/15_SysInternals_winSlides.html?job=generate_adoc-slides
+https://git.cybbh.space/os/public/-/jobs/artifacts/master/file/os/modules/014_windows_ad/pages/12_BloodHound_Slides.html?job=generate_adoc-slides
+https://git.cybbh.space/os/public/-/jobs/artifacts/master/file/os/modules/011_win_logging/pages/8_Win_Auditing_Logging.html?job=generate_adoc-slides+
+_Output_Truncated_
+
+# Most Visited
+PS C:\> Z:\strings.exe 'C:\users\andy.dwyer\AppData\Local\Google\Chrome\User Data\Default\Top Sites' 
+_Output_Truncated_
+Fox News - Breaking News Updates | Latest News Headlines | Photos & News Videos
+http://10.50.24.186:8000/themes/core/static/cyberchef.htm
+https://github.com/volatilityfoundation/volatility/wiki/Command-Reference
+http://172.20.25.182:8000/
+http://cyberchef.com/
+https://www.target.com/
+http://vta.cybbh.space/
+http://www.yahoo.com/
+_Output_Truncated_
+
+# User Names
+PS C:\> Z:\strings.exe  'C:\users\andy.dwyer\AppData\Local\Google\Chrome\User Data\Default\Login Data' 
+_Output_Truncated_
+http://172.20.25.182:8000/ctfadmin
+https://git.cybbh.space/<USERNAME>
+d9Q
+https://vta.cybbh.space/<USERNAME>
+https://login.yahoo.com/<USERNAME>
+http://172.20.25.182:8000/ctfadmin
+https://git.cybbh.space/<USERNAME>
+https://vta.cybbh.space/
+_Output_Truncated_
+```
+```
+Find FQDNs in Sqlite Text files
+
+$History = (Get-Content 'C:\users\student\AppData\Local\Google\Chrome\User Data\Default\History') -replace "[^a-zA-Z0-9\.\:\/]","" 
+
+PS C:\> $History| Select-String -Pattern "(https|http):\/\/[a-zA-Z_0-9]+\.\w+[\.]?\w+" -AllMatches|foreach {$_.Matches.Groups[0].Value}| ft 
+http://172.20.25
+https://login.yahoo.com
+https://os.cybbh.io
+https://git.cybbh.space
+http://172.20.25
+_Output_Truncated_
+```
+
+
+
+## Auditing 
+The Auditing Windows portion of this FG covers the concept of Windows Auditing using native tools along with the analysis of generated artifacts using cmd, powershell, or the GUI based program Eventviewer.
+
+
+Enable auditing on a text file
+```
+    Create a text file on the Desktop
+
+PS C:\Users\andy.dwyer\Desktop\Audit> new-item C:\Users\andy.dwyer\Desktop\Auditing.txt
+    Directory: C:\Users\andy.dwyer\Desktop
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----         6/7/2021   2:45 PM              0 Auditing.txt
+
+    Add content to the file then show the contents
+```
+```
+PS C:\Users\andy.dwyer\Desktop\Audit> set-content C:\Users\andy.dwyer\Desktop\Auditing.txt "This is the file for Auditing"
+
+PS C:\Users\andy.dwyer\Desktop\Audit> get-content C:\Users\andy.dwyer\Desktop\Auditing.txt
+This is the file for Auditing
+
+    Set audit policy to Full Control for the "User Name" object
+```
+```
+Rt click <file> on the desktop > Properties > Security > Advanced > Auditing > Continue > Add > Select a Principle > Type <username> (andy.dwyer) > Check Names > Ok >  Full Control > Ok > Apply > Ok
+
+    Double click the file in Explorer, view that no auditing happened
+
+    In Event Viewer, observe no log was created ( eventvwr )
+
+eventvwr 
+> Windows Logs > Security
+
+(1) Opens Event Viewer GUI
+```
+```
+    Enable the Audit Object Access
+
+PS C:\Users\andy.dwyer> auditpol /get /category:* 
+System audit policy
+Category/Subcategory                      Setting
+System
+  Security System Extension               No Auditing
+  System Integrity                        Success and Failure
+  IPsec Driver                            No Auditing
+  Other System Events                     Success and Failure
+  Security State Change                   Success
+Logon/Logoff
+  Logon                                   Success and Failure
+  Logoff                                  Success
+  Account Lockout                         Success
+_output_truncated_
+
+(1) Shows all of the Audit Policy settings
+```
+```
+PS C:\Users\andy.dwyer> auditpol /get /category:"Object Access" 
+System audit policy
+Category/Subcategory                      Setting
+Object Access
+  File System                             No Auditing
+  Registry                                No Auditing
+  Kernel Object                           No Auditing
+  SAM                                     No Auditing
+  Certification Services                  No Auditing
+_output_truncated_
+
+(1) Shows all of the Object Access Subcategory settings
+```
+```
+PS C:\Users\andy.dwyer> auditpol /get /subcategory:"File System" 
+System audit policy
+Category/Subcategory                      Setting
+Object Access
+  File System                             No Auditing
+
+(1) Shows the Fiel System subcategory setting
+```
+```
+PS C:\Users\andy.dwyer> auditpol /set /subcategory:"File System" 
+The command was successfully executed.
+PS C:\Users\andy.dwyer> auditpol /get /subcategory:"File System" 
+System audit policy
+Category/Subcategory                      Setting
+Object Access
+  File System                             Success
+
+(1) Sets the File System subcategory (2) Show that the File System setting changed
+```
+```
+    Open the .txt file again, and open Event Viewer to show that there is an entry in the Security log
+
+
+Change the settings back to default
+
+PS C:\Users\andy.dwyer> auditpol /set /subcategory:"File System" /success:disable
+The command was successfully executed.
+PS C:\Users\andy.dwyer>
+```
+
+## Event Logs
+```
+10.1 Locations
+
+*.evtx files accessed by:
+
+    Windows Event View Application
+
+    Get-Eventlog or Get-WinEvent in Powershell
+
+    wevtutil in Command Prompt
+
+```
+
+```
+C:\windows\system32>auditpol /get /category:"Object Access" 
+System audit policy
+Category/Subcategory                      Setting
+Object Access
+  File System                             No Auditing
+  Registry                                No Auditing
+  Kernel Object                           No Auditing
+  SAM                                     No Auditing
+  Certification Services                  No Auditing
+  Application Generated                   No Auditing
+
+C:\windows\system32>auditpol /set /subcategory:"File System" 
+The command was successfully executed.
+
+C:\windows\system32>auditpol /get /category:"Object Access"
+System audit policy
+Category/Subcategory                      Setting
+Object Access
+  File System                             Success
+  Registry                                No Auditing
+  Kernel Object                           No Auditing
+
+C:\windows\system32>auditpol /set /subcategory:"File System" /success:disable 
+The command was successfully executed.
+
+ auditpol /get /category:* 
+```
+
+
+Command Prompt Logging
+
+```
+C:\windows\system32>wevtutil el 
+
+C:\windows\system32>wevtutil el | find /c /v "" 
+1149
+
+C:\windows\system32>wevtutil gli security 
+creationTime: 2019-01-03T22:39:36.602Z
+lastAccessTime: 2021-03-15T15:47:53.735Z
+lastWriteTime: 2021-03-15T15:47:53.735Z
+fileSize: 15798272
+attributes: 32
+numberOfLogRecords: 17595
+oldestRecordNumber: 1
+
+C:\windows\system32>wevtutil qe security /c:3 /f:text 
+Event[0]:
+  Log Name: Security
+  Source: Microsoft-Windows-Eventlog
+  Date: 2019-01-03T20:22:38.227
+  Event ID: 1102
+
+_Output_Truncated_
+```
+
+
+```
+Powershell
+PS C:\> Get-EventLog -LogName System -Newest 10 
+   Index Time          EntryType   Source                 InstanceID Message
+   ----- ----          ---------   ------                 ---------- -------
+    1102 Mar 15 12:00  Information EventLog               2147489661 The system uptime is 2750871 seconds.
+    1101 Mar 14 12:00  Information EventLog               2147489661 The system uptime is 2664471 seconds.
+    1100 Mar 13 23:52  Information Microsoft-Windows...   16 The description for Event ID '16' in Source 'Microsoft-Windows-Kernel-Gen...
+    1099 Mar 13 23:52  Information Microsoft-Windows...   16 The description for Event ID '16' in Source 'Microsoft-Windows-Kernel-Gen...
+    1098 Mar 13 12:00  Information EventLog               2147489661 The system uptime is 2578071 seconds.
+    1097 Mar 12 21:52  Information Microsoft-Windows...   16 The description for Event ID '16' in Source 'Microsoft-Windows-Kernel-Gen...
+    1096 Mar 12 21:52  Information Microsoft-Windows...   16 The description for Event ID '16' in Source 'Microsoft-Windows-Kernel-Gen...
+    1095 Mar 12 12:00  Information EventLog               2147489661 The system uptime is 2491671 seconds.
+    1094 Mar 11 20:58  Error       DCOM                   10016 The description for Event ID '10016' in Source 'DCOM' cannot be found.  T...
+    1093 Mar 11 18:27  Information Microsoft-Windows...   16 The description for Event ID '16' in Source 'Microsoft-Windows-Kernel-Gen...
+
+PS C:\> Get-EventLog -LogName System -Newest 3 | Format-Table -Wrap 
+   Index Time          EntryType   Source                 InstanceID Message
+   ----- ----          ---------   ------                 ---------- -------
+    1102 Mar 15 12:00  Information EventLog               2147489661 The system uptime is 2750871 seconds.
+    1101 Mar 14 12:00  Information EventLog               2147489661 The system uptime is 2664471 seconds.
+    1100 Mar 13 23:52  Information Microsoft-Windows-Ke   16 The description for Event ID '16' in Source
+                                   rnel-General           'Microsoft-Windows-Kernel-General' cannot be found.  The local computer may not have the necessary registry information or message DLL files to display the message, or you may not have permission to access them. The following  information is part of the event:'119', '\??\C:\windows\ServiceProfiles\NetworkService\AppData\Local\Microsoft\Windows\DeliveryOptimization\State\dosvcState.dat', '4', '1'
+```
+
+
+```
+PS C:\> Get-WinEvent -Listlog * 
+LogMode   MaximumSizeInBytes RecordCount LogName
+-------   ------------------ ----------- -------
+Circular            20971520         993 Application
+Circular            20971520           0 HardwareEvents
+Circular             1052672           0 Internet Explorer
+Circular            20971520           0 Key Management Service
+Circular            20971520       17711 Security
+Circular            20971520         576 System
+Circular            15728640         176 Windows PowerShell
+Circular            20971520             ForwardedEvents
+Circular            10485760           0 Microsoft-AppV-Client/Admin
+_Output_Trucncated_
+
+PS C:\> (Get-WinEvent -Listlog *).count 
+426
+
+PS C:\> Get-WinEvent -Listlog * | findstr /i "Security" 
+Circular            20971520       18179 Security
+Circular             1052672           0 Microsoft-Windows-Security-Adminless/Operational
+Circular             1052672           0 Microsoft-Windows-Security-Audit-Configuration-Client/Operational
+Circular             1052672           0 Microsoft-Windows-Security-EnterpriseData-FileRevocationManager/Operational
+Circular             1052672             Microsoft-Windows-Security-ExchangeActiveSyncProvisioning/Operational
+Circular             1052672             Microsoft-Windows-Security-IdentityListener/Operational
+_Output_Truncated_
+
+```
+
+
+```
+PS C:\> Get-Winevent -FilterHashtable @{logname='Security';id='4624'} | ft -Wrap 
+   ProviderName: Microsoft-Windows-Security-Auditing
+TimeCreated                     Id LevelDisplayName Message
+-----------                     -- ---------------- -------                                    3/15/2021 7:42:19 PM          4624 Information      An account was successfully logged on.                                                        Subject:
+                                                    	Security ID:		S-1-5-18
+                                                    	Account Name:		ADMIN-STATION$
+                                                    	Account Domain:		WORKGROUP
+                                                    	Logon ID:		0x3E7
+                                                    Logon Information:
+                                                    	Logon Type:		5
+                                                    	Restricted Admin Mode:	-
+                                                    	Virtual Account:	No
+                                                    	Elevated Token:		Yes
+                                                    Impersonation Level:	Impersonation
+                                                    New Logon:
+                                                    	Security ID:		S-1-5-18
+                                                    	Account Name:		SYSTEM
+                                                    	Account Domain:		NT AUTHORITY
+                                                    	Logon ID:		0x3E7
+                                                    	Linked Logon ID:	0x0
+                                                    	Network Account Name:	-
+                                                    	Network Account Domain:	-
+                                                    	Logon GUID:             {00000000-0000-0000-0000-000000000000}
+_Output_Truncated_
+
+PS C:\> Get-Winevent -FilterHashtable @{logname='Security';id='4624'} | ft -Wrap | findstr /i "generated" 
+
+```
+
+
+```
+Powershell Operational logs
+
+PS C:\> Get-WinEvent Microsoft-Windows-PowerShell/Operational | Where-Object {$_.Message -ilike "*RunspacePool*"} | Format-List 
+TimeCreated  : 3/8/2021 7:28:43 PM
+ProviderName : Microsoft-Windows-PowerShell
+Id           : 8195
+Message      : Opening RunspacePool
+
+TimeCreated  : 3/8/2021 7:28:43 PM
+ProviderName : Microsoft-Windows-PowerShell
+Id           : 8194
+Message      : Creating RunspacePool object
+                	 InstanceId 18bed982-3d17-47b0-8f7a-0836900efea6
+                	 MinRunspaces 1
+                	 MaxRunspaces 1
+_Output_Truncated_
+
+Get-WinEvent Microsoft-Windows-PowerShell/Operational | Where-Object {$_.Message -ilike "*Pipeline ID = ##"} | Format-List
+
+```
+
+## Powershell Artifacts
+PowerShell Transcript is a feature that creates a record of all or part of a PowerShell session to a text file.
+
+
+```
+PS C:\> Start-Transcript 
+Transcript started, output file is C:\Users\andy.dwyer\Documents\PowerShell_transcript.ADMIN-STATION.OGp3Fa
+x7.20210316141734.txt
+```
+
+Powershell History
+
+```
+
+
+PS C:\> Get-History 
+  Id CommandLine
+  -- -----------
+   1 Get-PSDrive
+   2 get-process | select name,id,Description | sort -Property id
+   3 regedit
+   4 cls
+_Output_Truncated_
+C:\Users\username\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt
+
+
+PS C:\> Get-Content "C:\users\$env:username\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt" 
+Get-CimInstance Namespace root\securitycenter2 ClassName antispywareproduct
+Get-CimInstance -Namespace root\securitycenter2 -ClassName antispywareproduct
+hostname
+whoami
+exit
+get-process
+_Output_Truncated_
+```
+
+
+## Powershell Script Blocking
+
+
+
+Script block logging records blocks of code as they are executed by the PowerShell engine, thereby capturing the full contents of code executed by an attacker, including scripts and commands. Due to the nature of script block logging, it also records de-obfuscated code as it is executed.
+
+What logs are generated by PowerShell?
+
+By default no logs are generated by PowerShell. This is dangerous since this basically means any actions in PowerShell have no trail to follow. By default a few of the more powerful features of Windows and PowerShell are turned off, but let’s discuss what each one means and how to use them to our advantage in defense of our machines.
+
+    "A PowerShell “script block” is the base level of executable code in PowerShell. It might represent a command typed interactively in the PowerShell console, supplied through the command line, or wrapped in a function, script, workflow, etc."
+
+    Script block logging doesn’t just look at the code that was supplied via the console or scripts that have been ran, but what the PowerShell engine actually runs.
+
+    This feature will show any obfuscated commands (i.e. Base64, Rot 13 or CaSe InSenSiTive StRingS, etc) as well as the decoded input that the PowerShell engine runs.
+
+    While not available in PowerShell 4.0, PowerShell 5.0 will automatically log code blocks if the block’s contents match on a list of suspicious commands or scripting techniques, even if script block logging is not enabled.
+
+Q: How do I enable Script Block logging?
+
+```
+reg add HKLM\SOFTWARE\Wow6432Node\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging\ /v EnableScriptBlockLogging /t REG_DWORD /d 1 /f
+```
+
+    4103 is Verbose powershell command execution enabled via Script Block Logging.
+
+    4104 show the actual scripts ran, the encoded and decodes versions. If it was a file it will show the files name run then another even will have the script within that file
+
+    4105 is the time a script started aka the PowerShell engine was started
+
+    4106 is the time a script ended aka the PowerShell engine was stopped
 
