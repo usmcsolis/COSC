@@ -4911,6 +4911,22 @@ mem - Memory mapped file, usually for share library
 
 Are objects wiuthin a computer system that contain important information relevant to the activities performed on the system by the user
 
+```
+    UserAssist
+
+    Windows Background Activity Moderator (BAM)
+
+    Recycle Bin
+
+    Prefetch
+
+    Jump Lists
+
+    Recent Files
+
+    Browser Artifacts
+```
+
 ## Security Identifer (SID)
 
 
@@ -4927,7 +4943,9 @@ andy.dwyer         S-1-5-21-1584283910-3275287195-1754958050-1005
 sshd               S-1-5-21-1584283910-3275287195-1754958050-1003
 student            S-1-5-21-1584283910-3275287195-1754958050-1004
 WDAGUtilityAccount S-1-5-21-1584283910-3275287195-1754958050-504
-
+```
+WMI 32
+```
 PS C:\> Get-WmiObject win32_useraccount | select name,sid 
 name               sid
 ----               ---
@@ -4974,14 +4992,19 @@ They are located in
 ```
 HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{GUID}\Count\ *
 ```
-they are encoded in ROT13
+they are encoded in ROT13 NEEDS TO BE DECODED
 
 The GUID represents a particular file extension.
 
-CEBFF5CD-ACE2-4F4F-9178-9926F41749EA A list of applications, files, links, and other objects that have been accessed
+CEBFF5CD-ACE2-4F4F-9178-9926F41749EA 
+A list of applications, files, links, and other objects that have been accessed
 
-F4E57C4B-2036-45F0-A9AB-443BCFE33D9F Lists the Shortcut Links used to start programs
 
+F4E57C4B-2036-45F0-A9AB-443BCFE33D9F 
+Lists the Shortcut Links used to start programs
+```
+PS C:\> Get-ItemProperty "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist
+```
 
 ## Windows Background ACtivity Moderator (BAM)
 
@@ -4991,4 +5014,329 @@ BAM Provides the following:
 full path of an executable
 
 last execution date/time
+
+
+```
+Show in Reg Edit:
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\bam\State\UserSettings #On 1809 and Newer
+
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\bam\UserSettings #On 1803 and below
+```
+
+
+CMD command to get Windows OS Version - Ran in Admin-Station
+
+    systeminfo
+```
+C:\WINDOWS\system32>systeminfo
+
+Host Name:                 ADMIN-STATION
+OS Name:                   Microsoft Windows 10 Enterprise
+OS Version:                10.0.19045 N/A Build 19045 
+OS Manufacturer:           Microsoft Corporation
+OS Configuration:          Standalone Workstation
+/----Output Truncated----/
+```
+	see table below - 19045 (Windows 10 (22H2)) is the last Windows 10 Version
+
+
+Powershell cmdlet to get Windows OS Version - Ran in Admin-Station
+
+    Get-Computerinfo
+```
+Get-ComputerInfo | select osname,osversion,OsHardwareAbstractionLayer
+
+OsName                           OsVersion   OsHardwareAbstractionLayer
+------                           ---------   --------------------------
+Microsoft Windows 10 Enterprise  10.0.19045  10.0.19041.2251
+```
+
+
+## Recycle Bin
+
+When a user deletes a file in Windows it goes to the recylce bin
+
+```
+    SID - determines which user deleted it
+
+    Timestamp - When it was deleted
+
+    $RXXXXXX - content of deleted files
+
+    $IXXXXXX - original PATH and name
+```
+Location
+
+```
+C:\$Recycle.bin
+```
+
+DEMO
+
+```
+PS C:\> Get-Childitem 'C:\$RECYCLE.BIN' -Recurse -Verbose -Force | select FullName 
+FullName
+--------
+C:\$RECYCLE.BIN\S-1-5-18
+C:\$RECYCLE.BIN\S-1-5-21-1584283910-3275287195-1754958050-1004
+C:\$RECYCLE.BIN\S-1-5-21-1584283910-3275287195-1754958050-1005
+C:\$RECYCLE.BIN\S-1-5-21-950816436-4199619115-1663388479-500
+C:\$RECYCLE.BIN\S-1-5-18\desktop.ini
+C:\$RECYCLE.BIN\S-1-5-21-1584283910-3275287195-1754958050-1004\desktop.ini
+C:\$RECYCLE.BIN\S-1-5-21-1584283910-3275287195-1754958050-1005\$I8QZ1U8.txt
+C:\$RECYCLE.BIN\S-1-5-21-1584283910-3275287195-1754958050-1005\$IBBLWX1.txt
+C:\$RECYCLE.BIN\S-1-5-21-1584283910-3275287195-1754958050-1005\$IGJUCO3.txt
+C:\$RECYCLE.BIN\S-1-5-21-1584283910-3275287195-1754958050-1005\$R8QZ1U8.txt
+C:\$RECYCLE.BIN\S-1-5-21-1584283910-3275287195-1754958050-1005\$RBBLWX1.txt
+C:\$RECYCLE.BIN\S-1-5-21-1584283910-3275287195-1754958050-1005\$RGJUCO3.txt
+_Output_Truncated_
+```
+Output shows all of the contents of the Recycle Bin. -Recurse will look at all user’s/SID’s contents
+
+Look at the different directories (SIDs) discuss how you would determine what users they belong to.
+
+Q: Since this gives us all the users on the machine, how would you find the specific user this information belogs to?
+Match SID to USER:
+
+
+```
+ PS C:\> wmic useraccount where 'sid="S-1-5-21-1584283910-3275287195-1754958050-1005"' get name 
+Name
+andy.dwyer
+```
+
+To find Recycle Bin artifacts for a specific user, match the SID, then append it to the previous command:
+```
+PS C:\> Get-Content 'C:\$Recycle.Bin\S-1-5-21-1584283910-3275287195-1754958050-1005\$R8QZ1U8.txt' 
+This is the file for Auditing
+```
+Reads the contents of a particular file within the Recycle BIN
+
+
+
+ ## Prefetch
+
+Files that are created by the OS when an application is ran for the first time
+
+
+
+Q: What is the windows prefetch used for?
+
+These files are named in a predetermined format and the prefetch name consists of the name of the application, hash noting the location from which the application was run, and a “.PF” file extension.
+
+Q: What is the purpose of analysing the prefetch?
+
+Q: If you found a program in prefetch that you know you did not run, what would that be an indicator of?
+
+For example, the prefetch file for calc.exe would appear as CALC.EXE-0FE8F3A9.pf, where 0FE8F3A9 is a hash of the path from where the file was executed.
+
+The prefetch files are stored in “\Root\Windows\Prefetch” folder.
+* Analysis of prefetch files reveals the evidence of the intial program execution for a user and from a specific location at a specific time.
+
+Prefetch entries may remain even after the program has been deleted or uninstalled.
+
+This information together with timeline analysis helps in determining what programs have been executed in the system.
+
+Evidence of program execution can be a valuable resource for forensic investigators. They can prove that a suspect ran a program like CCleaner to cover up any potential wrongdoing.
+
+Limited to 128 files on Win7
+
+Limited to 1024 files on Win8-10
+
+Win8-10 Prefetch files store the last eight execution times. The file creation time of the prefetch file will indicate the original time of execution within 10 seconds leaving the investigator with a total of nine execution times.
+
+Prefetch entries record the location of the associated executable and files referenced by that executable. Look for any files executed or referenced from a temp directory as this is typically an outlier.
+
+By default, Windows Server does not have Prefetch enabled.
+
+Use Eric Zimmerman’s PECmd.exe utility to analyze Prefetch data
+
+General Format of a prefetch file: (exename)-(hash-of-path).pf
+
+
+
+Location
+```
+c:\Windows\Prefetch
+```
+
+Demo
+```
+PS C:\> Get-Childitem -Path 'C:\Windows\Prefetch' -ErrorAction Continue | select -First 8 
+    Directory: C:\Windows\Prefetch
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+d-----        2/11/2021   3:53 PM                ReadyBoot
+-a----        2/11/2021   3:39 PM         334168 AgAppLaunch.db
+-a----        2/16/2021   2:13 PM        1450197 AgCx_S1_S-1-5-21-1584283910-3275287195-1754958050-1004.snp.db
+-a----        2/23/2021   7:29 PM        1690240 AgCx_S2_S-1-5-21-1584283910-3275287195-1754958050-1005.snp.db
+-a----        3/11/2021   7:21 PM          83229 AgGlFaultHistory.db
+-a----        3/11/2021   7:21 PM         420736 AgGlFgAppHistory.db
+-a----        3/11/2021   7:21 PM        1629990 AgGlGlobalHistory.db
+-a----        2/22/2021   5:19 PM         125687 AgGlUAD_P_S-1-5-21-1584283910-3275287195-1754958050-1004.db
+Output shows the programs that were run and when they were executed that are stored in the Prefetch location.
+
+```
+
+## Jump List
+
+Things you access alot
+
+
+The Windows 7-10 taskbar (Jump List) is engineered to allow users to “jump” or access items they have frequently or recently used quickly and easily.
+
+The data stored in the Automatic Destinations folder will each have a unique file prepended with the AppID of the associated application.
+
+First time of execution of application.
+
+Creation Time = First time item added to the AppID file.
+
+Last time of execution of application w/file open.
+
+Modification Time = Last time item added to the AppID file.
+
+Jumplists allow us to get visibility about the intent or knowledge an attacker had when opening a particular file, launching a particular application or browsing a specific directory during the course of an interactive session.
+
+Jumplist entries
+
+
+```
+Win7/8/10
+
+C:\%USERPROFILE%\AppData\Roaming\Microsoft\Windows\Recent\AutomaticDestinations (C:\Users\king\AppData\Roaming\Microsoft\Windows\Recent)
+
+Show in Explorer:
+C:\%USERPROFILE%\AppData\Roaming\Microsoft\Windows\Recent\AutomaticDestinations (C:\Users\king\AppData\Roaming\Microsoft\Windows\Recent)
+```
+
+
+Demo
+
+```
+
+
+PS C:\> Get-Childitem -Recurse C:\Users\*\AppData\Roaming\Microsoft\Windows\Recent -ErrorAction Continue | select FullName, LastAccessTime 
+FullName                                                                                                                                     LastAccessTime
+--------                                                                                                                                     --------------
+C:\Users\andy.dwyer\AppData\Roaming\Microsoft\Windows\Recent\AutomaticDestinations                                                        3/11/2021 8:21:30 PM
+C:\Users\andy.dwyer\AppData\Roaming\Microsoft\Windows\Recent\AutomaticDestinations\1bc392b8e104a00e.automaticDestinations-ms              3/11/2021 6:24:55 PM
+C:\Users\andy.dwyer\AppData\Roaming\Microsoft\Windows\Recent\AutomaticDestinations\5f7b5f1e01b83767.automaticDestinations-ms              3/11/2021 8:16:30 PM
+C:\Users\andy.dwyer\AppData\Roaming\Microsoft\Windows\Recent\AutomaticDestinations\9b9cdc69c1c24e2b.automaticDestinations-ms              3/11/2021 6:24:55 PM
+C:\Users\andy.dwyer\AppData\Roaming\Microsoft\Windows\Recent\AutomaticDestinations\9d1f905ce5044aee.automaticDestinations-ms              3/11/2021 6:24:55 PM
+C:\Users\andy.dwyer\AppData\Roaming\Microsoft\Windows\Recent\AutomaticDestinations\cf02284227526d80.automaticDestinations-ms              3/11/2021 7:02:30 PM
+
+or
+
+PS C:\> Get-Childitem -Recurse $env:USERPROFILE\AppData\Roaming\Microsoft\Windows\Recent -ErrorAction SilentlyContinue | select FullName,LastAccessTime 
+FullName                                                                                                                                     LastAccessTime
+--------                                                                                                                                     --------------
+C:\Users\andy.dwyer\AppData\Roaming\Microsoft\Windows\Recent\AutomaticDestinations                                                        3/11/2021 8:21:30 PM
+C:\Users\andy.dwyer\AppData\Roaming\Microsoft\Windows\Recent\CustomDestinations                                                           3/11/2021 8:21:30 PM
+C:\Users\andy.dwyer\AppData\Roaming\Microsoft\Windows\Recent\14287.lnk                                                                    3/9/2021 6:15:30 PM
+C:\Users\andy.dwyer\AppData\Roaming\Microsoft\Windows\Recent\Active_Directory.lnk                                                         3/8/2021 7:07:26 PM
+C:\Users\andy.dwyer\AppData\Roaming\Microsoft\Windows\Recent\Artifacts (2).lnk                                                            3/3/2021 8:30:33 PM
+C:\Users\andy.dwyer\AppData\Roaming\Microsoft\Windows\Recent\Artifacts.lnk                                                                3/3/2021 7:12:42 PM
+
+or
+
+- Make sure sysinternals is mounted or unzipped
+- Gci C:\users\student\AppData\Roaming\Microsoft\Windows\Recent\AutomaticDestinations | % {z:\strings.exe -accepteula $_} >> c:\recentdocs.txt
+
+Output shows all users Jump Lists artifacts
+Output shows the Jump Lists Artifacts for the currently logged user
+Output redirected through strings.exe and into a file provides more readable output.
+
+```
+
+
+## Recent Files
+
+
+
+Registry Key that will track the last files and folders opened and is used to populate data in “Recent” menus of the Start menu.
+Tracks last 150 files or folders opened.
+Entry and modification time of this key will be the time and location the last file of a specific extension was opened.
+
+Location
+```
+HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\RecentDocs
+
+HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\RecentDocs\.txt
+```
+
+
+```
+PS C:\> Get-Item 'Registry::\HKEY_USERS\*\Software\Microsoft\Windows\CurrentVersion\Explorer\RecentDocs\.*' 
+    Hive: \HKEY_USERS\S-1-5-21-1584283910-3275287195-1754958050-1005\Software\Microsoft\Windows\CurrentVersion\Explorer\RecentDocs
+Name                           Property
+----                           --------
+.html                          MRUListEx : {0, 0, 0, 0...}
+                               0         : {114, 0, 101, 0...}
+.pdf                           0         : {49, 0, 52, 0...}
+                               MRUListEx : {0, 0, 0, 0...}
+.ps1                           0         : {65, 0, 114, 0...}
+                               MRUListEx : {2, 0, 0, 0...}
+                               1         : {65, 0, 99, 0...}
+                               2         : {82, 0, 83, 0...}
+.sh                            0         : {116, 0, 101, 0...}
+                               MRUListEx : {0, 0, 0, 0...}
+.txt                           0         : {114, 0, 101, 0...}
+                               MRUListEx : {4, 0, 0, 0...}
+                               1         : {114, 0, 101, 0...}
+                               2         : {114, 0, 101, 0...}
+                               3         : {97, 0, 117, 0...}
+                               4         : {97, 0, 117, 0...}
+.vcex                          MRUListEx : {0, 0, 0, 0...}
+                               0         : {67, 0, 111, 0...}
+```
+	With the * we can see the types of files/ information that was recently viewed.
+
+
+
+```
+PS C:\> Get-Item 'Registry::\HKEY_USERS\*\Software\Microsoft\Windows\CurrentVersion\Explorer\RecentDocs\.txt' 
+    Hive: \HKEY_USERS\S-1-5-21-1584283910-3275287195-1754958050-1005\Software\Microsoft\Windows\CurrentVersion\Explorer\RecentDocs
+Name                           Property
+----                           --------
+.txt                           0         : {114, 0, 101, 0...}
+                               MRUListEx : {4, 0, 0, 0...}
+                               1         : {114, 0, 101, 0...}
+                               2         : {114, 0, 101, 0...}
+                               3         : {97, 0, 117, 0...}
+```
+	With .txt we can see the text files/ information that was recently viewed. Queries the Hex Value Stored in the Key
+
+This command will allow you to read some of the data stored within the keys:
+
+```
+Converting a Single Value from Hex to Unicode
+
+[System.Text.Encoding]::Unicode.GetString((gp "REGISTRY::HKEY_USERS\*\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\RecentDocs\.txt")."0") 
+recent1.txt b2     敲散瑮⸱湬kH	뻯    .              recent1.lnk
+
+	Shows the text file represented by 0, you can change number to veiw the rest of the files
+Convert all of a users values from HEX to Unicode
+
+[System.Text.Encoding]::Unicode.GetString((gp "REGISTRY::HKEY_USERS\*\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\RecentDocs\.txt")."0")
+recent1.txt b2     敲散瑮⸱湬kH	뻯    .              recent1.lnk 
+```
+
+```
+PS C:\> Get-Item "REGISTRY::HKEY_USERS\*\Software\Microsoft\Windows\CurrentVersion\Explorer\RecentDocs\.txt" | select -Expand property | ForEach-Object {
+    [System.Text.Encoding]::Default.GetString((Get-ItemProperty -Path "REGISTRY::HKEY_USERS\*\Software\Microsoft\Windows\CurrentVersion\Explorer\RecentDocs\.txt" -Name $_).$_)
+}   
+r e c e n t 1 . t x t   b 2           recent1.lnk H 	  ï¾        .                             r e c e n t 1 . l n k   
+                ÿÿÿÿ
+r e c e n t 2 . t x t   b 2           recent2.lnk H 	  ï¾        .                             r e c e n t 2 . l n k   
+r e c e n t 3 . t x t   b 2           recent3.lnk H 	  ï¾        .                             r e c e n t 3 . l n k   
+a u d i t i n g . t x t   f 2           auditing.lnk  J 	  ï¾        .                             a u d i t i n g . l n k   
+a u d i t . t x t   \ 2           audit.lnk D 	  ï¾        .                             a u d i t . l n k
+(Change/manipulate the extensions -.txt- to different extensions to view different sets of information)
+```
+Shows and converts all of the text files located in the Recent Files Registry location
+
+## Browser Artifacts
+
+
+
 
