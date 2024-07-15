@@ -40,7 +40,9 @@ Minas_Tirith
 ssh -X bombadil@10.8.0.7
 bombadil : jolly
 
-
+Workstation 2
+ssh -X andy.dwyer@10.8.0.4
+andy.dwyer : BurtMacklinFBI
 ```
 ```
 USER=
