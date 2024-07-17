@@ -5763,3 +5763,554 @@ reg add HKLM\SOFTWARE\Wow6432Node\Policies\Microsoft\Windows\PowerShell\ScriptBl
 
     4106 is the time a script ended aka the PowerShell engine was stopped
 
+
+
+# Memory Analysis (Day 9)
+
+Volatile Memory
+	
+
+    Non-persistent - requires power to maintain stored information; immediate loss of data after power loss.
+
+    Examples: RAM
+
+Non-Volatile Memory
+	
+
+    Persistent - Does not require a continuous power supply to retain the dta stored in a computing device
+
+    Examples: HDD, USB
+
+## Order of Volatility
+
+
+
+Order of Volatility From Most to Least
+
+    CPU registers, cache
+
+    Routing table, ARP cache, process table, kernel stats, memory
+
+    Temporary file systems
+
+    Disk
+
+    Remote logging and monitoring data
+
+    Physical configuration, network topology
+
+    Archival media - backups
+https://datatracker.ietf.org/doc/html/rfc3227#section-2.1
+
+## Volatility Versions
+
+
+Python
+	
+
+    Updated Frequently
+
+    All profiles available
+
+	
+
+    Lengthy Install
+
+    Can’t run without Python installed
+
+Standlone
+	
+
+    No install necessary
+
+    Quick and easy to download/run
+
+    Can run without python
+
+	
+
+    Not all profiles included
+
+    Not updated frequently
+
+
+
+## Using Volatility
+
+
+```
+PS C:\windows\system32> invoke-webrequest -uri "https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v7.8.8/npp.7.8.8.Installer.x64.exe" -outfile "C:\npp.7.8.8.Installer.x64.exe" 
+
+PS C:\windows\system32> cd C:\ 
+
+PS C:\> start-process npp.7.8.8.Installer.x64.exe -ArgumentList '/S' 
+
+	invoke-webrequest downloads Notepad++ 7.8.8 installer to C:\
+	cd to C:\
+	start-process to launch Notepad++ 7.8.8 installer and accept defaults (/s)
+```
+
+
+```
+
+
+PS C:\Users\andy.dwyer\Desktop\Memory_Analysis> .\volatility_2.6_win64_standalone.exe -h 
+
+	-h or --help will list options and supported plugin commands for Volatility
+
+```
+
+
+```
+
+
+PS C:\Users\andy.dwyer\Desktop\Memory_Analysis> .\volatility_2.6_win64_standalone.exe -f <FILENAME> --profile=<PROFILE> <PLUGIN> 
+
+	At a minimum, the Volatility executable followed by a filename (-f), profile(--profile=), and plugin should be used when working with a memory image/dump.
+
+
+
+PS C:\Users\andy.dwyer\Desktop\Memory_Analysis> .\volatility_2.6_win64_standalone.exe -f ".\cridex.vmem" imageinfo 
+          Suggested Profile(s) : WinXPSP2x86, WinXPSP3x86 (Instantiated with WinXPSP2x86) 
+                     AS Layer1 : IA32PagedMemoryPae (Kernel AS)
+                     AS Layer2 : FileAddressSpace (C:\Users\andy.dwyer\Desktop\Memory_Analysis\cridex.vmem)
+                      PAE type : PAE
+                           DTB : 0x2fe000L
+                          KDBG : 0x80545ae0L
+          Number of Processors : 1
+     Image Type (Service Pack) : 3
+                KPCR for CPU 0 : 0xffdff000L
+             KUSER_SHARED_DATA : 0xffdf0000L
+           Image date and time : 2012-07-22 02:45:08 UTC+0000
+     Image local date and time : 2012-07-21 22:45:08 -0400
+```
+```
+Volatility syntax to list available plugins for a given profile
+PS C:\Users\andy.dwyer\Desktop\Memory_Analysis> .\volatility_2.6_win64_standalone.exe -f ".\cridex.vmem" --profile=WinXPSP2x86 -h 
+
+	help (-h) syntax to list plugins available for the profile WinXPSP2x86 (--profile=WinXPSP2x86)
+```
+
+## Volatility Methodoloy
+
+```
+
+
+
+The SANS Institute recommends the following commands when using Volatility.
+
+    Identify Rogue Processes: pslist vs. psscan; output results to a dot file to have a nice visual representation of parent/child process relationships
+
+        Process validity - look for things that are off (misspellings, high PIDs, multiples that shouldn’t be, etc.)
+
+    DLLs and Handles: dlllist, dlldump
+
+    Network Artifacts: connections
+
+    Hunt for Code Injection: malfind
+
+    Check for rootkit: psscan, devicetree
+
+    Dump suspicious processes and drivers: dlldump, procdump, memdump, filescan, svcscan, driverirp
+
+
+
+```
+
+
+
+## Registry Analysis
+
+```
+
+
+It is possible to read the registry from the box but a bit more involved. The list below shows plugins and options one may use within Volatility to achieve this.
+
+    hivelist - Shows addresses of hives and filesystem locations
+
+    printkey
+
+        use -o with the virtual offset to show subkeys
+
+        use -K with the location of the registry key you want on the filesystem (note double quotes with this method) "path\to\key"
+
+    hivedump - use -o with virtual offset to recursively list all subkeys
+
+    hashdump - may or may not work, depending
+
+    dumpregistry - Go nuclear. Dumps the whole registry to disk (requires --dump-dir)
+
+Try other plugins to investigate other artifacts mentioned in earlier lectures. Run help in Volatility to see what plugins you have available for use.
+
+```
+
+
+# Active Directory (Day 9)
+
+
+
+1.) Domains
+
+    Active Directory objects (users or devices) that all use the same database or are typically in the same location.
+
+2.) Trees
+
+    Several Domains grouped together. Typically, has a primary domain controller for the entire tree.
+
+3.) Forests
+
+    Forests are groups of trees connected together via trust relationships.
+
+
+
+## Initial Recon
+
+1. Get a list of AD Commands Available
+
+PS> Get-Command -Module activedirectory
+
+CommandType     Name                                               Version    Source
+-----------     ----                                               -------    ------
+Cmdlet          Add-ADCentralAccessPolicyMember                    1.0.1.0    ActiveDirectory
+Cmdlet          Add-ADComputerServiceAccount                       1.0.1.0    ActiveDirectory
+Cmdlet          Add-ADDomainControllerPasswordReplicationPolicy    1.0.1.0    ActiveDirectory
+Cmdlet          Add-ADFineGrainedPasswordPolicySubject             1.0.1.0    ActiveDirectory
+
+__________CUT____________
+
+
+
+2. Get the Default Domain Password Policy
+
+    AD supports one set of password and account lockout policies for a domain. Beginning in Windows Server 2008, you can override the default password and account lockout policies in a domain using Fine-Grained Password Policies (FGPP
+
+PS> Get-ADDefaultDomainPasswordPolicy
+
+ComplexityEnabled           : True
+DistinguishedName           : DC=army,DC=warriors
+LockoutDuration             : 00:30:00
+LockoutObservationWindow    : 00:30:00
+LockoutThreshold            : 0
+MaxPasswordAge              : 42.00:00:00
+__________CUT____________
+
+
+3. Check for any Fine-Grained Password Policies
+
+PS> Get-ADFineGrainedPasswordPolicy -Filter {name -like "*"}
+
+   -No returns means it is not set-
+
+
+4. Get Forest details
+
+PS> Get-ADForest
+
+ApplicationPartitions : {DC=DomainDnsZones,DC=army,DC=warriors, DC=ForestDnsZones,DC=army,DC=warriors}
+CrossForestReferences : {}
+DomainNamingMaster    : domain-controll.army.warriors
+Domains               : {army.warriors}
+__________CUT____________
+
+
+5. Get Domain details:
+
+PS> Get-ADDomain
+
+AllowedDNSSuffixes                 : {}
+ChildDomains                       : {}
+ComputersContainer                 : CN=Computers,DC=army,DC=warriors
+DeletedObjectsContainer            : CN=Deleted Objects,DC=army,DC=warriors
+DistinguishedName                  : DC=army,DC=warriors
+__________CUT____________
+
+
+6. Get AD Groups
+
+Get-ADGroup -Filter *
+
+DistinguishedName : CN=System Admins,CN=Users,DC=army,DC=warriors
+GroupCategory     : Security
+GroupScope        : Global
+Name              : System Admins
+__________CUT____________
+
+
+7. Get a groups details
+
+PS> Get-ADGroup -Identity 'IA Analysts Team'
+
+DistinguishedName : CN=IA Analysts Team,CN=Users,DC=army,DC=warriors
+GroupCategory     : Security
+GroupScope        : Global
+Name              : IA Analysts Team
+__________CUT____________
+
+
+8. Get a list of a groups members
+
+PS> Get-ADGroupMember -Identity 'IA Analysts Team' -Recursive
+   -No return means there are no assigned members-
+
+
+9. Get AD users
+
+PS> Get-ADUser -Filter 'Name -like "*"'
+
+DistinguishedName : CN=Willie.Liu,OU=3RD PLT,OU=CCO,OU=3RDBN,OU=WARRIORS,DC=army,DC=warriors
+Enabled           : True
+GivenName         : Willie
+Name              : Willie.Liu
+ObjectClass       : user
+__________CUT____________
+
+
+10. To see additional properties, not just the default set
+
+PS> Get-ADUser -Identity 'Nina.Webster' -Properties Description
+
+Description       : 3rd PLT Soldier
+DistinguishedName : CN=Nina.Webster,OU=3RD PLT,OU=CCO,OU=3RDBN,OU=WARRIORS,DC=army,DC=warriors
+Enabled           : True
+GivenName         : Nina
+Name              : Nina.Webster
+ObjectClass       : user
+ObjectGUID        : b35ba844-5b40-4eb4-96fd-ffafef36269a
+Office            :
+SamAccountName    : Nina.Webster
+SID               : S-1-5-21-1181003830-945744892-2632747169-1820
+Surname           : Webster
+UserPrincipalName :
+
+
+## Enumerate Users
+
+
+Find Disabled users
+
+PS> get-aduser -filter {Enabled -eq "FALSE"} -properties name, enabled
+
+DistinguishedName : CN=Guest,CN=Users,DC=army,DC=warriors
+Enabled           : False
+GivenName         :
+Name              : Guest
+ObjectClass       : user
+__________CUT____________
+
+
+Enable that user
+
+PS> Enable-ADAccount -Identity guest
+   -Nothing returned if successful execution-
+
+
+Change the password
+
+PS> Set-AdAccountPassword -Identity guest -NewPassword (ConvertTo-SecureString -AsPlaintext -String "PassWord12345!!" -Force)
+   -Nothing returned if successful execution-
+
+
+Add the user to an Admin Group
+
+Add-ADGroupMember -Identity "Domain Admins" -Members guest
+-Nothing returned if successful execution-
+
+
+
+## Scenario 2
+
+
+Get Distinguished Name to match AD format
+
+PS> Get-ADuser -filter * | select distinguishedname, name
+
+CN=Amelie.Benjamin,OU=3RD PLT,OU=CCO,OU=3RDBN,OU=WARRIORS,DC=army,DC=warriors     Amelie.Benjamin
+CN=Ramon.Gibbs,OU=3RD PLT,OU=CCO,OU=3RDBN,OU=WARRIORS,DC=army,DC=warriors         Ramon.Gibbs
+CN=Willie.Liu,OU=3RD PLT,OU=CCO,OU=3RDBN,OU=WARRIORS,DC=army,DC=warriors          Willie.Liu
+CN=Yair.Roth,OU=3RD PLT,OU=CCO,OU=3RDBN,OU=WARRIORS,DC=army,DC=warriors           Yair.Roth
+CN=Elisha.Coleman,OU=3RD PLT,OU=CCO,OU=3RDBN,OU=WARRIORS,DC=army,DC=warriors      Elisha.Coleman
+__________CUT____________
+
+
+Create a new user
+
+New-ADUser -Name "Bad.Guy" -AccountPassword (ConvertTo-SecureString -AsPlaintext -String "PassWord12345!!" -Force) -path "OU=3RD PLT,OU=CCO,OU=3RDBN,OU=WARRIORS,DC=army,DC=warriors"
+   -Nothing returned if successful execution-
+
+
+Enable the user
+
+Enable-ADAccount -Identity "Bad.Guy"
+   -Nothing returned if successful execution-
+
+
+Add the user to an Admin Group
+
+Add-ADGroupMember -Identity "Domain Admins" -Members "Bad.Guy"
+   -Nothing returned if successful execution-
+
+
+Remove User
+
+PS> Remove-ADUser -Identity "Bad.Guy"
+
+Confirm
+Are you sure you want to perform this action?
+Performing the operation "Remove" on target "CN=Bad.Guy,OU=3RD PLT,OU=CCO,OU=3RDBN,OU=WARRIORS,DC=army,DC=warriors".
+[Y] Yes  [A] Yes to All  [N] No  [L] No to All  [S] Suspend  [?] Help (default is "Y"): Y
+
+
+Remove From Group
+
+PS> Remove-ADGroupMember -Identity "Domain Admins" -Members guest
+
+Confirm
+Are you sure you want to perform this action?
+Performing the operation "Remove" on target "CN=Bad.Guy,OU=3RD PLT,OU=CCO,OU=3RDBN,OU=WARRIORS,DC=army,DC=warriors".
+[Y] Yes  [A] Yes to All  [N] No  [L] No to All  [S] Suspend  [?] Help (default is "Y"): Y
+
+
+Disable Guest account
+
+PS> Disable-AdAccount -Identity Guest
+   -Nothing returned if successful execution-
+
+
+
+## Enumerate User DCO POV
+
+
+Get All Domain Admin Accounts
+
+PS> Get-AdGroupMember -identity "Domain Admins" -Recursive | %{Get-ADUser -identity $_.DistinguishedName}
+
+PS> Get-AdGroupMember -identity "Domain Admins" -Recursive | %{Get-ADUser -identity $_.DistinguishedName} | select name, Enabled
+
+name            Enabled
+----            -------
+Administrator      True
+andy.dwyer         True
+Giada.Barrett      True
+Garrett.Lowery     True
+Trevon.Wolfe       True
+Angelo.Berry       True
+__________CUT____________
+
+
+Get ALL Enterprise Admin accounts
+
+Get-AdGroupMember -identity "Enterprise Admins" -Recursive | %{Get-ADUser -identity $_.DistinguishedName} | select name, Enabled
+
+name          Enabled
+----          -------
+Administrator    True
+__________CUT____________
+
+
+
+## Display RSoP Info
+
+
+1. Display Help
+
+C:> gpresult /?
+
+GPRESULT [/S system [/U username [/P [password]]]] [/SCOPE scope]
+           [/USER targetusername] [/R | /V | /Z] [(/X | /H) <filename> [/F]]
+
+Description:
+    This command line tool displays the Resultant Set of Policy (RSoP)
+    information for a target user and computer.
+__________CUT____________
+
+
+
+2. Output the computer and user node settings of a user
+
+C:> gpresult /user Webster /v
+
+C:> gpresult /user Administrator /v
+
+RSOP data for ARMY\Administrator on DOMAIN-CONTROLL : Logging Mode
+
+
+OS Configuration:            Primary Domain Controller
+OS Version:                  10.0.17763
+Site Name:                   Default-First-Site-Name
+Roaming Profile:             N/A
+Local Profile:               C:\Users\Administrator
+__________CUT____________
+
+
+3. Displays data about the machine and logged on user
+
+C:> gpresult /r
+
+COMPUTER SETTINGS
+
+    CN=DOMAIN-CONTROLL,OU=Domain Controllers,DC=army,DC=warriors
+    Last time Group Policy was applied: 2/25/2021 at 6:21:44 PM
+    Group Policy was applied from:      domain-controll.army.warriors
+    Group Policy slow link threshold:   500 kbps
+    Domain Name:                        ARMY
+    Domain Type:                        Windows 2008 or later
+__________CUT____________
+
+
+4. Force any group policy setting to take affect immediately versus rebooting the computer
+
+C:> gpupdate /force
+
+Updating policy...
+
+Computer Policy update has completed successfully.
+User Policy update has completed successfully.
+
+
+
+## Admin Best Practices
+
+1. Get Name Property from the Active Directory Group named "Domain Admins"
+
+PS> (Get-AdGroupMember -Identity 'domain admins').Name
+Administrator
+System Admins LV1
+
+PS> Get-AdGroupMember -Identity 'domain admins' | select name
+
+name
+--------
+Administrator
+System Admins LV1
+
+
+2. Get Active Directory Group 'System' Admin Names 'LvL 1'
+
+PS> (Get-AdGroupMember -Identity "System Admins LV1").Name
+System Admins
+
+
+3. Get Active Directory Group 'System Admin' Names
+
+PS> (Get-AdGroupMember -Identity "System Admins").Name
+andy.dwyer
+System Admins
+Print Server Group
+System Admins LV2
+Giada.Barrett
+Garrett.Lowery
+Trevon.Wolfe
+Angelo.Berry
+
+4. Get Active Directory Group 'System' Admin Names 'LVL 2'
+
+PS> (Get-AdGroupMember -Identity "System Admins LV2").Name
+Silas.Salas
+Shania.Reilly
+Santino.Glass
+Xavier.Ibarra
+London.Cantrell
+Raegan.Lee
+
+
+
