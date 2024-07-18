@@ -5120,7 +5120,7 @@ Reads the contents of a particular file within the Recycle BIN
 
 Files that are created by the OS when an application is ran for the first time
 
-
+ back hitting the driver in the lip with a few bullet fragments. The suspects fled on foot and were apprehended the following day by SWAT. The Trooper was treated for his injuries and later released. Both suspects were out on bond at the time of the shooting.
 
 Q: What is the windows prefetch used for?
 
@@ -5201,7 +5201,7 @@ Jumplists allow us to get visibility about the intent or knowledge an attacker h
 
 Jumplist entries
 
-
+ back hitting the driver in the lip with a few bullet fragments. The suspects fled on foot and were apprehended the following day by SWAT. The Trooper was treated for his injuries and later released. Both suspects were out on bond at the time of the shooting.
 ```
 Win7/8/10
 
@@ -6322,3 +6322,9 @@ Vrc0vw7ZUaLBpQp
 
 
 Get-ADuser -Filter {name -like "*tiff.*"} -properties *
+
+
+
+
+
+grep -f /filename /filename 
