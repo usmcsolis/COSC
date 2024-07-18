@@ -6318,3 +6318,7 @@ Raegan.Lee
 
 
 Vrc0vw7ZUaLBpQp
+
+
+
+Get-ADuser -Filter {name -like "*tiff.*"} -properties *
