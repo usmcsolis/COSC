@@ -5884,7 +5884,7 @@ PS C:\Users\andy.dwyer\Desktop\Memory_Analysis> .\volatility_2.6_win64_standalon
            Image date and time : 2012-07-22 02:45:08 UTC+0000
      Image local date and time : 2012-07-21 22:45:08 -0400
 ```
-```
+```norse god freya
 Volatility syntax to list available plugins for a given profile
 PS C:\Users\andy.dwyer\Desktop\Memory_Analysis> .\volatility_2.6_win64_standalone.exe -f ".\cridex.vmem" --profile=WinXPSP2x86 -h 
 
@@ -6319,7 +6319,7 @@ Raegan.Lee
 
 Vrc0vw7ZUaLBpQp
 
-
+norse god freya
 
 Get-ADuser -Filter {name -like "*tiff.*"} -properties *
 
@@ -6328,3 +6328,465 @@ Get-ADuser -Filter {name -like "*tiff.*"} -properties *
 
 
 grep -f /filename /filename 
+
+
+
+
+# Review
+
+## Powershell Profiles
+
+Persistence 
+
+Profiles 
+$HOME/Profile
+$Profiles
+
+All Users, All Hosts
+$PsHome\Profile.ps1
+
+All Users, Current Host
+$PsHome\Microsoft.PowerShell_profile.ps1
+
+Current User, All Hosts
+$Home\[My]Documents\Profile.ps1
+
+Current User, Current Host
+$Home\[My ]Documents\WindowsPowerShell\Profile.ps1
+
+
+$profile | Get-Member -Type NoteProperty                        # Displays the profile values of Names, MemberType, and Paths.
+$Profile | get-member -type noteproperty | ft -wrap             # Displays the same results but completed in case it was cut off '...'
+$PROFILE | Get-Member -MemberType noteproperty | select name    # Narrowed results to display only Names
+
+## Windows Reg
+
+
+regedit
+reg query
+get-childitem / get-item 
+
+Get-ChildItem HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run 
+
+Get-ChildItem HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\ 
+
+Get-item HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
+
+
+net use * http://live.sysinternals.com
+
+
+
+HKLM\Software\Microsoft\Windows\CurrentVersion\Run
+
+HKLM\Software\Microsoft\Windows\CurrentVersion\RunOnce
+
+HKU\<SID>\Software\Microsoft\Windows\CurrentVersion\Run
+
+HKU\<SID>\Software\Microsoft\Windows\CurrentVersion\RunOnce
+
+HKLM\SYSTEM\CurrentControlSet\services
+
+HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders
+
+HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders
+
+HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon
+
+
+
+Microsoft Edge Internet URL history and Browser Artifacts and Forensics
+HKEY_CLASSES_ROOT\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppContainer\Storage\microsoft.microsoftedge_8wekyb3d8bbwe\Children\001\Internet Explorer\DOMStorage
+
+
+USB history / USB Forensics
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Enum\USB
+
+        This registry key contains information about all USB devices that have been connected to the system at some point, regardless of whether they are currently connected or not. It includes information about the USB controllers, hubs, and individual devices. Each device is typically identified by a unique identifier (like a device instance path or hardware ID).
+
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Enum\USBSTOR
+This registry key specifically deals with USB storage devices, such as USB flash drives, external hard drives, etc. It contains information about connected USB storage devices, including details like device instance paths, hardware IDs, and other configuration information.
+
+
+Recent MRU history / MRU in forensics
+
+    HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\ComDlg32\OpenSavePidlMRU
+
+        MRU is the abbreviation for most-recently-used.
+
+        This key maintains a list of recently opened or saved files via typical Windows Explorer-style common dialog boxes (i.e. Open dialog box and Save dialog box).
+
+        For instance, files (e.g. .txt, .pdf, htm, .jpg) that are recently opened or saved files from within a web browser (including IE and Firefox) are maintained.
+
+
+Recent Files with LNK files
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\RecentDocs
+
+
+Windows User Profiles User Account Forensics
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList
+
+
+Saved Network Profiles and How to decode Network history
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\NetworkList\Profiles
+
+
+Windows Virtual Memory and why it is important=
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management
+
+
+## ADS
+
+Get-Item reminder.txt -Stream * 
+
+
+
+## Linux Essentials
+ls --help 
+
+
+read
+r
+4
+Read the contents of the file
+List the contents of the directory
+
+write
+w
+2
+Write content into a file
+Create/delete in the directory
+
+exe
+x
+1
+Run the file as an executable
+Move into the directory
+
+
+
+## Windows Boot Process
+findstr /C:"Detected boot environment" "C:\Windows\Panther\Setupact.log"
+Get-Content C:\Windows\Panther\Setupact.log | Select-String "Detected boot environment"
+
+
+
+
+c:\demo>bcdedit
+
+Windows Boot Manager
+--------------------
+identifier              {bootmgr}
+device                  partition=C:
+description             Windows Boot Manager
+locale                  en-US
+inherit                 {globalsettings}
+default                 {current}
+resumeobject            {2bd08882-0f8f-11e9-94b6-0002c9550dce}
+displayorder            {current}
+toolsdisplayorder       {memdiag}
+timeout                 29
+
+Windows Boot Loader
+-------------------
+identifier              {current}
+device                  partition=C:
+path                    \windows\system32\winload.exe
+description             Windows 7 - Tiger Paw
+locale                  en-US
+inherit                 {bootloadersettings}
+recoverysequence        {91061b50-0fa8-11e9-aa6e-00155d49334a}
+displaymessageoverride  Recovery
+recoveryenabled         Yes
+allowedinmemorysettings 0x15000075
+osdevice                partition=C:
+systemroot              \windows
+resumeobject            {2bd08882-0f8f-11e9-94b6-0002c9550dce}
+nx                      OptIn
+bootmenupolicy          Standard
+
+
+
+##  Linux Boot Process
+/sbin/init
+/etc/init
+etc/inittab
+
+
+
+cat /etc/inittab
+
+is:5:initdefault: 
+
+
+l0:0:wait:/etc/rc0.d
+l1:1:wait:/etc/rc1.d
+l2:2:wait:/etc/rc2.d
+l3:3:wait:/etc/rc3.d
+l4:4:wait:/etc/rc4.d 
+l5:5:wait:/etc/rc5.d
+l6:6:wait:/etc/rc6.d
+
+
+student@linux-opstation-kspt:/etc/rc3.d$ ls -l /etc/rc3.d/ 
+
+lrwxrwxrwx 1 root root 15 Jan 31  2020 S01acpid -> ../init.d/acpid 
+lrwxrwxrwx 1 root root 17 Feb  4  2020 S01anacron -> ../init.d/anacron
+lrwxrwxrwx 1 root root 16 Jan 31  2020 S01apport -> ../init.d/apport
+lrwxrwxrwx 1 root root 13 Jan 31  2020 S01atd -> ../init.d/atd
+lrwxrwxrwx 1 root root 26 Jan 31  2020 S01console-setup.sh -> ../init.d/console-setup.sh
+lrwxrwxrwx 1 root root 14 Jan 31  2020 S01cron -> ../init.d/cron
+lrwxrwxrwx 1 root root 14 Jan 31  2020 S01dbus -> ../init.d/dbus
+lrwxrwxrwx 1 root root 14 Feb  4  2020 S01gdm3 -> ../init.d/gdm3
+
+
+student@linux-opstation-kspt:/etc/rc3.d$ ls -l /etc/rc1.d/ 
+
+lrwxrwxrwx 1 root root 20 Feb  4  2020 K01alsa-utils -> ../init.d/alsa-utils
+lrwxrwxrwx 1 root root 13 Jan 31  2020 K01atd -> ../init.d/atd
+lrwxrwxrwx 1 root root 20 Jan 31  2020 K01cryptdisks -> ../init.d/cryptdisks
+lrwxrwxrwx 1 root root 26 Jan 31  2020 K01cryptdisks-early -> ../init.d/cryptdisks-early
+lrwxrwxrwx 1 root root 18 Jan 31  2020 K01ebtables -> ../init.d/ebtables
+lrwxrwxrwx 1 root root 14 Feb  4  2020 K01gdm3 -> ../init.d/gdm3 
+
+
+
+cat /lib/systemd/system/default.target | tail -n 8
+
+Description=Graphical Interface
+Documentation=man:systemd.special(7)
+Requires=multi-user.target
+Wants=display-manager.service 
+Conflicts=rescue.service rescue.target
+After=multi-user.target rescue.service rescue.target display-manager.service 
+AllowIsolate=yes
+
+
+
+student@linux-opstation-kspt:/$ ls -l /etc/systemd/system/ | grep graphical
+drwxr-xr-x 2 root root 4096 Feb  4  2020 graphical.target.wants 
+
+student@linux-opstation-kspt:/$ ls -l /etc/systemd/system/graphical.target.wants/
+total 0
+lrwxrwxrwx 1 root root 43 Jan 31  2020 accounts-daemon.service -> /lib/systemd/system/accounts-daemon.service  
+lrwxrwxrwx 1 root root 35 Feb  4  2020 udisks2.service -> /lib/systemd/system/udisks2.service 
+
+student@linux-opstation-kspt:/$ ls -l /lib/systemd/system | grep graphical
+lrwxrwxrwx 1 root root   16 Nov 15  2019 default.target -> graphical.target
+-rw-r--r-- 1 root root  598 Jan 28  2018 graphical.target
+drwxr-xr-x 2 root root 4096 Jan 31  2020 graphical.target.wants 
+lrwxrwxrwx 1 root root   16 Nov 15  2019 runlevel5.target -> graphical.target
+
+student@linux-opstation-kspt:/$ ls -l /lib/systemd/system/graphical.target.wants/
+total 0
+lrwxrwxrwx 1 root root 39 Nov 15  2019 systemd-update-utmp-runlevel.service -> ../systemd-update-utmp-runlevel.service 
+
+
+
+
+
+    This means that the default.target is actually graphical.target
+
+    The graphical.target unit wants to start:
+
+        display-manager.service
+
+        udisks2.service
+
+        accounts-daemon.service
+
+        systemd-update-utmp-runlevel.service
+
+    But, the graphical.target requires the multi-user.target to execute.
+
+
+
+## Process Validity 
+
+PS C:\Users\student> Get-Process
+
+Handles  NPM(K)    PM(K)      WS(K)     CPU(s)     Id  SI ProcessName
+-------  ------    -----      -----     ------     --  -- -----------
+    278      18     9420      18984       3.61   6304   1 ApplicationFrameHost
+    342      19     4516       3988              4624   0 armsvc
+    958      57   127900     202620      51.38    632   1 atom
+    572      82   182356     266836     117.64   3148   1 atom
+    321      33    92760     164644       0.56   7864   1 atom
+    222      15     6884      28916       0.03   8024   1 atom
+    733      27   143268     172480      38.33  13980   1 atom
+     68       5     2040       4128       0.02   7504   1 cmd
+
+
+     PS C:\Users\student> Get-Ciminstance Win32_service | Select Name, Processid, Pathname | ft -wrap | more
+
+Name                                                   Processid Pathname
+----                                                   --------- --------
+AdobeARMservice                                             4624 "C:\Program Files (x86)\Common Files\Adobe\ARM\1.0\armsvc.exe"
+AJRouter                                                       0 C:\WINDOWS\system32\svchost.exe -k LocalServiceNetworkRestricted -p
+ALG                                                            0 C:\WINDOWS\System32\alg.exe
+AppIDSvc                                                       0 C:\WINDOWS\system32\svchost.exe -k LocalServiceNetworkRestricted -p
+Appinfo                                                     7752 C:\WINDOWS\system32\svchost.exe -k netsvcs -p
+AppReadiness                                                   0 C:\WINDOWS\System32\svchost.exe -k AppReadiness -p
+AppXSvc                                                    13292 C:\WINDOWS\system32\svchost.exe -k wsappx -p
+AudioEndpointBuilder                                        3168 C:\WINDOWS\System32\svchost.exe -k LocalSystemNetworkRestricted -p
+Audiosrv                                                    3920 C:\WINDOWS\System32\svchost.exe -k LocalServiceNetworkRestricted -p
+autotimesvc                                                    0 C:\WINDOWS\system32\svchost.exe -k autoTimeSvc
+AxInstSV                                                       0 C:\WINDOWS\system32\svchost.exe -k AxInstSVGroup
+BDESVC                                                      1628 C:\WINDOWS\System32\svchost.exe -k netsvcs -p
+BFE                                                         3908 C:\WINDOWS\system32\svchost.exe -k LocalServiceNoNetworkFirewall -p
+BITS                                                           0 C:\WINDOWS\System32\svchost.exe -k netsvcs -p
+BrokerInfrastructure                                        1172 C:\WINDOWS\system32\svchost.exe -k DcomLaunch -p
+
+
+PS C:\Users\student> Get-Ciminstance Win32_service | Select Name, Processid, Pathname | more
+
+Name                                                   Processid Pathname
+----                                                   --------- --------
+AdobeARMservice                                             4624 "C:\Program Files (x86)\Common Files\Adobe\ARM\1.0\armsvc.exe"
+AJRouter                                                       0 C:\WINDOWS\system32\svchost.exe -k LocalServiceNetworkRestri...
+ALG                                                            0 C:\WINDOWS\System32\alg.exe
+AppIDSvc                                                       0 C:\WINDOWS\system32\svchost.exe -k LocalServiceNetworkRestri...
+Appinfo                                                     7752 C:\WINDOWS\system32\svchost.exe -k netsvcs -p
+AppReadiness                                                   0 C:\WINDOWS\System32\svchost.exe -k AppReadiness -p
+AppXSvc                                                        0 C:\WINDOWS\system32\svchost.exe -k wsappx -p
+AudioEndpointBuilder                                        3168 C:\WINDOWS\System32\svchost.exe -k LocalSystemNetworkRestric...
+Audiosrv                                                    3920 C:\WINDOWS\System32\svchost.exe -k LocalServiceNetworkRestri...
+
+-- More --
+
+
+
+PS C:\Users\student> get-service ALG | format-list *
+
+
+Name                : ALG
+RequiredServices    : {}
+CanPauseAndContinue : False
+CanShutdown         : False
+CanStop             : False
+DisplayName         : Application Layer Gateway Service
+DependentServices   : {}
+MachineName         : .
+ServiceName         : ALG
+ServicesDependedOn  : {}
+ServiceHandle       :
+Status              : Stopped
+ServiceType         : Win32OwnProcess
+StartType           : Manual
+Site                :
+Container           :
+
+
+
+
+schtasks /query /tn "IchBinBosh" /v /fo list
+
+Folder: \
+HostName:                             ADMIN-STATION
+TaskName:                             \IchBinBosh
+Next Run Time:                        6/1/2021 5:02:00 PM
+Status:                               Ready
+Logon Mode:                           Interactive only
+Last Run Time:                        6/1/2021 4:47:00 PM
+Last Result:                          0
+Author:                               ADMIN-STATION\andy.dwyer
+Task To Run:                          powershell.exe -win hidden -encode JABMAD0ATgBlAHcALQBPAGIAagBlAGMAdAAgAFMAeQBzAHQAZQBtAC4ATgBlAHQALgBTAG8AYwBrAGUAdABzAC4AVABjAHAATABpAHMAdABlAG4AZQByACgANgA2ADYANgApADsAJABMAC4AUwB0AGEAcgB0ACgAKQA7AFMAdABhAHIAdAAtAFMAbABlAGUAcAAgAC0AcwAgADYAMAA=
+Start In:                             N/A
+Comment:                              N/A
+Scheduled Task State:                 Enabled
+Idle Time:                            Disabled
+Power Management:                     Stop On Battery Mode, No Start On Batteries
+Run As User:                          andy.dwyer
+Delete Task If Not Rescheduled:       Disabled
+Stop Task If Runs X Hours and X Mins: 72:00:00
+Schedule:                             Scheduling data is not available in this format.
+Schedule Type:                        One Time Only, Minute
+Start Time:                           4:02:00 PM
+Start Date:                           6/1/2021
+End Date:                             N/A
+Days:                                 N/A
+Months:                               N/A
+Repeat: Every:                        0 Hour(s), 15 Minute(s)
+Repeat: Until: Time:                  None
+Repeat: Until: Duration:              Disabled
+Repeat: Stop If Still Running:        Disabled
+
+
+
+Autorun Registry Locations
+https://os.cybbh.io/public/os/latest/011_windows_auditing_&_logging/artifacts_fg.html#_10_1_locations
+
+    Q: What are some Registry keys that can be used for autoruns?
+
+        Registry Keys Locations, Locations connected with Services.
+
+            HKLM\Software\Microsoft\Windows\CurrentVersion\Run - Local Machine
+
+            HKLM\Software\Microsoft\Windows\CurrentVersion\RunOnce
+
+            HKLM\System\CurrentControlSet\Services
+
+        Remember that the Users have individual Hives with autoruns as well as the Current User.
+
+            HKCU\Software\Microsoft\Windows\CurrentVersion\Run - Current User
+
+            HKCU\Software\Microsoft\Windows\CurrentVersion\RunOnce
+
+            HKU\<sid>\Software\Microsoft\Windows\CurrentVersion\Run - Specific User
+
+            HKU\<sid>\Software\Microsoft\Windows\CurrentVersion\RunOnce
+
+        The order in which services are loaded can be adjusted.
+
+            HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\ServiceGroupOrder
+
+            HKEY_LOCAL_MACHINE\CurrentControlSet\Control\GroupOrderList
+
+
+
+
+andy.dwyer@ADMIN-STATION C:\Users\andy.dwyer>netstat -anob | more
+
+Active Connections
+
+net star
+
+  Proto  Local Address          Foreign Address        State           PID
+  TCP    0.0.0.0:22             0.0.0.0:0              LISTENING       2944
+ [sshd.exe]
+  TCP    0.0.0.0:135            0.0.0.0:0              LISTENING       832
+  RpcSs
+ [svchost.exe]
+  TCP    0.0.0.0:445            0.0.0.0:0              LISTENING       4
+ Can not obtain ownership information
+  TCP    0.0.0.0:3389           0.0.0.0:0              LISTENING       304
+  TermService
+ [svchost.exe]
+  TCP    0.0.0.0:5040           0.0.0.0:0              LISTENING       4456
+  CDPSvc
+
+-- More --
+
+TCP View
+
+## Process Validity in Linux
+
+
+The cron daemon checks the directories /var/spool/cron, /etc/cron.d and the file /etc/crontab, once a minute and executes any commands specified that match the time.
+
+
+
+    crontab -u [user] file This command will load the crontab data from the specified file
+
+    crontab -l -u [user] This command will display/list user’s crontab contents
+
+    crontab -r -u [user] This Command will remove user’s crontab contents
+
+    crontab -e -u [user] This command will edit user’s crontab contents
+
+
+## Auditing and Logging
+https://os.cybbh.io/public/os/latest/011_windows_auditing_&_logging/artifacts_fg.html#_10_1_locations
+
+
+
