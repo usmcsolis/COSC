@@ -15,6 +15,18 @@ File Server:
 10.8.0.3
 student
 password
+
+```
+
+ 
+## TEST Stack 8
+```
+windows
+ssh -X 10.50.39.235
+
+
+Linux
+ssh -X 10.50.31.156
 ```
 
 ## Remote Connection Instructions
