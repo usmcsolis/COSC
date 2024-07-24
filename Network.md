@@ -2597,3 +2597,73 @@ Man-in-th-Middle (MitM) attack with SLAAC - It is possible for a malicious actor
 
 
 ## ICMPv6 
+
+
+    This protocol includes all the same functionality as ICMPv4 with some added features like Fragmentation, Neighbor Discovery, and StateLess Address AutoConfiguration (SLAAC). Another change between ICMPv6 and ICMPv4 is that version 6 allows multicast transmission not just unicast transmission.
+
+
+ICMPv6 Ping Request
+![image](https://github.com/user-attachments/assets/4f07ce40-c07c-4ce0-b82e-c420a15f4a22)
+
+
+    The first image shows that the PC is performing a ping request to a network address of 2a01:2e0:3fe:1001:302::
+
+
+ICMPv6 Neighbor Solicitation
+![image](https://github.com/user-attachments/assets/68b96df6-25ba-46b7-bf43-d97593a83b33)
+
+
+    The second image shows after the router received the ping request, it sends out a Neighbor Solicitation (ICMPv6 Type 135) to the Solicited-Node multicast address, in this case ff02::1:ff2d:3b8e. The Solicited-Node address was derived by the least-significant 24 bits of the unicast address (2d:3b8e) and appending them to the prefix ff02::1:ff/104. The router’s source IPv6 is using its manual assigned Link-Local address (fe80::1). This Neighbor Solicitation process is similar to the IPv4 ARP request.
+
+
+ICMPv6 Neighbor Advertisement
+![image](https://github.com/user-attachments/assets/e68347d5-5cc5-426a-9e9f-c5c68b1205bd)
+
+
+    The third image shows the PC’s response, a Neighbor Advertisement (ICMPv6 Type 136), to the router’s Neighbor Solicitation. The PC’s IPv6 address is 2003:50:aa10:4243:221:6aff:fe2d:3b8e and the destination is back to the router’s Link-Local address (fe80::1). This Neighbor Advertisement process is similar to the IPv4 ARP reply.
+
+
+ICMPv6 Ping Reply
+![image](https://github.com/user-attachments/assets/a690d0da-124c-49f7-a32c-e630d344e45d)
+
+
+    The last image shows the router’s ping reply to the PC.
+
+
+
+
+# NDP
+## NEighbor Discovery Protocol
+
+
+
+    Router Solicitation (Type 133)
+
+        Hosts inquire with Router Solicitation messages to locate routers on an attached link. Routers which forward packets not addressed to them generate Router Advertisements immediately upon receipt of this message rather than at their next scheduled time.
+
+        Sent using the multicast address of FF02::2 (all routers) group.
+
+    Router Advertisement (Type 134)
+
+        Routers advertise their presence together with various link and Internet parameters either periodically, or in response to a Router Solicitation message.
+
+        Sent using the multicast of FF02::1 (all nodes) group.
+
+    Neighbor Solicitation (Type 135)
+
+        Neighbor solicitations are used by nodes to determine the link layer address of a neighbor, or to verify that a neighbor is still reachable via a cached link layer address.
+
+        Similar to an ARP Request when using IPv4. IPv6 does not use ARP however. It uses Neighbor Solicitation to request the MAC address of the destination.
+
+        Duplicate Address Detection (DAD). Sent by host to the IPv6 address it intends to use. This is to determine if the address is already in use.
+
+    Neighbor Advertisement (Type 136)
+
+        Neighbor advertisements are used by nodes to respond to a Neighbor Solicitation message.
+
+        Similar to an ARP Reply when using IPv4. IPv6 does not use ARP however. It uses Neighbor Advertisement to respond to a Neighbor Solicitation.
+
+    Redirect (Type 137)
+
+        Routers may inform hosts of a better first hop router for a destination.
+
