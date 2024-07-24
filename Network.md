@@ -2980,6 +2980,15 @@ Vector: This specifies the direction to the remote network. The router advertise
 
 
 
+There are four distance vector IPv4 IGPs:
+
+RIPv1: First generation legacy protocol
+
+RIPv2: Simple distance vector routing protocol
+
+IGRP: First generation Cisco proprietary protocol (obsolete and replaced by EIGRP)
+
+EIGRP: Advanced version of distance vector routing
 
 
 
@@ -2988,12 +2997,194 @@ Vector: This specifies the direction to the remote network. The router advertise
 
 
 
+## Link State Routing Protocols
+![image](https://github.com/user-attachments/assets/7110c7d7-18dd-458e-af84-ff0151d7ddf2)
+
+
+
+Compared to distance vector routing protocols, a router configured with a link-state routing protocol can create a complete view of the network. This is built by gathering information from all of the other routers to build a network topology.
+
+Link state routing protocols tend to flood the network with Link State Advertisements (LSAs). Each router receives these updates and begins to build a map of the entire network. It will use its algorithms to compute the best routes from this map to all remote networks. After this is done no periodic updates are sent unless there is a change in the topology.
+
+
+
+Link-state protocols work best in situations where:
+
+The network design is hierarchical, usually occurring in large networks
+
+Fast convergence of the network is crucial
+
+The administrators have good knowledge of the implemented link-state routing protocol
+
+
+
+There are two link-state IPv4 IGPs:
+
+OSPF: Popular open standards-based routing protocol
+
+IS-IS: Popular in service provider networks
+
+![Screenshot 2024-07-24 at 14-07-40 NETWORK LAYER FG Cyber Common Technical Core - Networking Module](https://github.com/user-attachments/assets/5500104a-3fb5-41ab-b8bf-71dd5116b3eb)
+
+
+## Routing Protocol Vulnerabilities
+
+
+Distributed Denial of Service (DDOS) - Attackers send more packets to the router than they can handle or process. This will cause the router to drop packets if proper QoS is not implemented.
+
+Packet Mistreating Attacks (PMA) - Similar to DOS attacks, packet mistreating injects packets with malicious codes designed to confuse and disrupt the router and network.
+
+Routing Table Poisoning (RTP) - Attackers can send specially crafted routing protocol packets to the router to poison the router’s tables. Enabling authentication can help mitigate this attack.
+
+Hit and Run DDOS (HAR) - DDOS attack on a specific network or router.
+
+Persistent Attacks (PA) - similar to hit and run, in which they both look to inject frequent harmful data packages into the router and network, helping the hackers gain control. The attacker can redirect traffic as they want, send wrong routing updates, or simply delete the configuration of that router.
+
+
+
+
+## Static Routing
+
+
+![image](https://github.com/user-attachments/assets/4fb3d590-fbc7-4016-ab8d-f20e0dd6d126)
+
+
+
+
+Static routing provides some advantages over dynamic routing, including:
+
+Static routes do not advertise over the network, resulting in better security.
+
+Static routes do not use bandwidth like dynamic routing protocols to send updates and no CPU cycles are used to calculate and communicate routes.
+
+The path a static route uses to send data is predetermined.
+
+
+
+Static routing has the following disadvantages:
+
+Initial configuration and maintenance is time-consuming.
+
+Configuration is prone to error, especially on large networks.
+
+Administrator must intervene to update routing information or to bypass network faults.
+
+Does not scale well with growing networks; maintenance becomes cumbersome.
+
+Requires complete knowledge of the whole network for proper implementation.
+
+
+
+
+## Dynamic Routing
+
+![image](https://github.com/user-attachments/assets/c08ae744-0f17-449b-b634-85b6dfd4485d)
 
 
 
 
 
+Routing protocols allow routers to dynamically exchange routing information to build routing tables. If 2 or more routers share the same protocol they can communicate with each other. The purpose of dynamic routing protocols includes:
 
+Discover new remote networks
+
+Maintaining current routing information
+
+Choose best path to remote networks
+
+Recalculate a new path to a remote network should the primary fail
+
+
+Dynamic routing provides some advantages over static routing, including:
+
+Easier to configure and maintain.
+
+Administrator does not need to intervene to update tables during network outages.
+
+Scales very well on growing networks.
+
+
+Dynamic routing has the following disadvantages:
+
+Routing protocols flood the network updates which consumes bandwidth and can be intercepted.
+
+Uses extensive CPU and RAM to run its algorithms and build its databases.
+
+Path data can travel is not deterministic and can change fluidly.
+
+
+
+
+## Understand First Hop Redundancy Protocols and their vulnerabilities
+
+
+![image](https://github.com/user-attachments/assets/b6b8fda5-7853-48ca-95e7-7b701ff7e7e2)
+
+
+
+
+Redundancy on networks are critical should a fault occur. One limitation on user PCs is that you can only configure one default gateway. Should this device fail the users cannot get out of their local network. Even if 2 or more routers are configured for redundancy, each interface will have a different IP address and both cannot be configured on users. FHRP provides a mechanism to provide alternate default gateways in switched networks where two or more routers are connected to the same network.
+
+FHRP works by assigning a virtual router to 2 or more gateway routers. This works by configuring a FHRP protocol on all participating gateway interfaces to share a "floating IP" address and MAC. Each interface will have its unique IP assigned to the interface but all will share this floating IP and MAC.
+
+
+Several types of FHRPs were developed:
+
+Hot Standby Router Protocol (HSRP)
+
+A Cisco-proprietary FHRP designed to allow for transparent fail-over of IPv4 networks.
+
+One router interface will be set as "active" and the others set as "standby".
+
+Once the active interface will forward traffic to other networks.
+
+Standby interfaces serve as backups in case the active fails.
+
+Active interface sends multicast "Hello" packets to inform the backups that its still operational.
+
+
+
+HSRP for IPv6 - Cisco-proprietary FHRP providing the same functionality as HSRP but for IPv6 addressing.
+
+
+
+Virtual Router Redundancy Protocol version 2 (VRRPv2)
+
+An industry-standard protocol defined in RFC 3768 that offers similar functionality to HSRP.
+
+Like HSRP, VRRP allows multiple routers to work together to provide redundancy for the default gateway.
+
+One router is elected as the master router, and the others are backup routers.
+
+The master router sends periodic advertisements to inform the backup routers of its status.
+
+If the master router fails, one of the backup routers is elected as the new master.
+
+
+
+VRRPv3 - VRRP for IPv6 addressing.
+
+
+
+Gateway Load Balancing Protocol (GLBP)
+
+GLBP is another Cisco proprietary protocol that extends the functionality of HSRP and VRRP by providing load balancing in addition to redundancy.
+
+GLBP allows multiple routers to share the traffic load for a virtual IP address, providing both redundancy and increased network capacity.
+
+GLBP uses an active virtual gateway (AVG) to assign different virtual MAC addresses to different routers, distributing traffic across multiple gateways.
+
+GLBP for IPv6 - CGLBP for IPv6 addressing.
+
+
+
+
+
+## HSRP Attack:
+
+Routers must exchange HSRP hello packets at the default interval of three seconds. Packets are sent using the multicast address of 224.0.0.2 (the "all routers" IPv4 multicast address). Since multicasts are flooded over the network similar to Broadcasts, they can be intercepted by any host with layer two connectivity and can inspect the HSRP parameters.
+
+To usurp the active router, the attacker only needs to inject false HSRP hellos claiming the active role with a higher priority.
 
 
 
