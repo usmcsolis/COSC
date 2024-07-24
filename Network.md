@@ -235,7 +235,7 @@ Similar to hubs but can use Collision Domain and it knows what you are addressin
 Allows you to cross networks using routing tables. Can connect different nets together. One router can connect a LAN to another LAN to create a WAN
 
 
-# Ethernet Timing (BIT-TIME)
+## Ethernet Timing (BIT-TIME)
 Bit Time - is the period of time is required for a bit to be placed and sensed on the media. Network speeds are measured by how many bits can be placed or sensed on the media in 1 second. Each increase in speed requires more bits to be sent during the same 1 second internal. To accomplish this the bit-times are reduced.
 
 ```
@@ -247,7 +247,203 @@ Speed       Bit-Time
 100 Gbps    .01ns
 ```
 
-#
+# Layer 2 Data Link
+## Sublayers
+MAC (Medium Access Control)
+
+LLC (Logical Link Control)
+
+## Message Formatting Method and Terminology
+
+![image](https://github.com/user-attachments/assets/b2477912-db59-4914-8224-883a7ed47ac6)
+
+HEader - Layer 2 to Layer 7
+
+Data - Payload
+
+Footer - FCS/CRC ( FrameCheckSequence and CyclicRedundancyCheck)
+
+## Encapsulation and Decapsulation
+When data is being trasmitted through the OSI Model header and footers are constantly being stripped and added
+
+![image](https://github.com/user-attachments/assets/2a66375c-55bd-4ed2-97a0-200c5ddc5007)
+
+![image](https://github.com/user-attachments/assets/5df51644-8f08-473c-bec7-14e6023b0582)
+
+## Switches
+```
+Build MAC-Address (Content Addressible Memory (CAM)) Table
+- Learns by reading Source MAC Address
+
+Forwarding Frames
+- Decision based on Destination MAC Address
+
+Operational Modes
+- Cut Through - (sometimes called fast forward) only examines the destination address before forwarding it to its destination segment. This is the fastest switching mode but requires the interfaces to be the same speed.
+
+- Fragment-Free - Checks the entire packet and verifies its not split up
+
+- Store-and-Forware - accepts and analyzes the entire frame before forwarding it to its destination
+```
+
+## EXPLOITS
+```
+CAM Table Overflow/ Media Acces Control (MAC) Attack
+- flooding attack, is a type of security exploit that targets network switches. This attack aims to overwhelm a switch’s CAM table, which is used to store MAC address-to-port mappings, leading to a denial of service (DoS) condition or facilitating a man-in-the-middle attack.
+- Similar to a buffer overflow attack, the goal is to fill the switches table with "learned" MAC addresses and see what happens. The attacker sits on one port and generates a vast number of "spoofed" MAC entries. When the CAM table is full, all additional MACs will not be learned and will default to "open". This means that traffic without a CAM entry will be flooded out on all ports of the VLAN in question. Traffic with a CAM entry won’t be affected, but neighbor switches could be.
+
+```
+
+## MAC Address
+```
+Length = 48 bit | 6 byte | 12 hex
+Format =
+Windows : 01-23-45-12-34-56
+unix-Linux : 01:23:54:12:34:56
+Cisco : 1234.5612.3456
+
+Parts
+OUI - First 24-bits assigned by IANA
+Vender Assigned - Last 24-bits
+
+```
+
+![image](https://github.com/user-attachments/assets/76290b2b-1b54-4b9d-b330-5fad385e2a77)
+
+```
+Types:
+Unicast - One to One 8th bit is OFF
+
+MultiCast - One to MANY 8th bit is ON
+
+BroadCast - One to ALL 8th bit is ON
+```
+
+## MAC Spoofing
+
+```
+Could not be changed at first
+Used to be called:
+hardware
+firmware
+burned-in
+
+Now it can be changed w/ software
+
+
+
+Spoofing is the act of disguising a communication from an unknown source as being from a known or trusted source. Spoofing is an attack vector done at several different layers of the OSI. At the Data-link layer attackers will commonly spoof the MAC-address.
+
+Originally MAC addresses were hard coded into the firmware of the NIC and could not be easily changed. This is why MAC addresses were commonly called "Firmware", "Hardware", or "Burned-in" addresses. In order to facilitate MAC spoofing attacks it required crafting of special frames with the MAC address pre-programmed in.
+
+Today most MAC addresses are programmed using the software. This makes modification of a device’s MAC address much simpler. In order to perform a MAC spoofing attack the malicious actor can either change their MAC address to a known or trusted address or create crafted frames with the MAC address already programmed in. MAC spoofing can be used to perform:
+
+ARP-Cache poisoning - modify the ARP cache of devices on the same network segment.
+
+ARP Man-in-the-middle (MitM) attacks - Specially crafted ARP messages to force 2 or more victims to send traffic thru the attacker’s system. Here the attacker can sniff or alter traffic.
+
+```
+
+## Ethernet Header and Frame
+
+![image](https://github.com/user-attachments/assets/ef5da628-1f90-435b-80fc-8509589af70e)
+
+![image](https://github.com/user-attachments/assets/c9c33467-ee6f-4aac-88a8-54c51ee84f3a)
+
+![image](https://github.com/user-attachments/assets/4c60dcac-dc44-418d-a669-c63a8d3e1339)
+
+```
+Structure:
+
+    Preamble (7 bytes) +Consists of alternating 1’s and 0’s to allow network synchronization with receiver clocks. Ethernet is self-clocked, the clock is extracted from the signal. The clock is used to set the bit-timing. This is so that the receiver knows what speed the bits will be arriving at. This is stripped off at the NIC and not visible by packet analyzer software.
+
+    SFD (Start Frame Delimiter) (1 byte field) Marks the end of the preamble, and the beginning of the Ethernet frame and send an announcement that data is about to be sent to any other hosts on the same network segment. This is stripped off at the NIC and not visible by packet analyzer software.
+
+    Destination MAC Addresses (6 bytes)
+
+        Initial 6 bytes (48 bits) contain the Destination MAC address.
+
+        This can be Unicast, Multicast, or Broadcst MAC address.
+
+        This is sent first to assist in switch operation of the cut-through mode.
+
+    Source MAC Addresses (6 bytes)
+
+        Next 6 bytes (48 bits) contain the Source MAC Address.
+
+        This is always a Unicast MAC address.
+
+        It is worth noting that this is pretty much the only time that the destination address comes before the source. The source address will come first in most other headers that we deal with in this course.
+
+    Ethertype (2 bytes) Used to indicate the next protocol encapsulated in the frame. This is provided by the LLC sub-layer.
+
+        Common Ethertypes controlled by IANA.org:
+
+            0x0800 - IPv4
+
+            0x0806 - ARP
+
+            0x86DD - IPv6
+
+            0x8100 - VLAN Tagging 802.1q
+
+            0x88A8 - Service VLAN tag identifier (S-Tag) (Q-in-Q tunnel)
+
+            0x8863(4) - PPP over Ethernet (PPPoE)
+
+            0x8847(8) - MPLS
+
+            0x8892 - PROFINET Protocol
+
+    Data / Payload (46-1500 bytes)
+
+        Consists of the encapsulated upper layer headers and data payload which may be 46-1500 bytes.
+
+        The minimum 46 bytes is based on the fact that the smallest "legal" ethernet frame size is 64 bytes; so 46 bytes of data with 18 bytes of Frame header equates to 64 bytes. Anything less than 64-bytes is assumed to be a collision fragment (or "runt"). "Padding" is used when there is less than 46-bytes of data.
+
+        The maximum data bytes is determined by the MTU for the network segment. The MTU is the maximum size of the payload of the frame of the particular network. Ethernet II by default has a max MTU of 1500 bytes. This MTU is the amount of encapsulated data. MTU of 1500 plus the 18 byte header equates to 1518 bytes. Anything greater than this may be considered a "Jumbo" frame.
+
+        This typically is the size of the IP packet but can be the size of other encapsulated protocols like ARP or IPv6.
+
+        The Frame header is not calculated in to this size. So the frame size could be 1518 bytes (or more) in total when the 18 byte header is added. It’s worth noting that the 1500 bytes is of total encapsulated information and not exclusively user data. This 1500 bytes includes the 20+ byte IPv4 header and 20+ byte TCP header. If VPN or tunneling is involved then the extra headers must also fit within this 1500 bytes.
+
+        MTU defaults:
+
+            1500 - Ethernet
+
+            17914 - 16 MBPS Token Ring
+
+            4464 - 4 MBPS Token Ring
+
+            4352 - FDDI
+
+            2304 - IEEE 802.11 Wi-FI (WLAN)
+
+            1280 - IPv6 path
+
+            1492 - IEEE 802.3/802.2
+
+            1480 - PPoE (WAN Miniport)
+
+            576 - X.25
+
+        If there are any other headers included, such as IPSEC, IPv4 or TCP options, then this would mean that even less user data can be encapsulated.
+
+    FCS/CRC (Frame Check Sequence / Cyclical Redundancy Check) (4 bytes)
+
+        Mathematical formula calculated on the entire frame. This calculation is appended in the FCS field so that the receiver can determine if the contents of the frame were corrupted in transit. This is stripped off at the NIC and not visible by packet analyzer software.
+
+
+```
+
+
+
+
+
+
+
+
+
 
 
 
