@@ -71,11 +71,24 @@ Traffic Capture: https://net.cybbh.io/-/public/-/jobs/874001/artifacts/modules/n
 7 Layer OSI MODEL (PDNTSPA)
 ![image](https://github.com/user-attachments/assets/6eb18223-a459-48a3-a01e-0fed85fb986a)
 
-TCP Connection Oriented
+PDU Protocol Data Unit -
 
-UPD Connection-less Oriented
+```
+Session Application = DATA
+Transport = Segment/DataGram
+Network = PACKET
+DataLink = FRAME
+Physical = BIT
 
+```
 
+## Internet Standard Organizations
+
+IETF - RFCs
+
+IANA - Internet Numbers
+
+IEEE - LAN/WAN Electrical Standards
 
 
 
