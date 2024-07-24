@@ -716,9 +716,223 @@ This attack works if the attacker knows what the "native VLAN" that is used on y
 
 ```
 
+# ARP 
+Address Resolution Protocol: quick way to resolve MAC to IP Addresses
 
 
 
+## Offset
+
+![image](https://github.com/user-attachments/assets/db3f02d6-a276-4d67-8ecf-0100741a4c6f)
+
+```
+
+
+    Structure:
+
+        Hardware type (HTYPE) This field specifies the network link protocol type.
+
+            1 = Ethernet
+
+            6 = Token Ring
+
+            15 = Frame Relay
+
+        Protocol type (PTYPE) This field specifies the internetwork protocol for which the ARP request is intended. The permitted PTYPE values share a numbering space with those for EtherType.
+
+            0x0800 = IPv4
+
+        Hardware length (HLEN) Length (in octets) of a hardware address.
+
+            6 = Byte size of Ethernet MAC addresses.
+
+        Protocol length (PLEN) Length (in octets) of addresses used in the upper layer protocol. (The upper layer protocol specified in PTYPE.)
+
+            4 = Byte size of IPv4 addresses.
+
+        Operation Specifies the operation that the sender is performing:
+
+            1 = ARP request
+
+            2 = ARP reply
+
+            3 = RARP request
+
+            4 = RARP reply
+
+        Sender hardware address (SHA) Media address of the sender. In an ARP request this field is used to indicate the address of the host sending the request. In an ARP reply this field is used to indicate the address of the host that the request was looking for. (Not necessarily address of the host replying as in the case of virtual media.) Switches do not pay attention to this field, particularly in learning MAC addresses. The ARP PDU is encapsulated in Ethernet frame, and that is why Layer 2 devices examine it.
+
+            In a ARP request, this will be the requestor’s MAC address.
+
+            In a ARP reply, this will be the target’s MAC address.
+
+        Sender protocol address (SPA) Internetwork address (usually IPv4 Address) of the sender.
+
+            In a ARP request, this will be the requestor’s IP address.
+
+            In a ARP reply, this will be the target’s IP address.
+
+        Target hardware address (THA) Media address of the intended receiver. In an ARP request this field is ignored. In an ARP reply this field is used to indicate the address of the host that originated the ARP request.
+
+            In a ARP request, this will be blank.
+
+            In a ARP reply, this will be the requestor’s MAC address.
+
+        Target protocol address (TPA) Internetwork address (usually IPv4 Address) of the intended receiver.
+
+            In a ARP request, this will be blank.
+
+            In a ARP reply, this will be requestor’s IP address.
+
+
+```
+
+## Types
+```
+ARP (OP 1 and 2)
+ 
+RARP (OP 3 and 4)
+
+Proxy ARP (OP 2)
+
+Gratuitous ARP (OP 2)
+```
+
+```
+
+
+ARP - A request and response in order to resolve the destination L2 (MAC) address when only the destination L3 (IPv4) address is known.
+
+    ARP Request Operation code = 1
+
+    ARP Reply Operation code = 2
+
+    ARP Request:
+
+        When a device needs to communicate with another device on the same network segment but only knows the destination’s IP address, it broadcasts an ARP request message to the entire network.
+
+        The ARP request contains the sender’s IP address and MAC address and the IP address of the target device.
+
+    ARP Reply:
+
+        The device with the IP address specified in the ARP request responds with an ARP reply.
+
+        The ARP reply contains the target device’s MAC address.
+
+        Once the sender receives the ARP reply, it can use the MAC address to address frames destined for the target device.
+
+RARP - A request and response in order to resolve the destination L3 (IPv4) address when only the destination L2 (MAC) is known. (This protocol has been deprecated since the widespread use of protocols like BOOTP and DHCP.)
+
+    RARP Request Operation code = 3
+
+    RARP Reply Operation code = 4
+
+    When a device boots up and has no configured IP address, it broadcasts a RARP request onto the local network.
+
+    The RARP request contains the device’s MAC address.
+
+    RARP servers on the network receive the broadcast request and check their tables for a corresponding IP address entry associated with the MAC address.
+
+Gratuitous ARP - An ARP reply that was not requested.
+
+    ARP Reply Operation code = 2
+
+    A gratuitous ARP messages is an ARP messages sent by a device to announce its own IP-to-MAC address mapping to other devices on the network.
+
+    Gratuitous ARP messages are commonly used during network initialization or to update ARP caches in other devices.
+
+    These are commonly used for:
+
+        Help in detecting IP conflicts
+
+        Assist in updating other system’s ARP cache
+
+        To inform switches of the MAC address of the client connected to its port
+
+        Helps pre-load other systems ARP cache when the local systems IP interface comes up
+
+    Maliciously used to:
+
+        Poision a victim’s ARP cache
+
+Proxy ARP - A device (router) answers the ARP queries for IP address that is on a different network.
+
+    The ARP proxy sees the ARP request and determines that the target Network address is not on the local network segment and is aware of how to reach the destination network.
+
+    The proxy will offer its own MAC address in response to the request.
+
+    Typically this device is the network gateway and is responsible to forward traffic for other networks.
+
+    Maliciously the ARP requests can be intercepted and a Proxy ARP sent as a response to poision the victim’s ARP Cache.
+
+ARP Cache - is a collection of Layer 2 to Layer 3 address mappings discovered utilizing the ARP request/response process. When a host needs to send a packet both the L2 and L3 addresses are needed. The host will look in this table to determine if it already knows both the L2 and L3 addresses. If the target is not in the table then a ARP request is initiated. The ARP cache can be populated statically but mostly its done dynamically. This cache can be exploited by attackers with the aim to poison the cache with incorrect information to either perform a DoS or MitM.
+
+```
+
+
+## ARP Cache
+```
+All resolved MAC to IP Addresses
+If MAC is not in cache then ARP is used
+Dynamic entries last from 2-20mins
+Default gateway is present at minimum
+Can be easily duped by attackers
+
+```
+
+## EXPLOIT MITM with ARM
+
+```
+
+
+    Address Resolution Protocol (ARP) attack using Gratuitous ARPs
+
+When ARP was developed security was not as much of an issue. Over time it was discovered that many protocols could be used in unintended ways. Typically a host will broadcast an ARP request over the network and expects only the intended host to respond. Gratuitous ARP on the other hand is another method that a host can announce itself to the network. All other hosts believe the message and will add this entry into their ARP cache. These are the legitimate uses of ARP but malicious actors can use the open, unencrypted, and unverified nature of the protocol to their own ends.
+
+An attacker can broadcast a gratuitous ARP, announcing itself as the networks default gateway. It will use the legitimate default gateway’s IP address but will use it’s own MAC address. All hosts on the network will assume this information to be true and update their ARP caches. This in essence will poison everyone’s ARP cache. All hosts on the network will now send all traffic to other networks to the attackers computer. The Attacker will forward all traffic to the legitimate gateway but now the attacker is included in the hosts communication.
+
+This process creates a Layer 2 Man in the Middle.
+
+
+    Proxy ARP and Security Concerns:
+
+Typically a PC will issue an ARP request to get the unknown MAC address of a device when its IP address is known. If the device is on the same network then that device will respond with ARP Reply. If the device happens to be on a different network, the router will respond with its own MAC address. The router responds because it will see that the destination IP address is on a different network and it knows how to get there from its routing tables. The router will respond to the ARP request with its own MAC to tell the host to send all the communication to itself to get to the remote destination. The host will update its ARP cache to reflect the router (default gateway) to be used to reach remote destinations. This is called a Proxy ARP.
+
+An attacker can intercept ARP requests for a gateway and respond with its own MAC address resulting in a Man in the Middle attack.
+
+
+```
+
+
+## VTP 
+
+## VLAN Trunking Protocol
+Simplifies an administrators job
+
+![image](https://github.com/user-attachments/assets/aa27e9b7-0a71-4a89-a25a-ef0ec9b8771e)
+
+```
+
+
+VLAN Trunking Protocol (VTP) is a Cisco proprietary protocol that propagates the definition of Virtual Local Area Networks (VLAN) on the whole local area network. VLAN Trunk Protocol (VTP) was developed to help reduce the administration of creating VLANs on all switches within a switched network. To do this, VTP sends VLAN information to all the switches in a VTP domain.
+
+    Server - can create, modify or delete VLANs. Can create and forward VTP messages.
+
+    Client - can only adopt VLAN information in VTP messages. Can forward VTP messages.
+
+    Transparent - only forwards VTP messages but does not adopt any of the information.
+
+VTP advertisements are sent over all trunk links. VTP messages advertise the following on its trunk ports:
+
+    Management domain
+
+    Configuration revision number
+
+    Known VLANs and their specific parameters
+
+There are three versions of VTP, version 1, version 2, version 3.
+
+```
 
 
 
