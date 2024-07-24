@@ -435,8 +435,8 @@ Structure:
 
 ```
 
-## VLANs (802.1Q)
-Virtual Local Area Network
+# VLANs (802.1Q)
+## Virtual Local Area Network
 
 
 ![image](https://github.com/user-attachments/assets/5d0a46c8-aa5f-4b16-b9b2-6f1001c29ccf)
