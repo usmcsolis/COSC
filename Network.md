@@ -495,6 +495,226 @@ VLAN 100 = SuperSecret
 
 ```
 
+## VLAN Types
+```
+    Default - VLAN 1 is the default vlan. VLAN 1 will always be present on the switch and can not be deleted. All ports will be assigned to VLAN 1. When VLAN assignment is removed from a port it will automaticcally be assigned to VLAN 1.
+
+    Data - VLANs assigned for user traffic.
+
+        Data VLANs are used to separate user data traffic based on different groups, departments, or functions.
+
+        Devices within the same data VLAN can communicate with each other as if they are on the same physical network.
+
+    Voice - VLAN assigned for use for voice traffic only. Typically uses CDP messages from VOIP phones to be asigned.
+
+        Voice VLANs are used to separate voice traffic from data traffic in networks that support Voice over IP (VoIP) systems.
+
+        This VLAN is configured to carry voice traffic, ensuring quality of service (QoS) for voice communications.
+
+    Management - A form of data VLAN used for switch/router remote management purposes.
+
+        A management VLAN is a VLAN used for managing networking devices such as switches, routers, and access points.
+
+        This VLAN is often used for remote device management, configuration, and monitoring purposes.
+
+        It helps secure management traffic by segregating it from user data traffic.
+
+    Native - VLAN used for switch/router generated traffic.
+
+        These are used for control traffic such as CDP, VTP, DTP, and STP. These do not normally have "tags" applied.
+
+        Native VLANs by default is VLAN 1 but is highly recommended to change.
+
+        The native VLAN is used on trunk links to carry untagged frames.
+
+        Frames from the native VLAN are not tagged when traversing trunk links, while frames from other VLANs are tagged.
+
+```
+
+## Without VLANs
+```
+
+
+Networks without VLANs operate as a single broadcast domain, where all devices connected to the same physical network segment can communicate with each other without any logical segmentation.
+
+    Single Broadcast Domain:
+
+        In networks without VLANs, all devices connected to the same physical network segment receive broadcast traffic intended for the entire segment.
+
+        Broadcast traffic includes protocols such as ARP (Address Resolution Protocol) and DHCP (Dynamic Host Configuration Protocol), as well as other network-wide announcements. Each physical interface on a router is assigned to a different network. Will need one physical interface per network required. Future planning is critical as additional added networks can be difficult and costly to install.
+
+        All hosts on the switched LAN are part of the same network and only a router can segment networks.
+
+        In normal operation, when a switch receives a broadcast frame on one of its ports, it forwards the frame out all other ports except the port where the broadcast was received.
+
+        On a switch with only 1 vlan configured (vlan 1 by default) all ports belong to same broadcast domain.
+
+    Flat Network Structure:
+
+        Networks without VLANs typically have a flat network structure, where all devices are part of the same logical network.
+
+        Devices within the network can communicate directly with each other without the need for routing between subnets or VLANs.
+
+    Limited Segmentation and Isolation:
+
+        Without VLANs, there is limited segmentation and isolation of network traffic.
+
+        Devices in different departments, groups, or security zones share the same broadcast domain and have unrestricted access to each other’s traffic, which can present security and performance challenges.
+
+    Broadcast Storms and Traffic Congestion:
+
+        In networks without VLANs, broadcast storms can occur if a device generates a large amount of broadcast traffic, overwhelming the network and causing performance degradation.
+
+        Similarly, network congestion can occur as all devices share the same network bandwidth, leading to potential bottlenecks.
+
+
+
+```
+
+## With VLANs
+```
+Networks with VLANs (Virtual Local Area Networks) offer greater flexibility, security, and efficiency compared to traditional networks without VLANs. VLANs allow network administrators to logically segment a single physical network into multiple virtual networks, each with its own broadcast domain.
+
+    Logical Segmentation:
+
+        VLANs allow network administrators to logically segment the network into multiple broadcast domains, regardless of the physical network topology. Devices within the same VLAN can communicate with each other as if they were on the same physical network segment, while traffic between VLANs typically requires routing.
+
+        When VLANs are implemented on a switch, the transmission of unicast, multicast, and broadcast traffic from a host in a particular VLAN are restricted to the devices that are in that VLAN only.
+
+    Broadcast Isolation:
+
+        Each VLAN forms a separate broadcast domain, reducing the scope of broadcast traffic. Broadcast traffic generated within a VLAN is only forwarded to devices within that VLAN, improving network efficiency and reducing unnecessary traffic on other VLANs.
+
+    Enhanced Security:
+
+        VLANs provide enhanced security by segregating network traffic and controlling communication between different groups of devices. Access control lists (ACLs) and firewall policies can be applied at VLAN boundaries to restrict traffic flow between VLANs based on security policies.
+
+    Improved Performance:
+
+        By dividing the network into smaller broadcast domains, VLANs can reduce broadcast traffic and network congestion, leading to improved performance and better overall network efficiency.
+
+    Flexibility:
+
+        VLANs provide flexibility in network design and management, allowing administrators to easily add, remove, or modify VLAN configurations without physical reconfiguration of network infrastructure.
+
+        All the "tagging" processes are completely transparent to the "user" and is handled by the intermediary network devices.
+
+        When the switch receives a frame on a port configured in access mode and assigned a VLAN, the switch will then determine what interface to send the frame out. If the outgoing interface happens to be a trunk port, the switch inserts the VLAN tag in the frame header, recalculates the Frame Check Sequence (FCS), and sends the tagged frame out of that trunk port. Inversely, when a switch receives a tagged frame from a trunk link and it determines that the outgoing interface is an access port, the switch will remove the vlan tag and the FCS is recalculated again. The Type field is also reverted back to its original value. The 4-byte tag is removed and the Type field reverts back to its original location at [12:2].
+
+```
+
+## VLANs 802.1AD Double Tagging
+
+![image](https://github.com/user-attachments/assets/0a9911f1-a0ad-401f-996c-0bdea2dc199c)
+
+```
+
+
+IEEE 802.1ad is an Ethernet networking standard informally known as "Q-in-Q". The was added as an amendment to IEEE standard IEEE 802.1Q-1998. This technique was commonly used for provider bridging or tagging. A service provider could tag already tagged user frames across a service providers network and then strip it off at the other end; this is a form of tunneling.
+
+This technique allowed the ability to insert more than one 4 byte tag into the frame. Each additional tag is inserted before the previous tag. The tags are then removed in reverse order. The first tag will be the typical 0x8100 Ethertype and include the user provided VLAN ID. Each additional tag will use 0x88A8 (standard) or 0x9100 (non-standard) Ethertype and include the provider’s VLAN ID.
+
+    Standard VLAN Tagging (IEEE 802.1Q):
+
+        In a standard VLAN tagging scenario, each Ethernet frame includes a 4-byte VLAN tag inserted between the source MAC address and the EtherType/Length field.
+
+        Ethertype uses is 0x8100.
+
+        This VLAN tag contains information such as the VLAN ID (VID) that identifies the VLAN to which the frame belongs.
+
+        IEEE 802.1Q supports up to 4096 VLANs (VLAN IDs 1-4094), allowing network administrators to segment a network into multiple virtual LANs.
+
+    QinQ VLAN Tagging:
+
+        QinQ extends VLAN tagging by adding another layer of VLAN tags, effectively allowing VLAN tagging within VLAN tagging.
+
+        In a QinQ scenario, the original Ethernet frame is encapsulated within another VLAN tag, creating a "tagged outer frame" with its own VLAN ID.
+
+        This outer VLAN tag provides a second level of VLAN identification, allowing for hierarchical VLAN structures.
+
+        The original VLAN tag remains intact, providing the VLAN segmentation information within the inner frame.
+
+        Outer VLAN tag uses the Ethertype of 0x88A8.
+
+    Usage and Benefits:
+
+        QinQ VLAN tagging is commonly used in service provider networks, particularly in metro Ethernet deployments.
+
+        It allows service providers to deliver multiple customer VLANs transparently over a single Ethernet link, preserving the VLAN segmentation of each customer.
+
+        By using QinQ, service providers can avoid VLAN ID conflicts between different customers' VLANs and simplify VLAN management.
+
+        QinQ also enables the creation of "service VLANs" or "provider VLANs" to carry traffic from multiple customer VLANs over a shared infrastructure while maintaining isolation between customers.
+
+    Frame Format:
+
+        In QinQ VLAN tagging, the Ethernet frame contains two 802.1Q headers:
+
+        The outer VLAN tag (or "service tag") contains the service provider’s VLAN ID.
+
+        The inner VLAN tag (or "customer tag") contains the customer’s VLAN ID.
+
+        The outer VLAN tag precedes the inner VLAN tag, and the original Ethernet frame is encapsulated between them.
+
+    IEEE 802.1ad was created for the following reasons:
+
+        802.1Q has a 12-bit VLAN ID field, which has a theoretical maximum of 4096 tags (212). With the growth of network this has become a limitation. A double-tagged frame however has two 12 byte VLAN ID fields. This can have a theoretical max of 4096×4096 or 16,777,216 VLAN IDs.
+
+        A tag stack creates a mechanism for some Internet Service Providers to encapsulate customer tagged 802.1Q traffic within another tag thus creating a Q-in-Q frame. The second (outer tag) is used to identify and segregate traffic from different customers; the inner tag is preserved from the original frame.
+
+        Using Q-in-Q provides a means of constructing Layer 2 tunnels, or even applying Quality of service (QoS) policies.
+
+        802.1ad is upward compatible with 802.1Q. Although 802.1ad is limited to two tags, there is no ceiling on the standard limiting a single frame to more than two tags, allowing for growth in the protocol. In practice Service Provider topologies often anticipate and utilize frames having more than two tags.
+
+        It is easier for networking equipment makers to modify their existing equipment by creating multiple 802.1Q headers than to modify their equipment to implement some hypothetical new non-802.1Q extended VLAN ID field header.
+
+```
+
+## EXPLOIT VLAN Hopping
+
+
+
+VLAN hopping Attack
+
+VLAN hopping is an exploit method of attacking networked devices on separate virtual LAN (VLAN) without traversing a router or other Layer 3 device. The concept behind VLAN hopping attacks is for the attacker on one VLAN to gain access to traffic on other VLANs that would normally not be accessible. Keep in mind that VLAN hopping is typically a one-way attack. It will not be possible to get any response from the target device unless methods are setup on the target to respond with similar vlan hopping methods.
+
+There are three primary methods of VLAN hopping:
+
+Switch Spoofing
+
+In this attack, an attacking host imitates a trunking switch by crafting Dynamic Trunking Protocol (DTP) frames in order to form a trunk link with the switch. With a trunk link formed the attacker can then use tagging and trunking protocols such as ISL or 802.1q. Traffic for all VLANs is then accessible to the attacking host.
+
+```
+                switch(config)# interface fastethernet 1/10
+                switch(config-if)# switchport mode access
+                switch(config-if)# switchport nonegotiate
+                switch(config-if)# switchport access vlan 10
+                switch(config)# iterface gigabit 0/1
+                switch(config-if)# switchport trunk encapsulation dot1q
+                switch(config-if)# switchport mode trunk
+                switch(config-if)# switchport nonegotiate
+```
+
+Tagging
+
+This attack typically requires the attacker add the target 802.1Q tag manually to an Ethernet frame even though it is an access port. This process is normally done by the switch. The switch will receive the frame and forward it out the trunk port leading to the target without it needing to be routed. This method requires that the attacker and victim are separated by a trunk and success depends on the switch firmware being vulnerable.
+
+Double Tagging
+
+This attack works if the attacker knows what the "native VLAN" that is used on your organization. Typically VLAN 1 is used. All VLANs will be "tagged" with its corresponding VLAN. The Native VLAN however is intended for local network communication and is not tagged. Thus anything tagged for the native VLAN will be stripped off. The attacker will insert 2 tags into their frames. The first tag will be for the Native VLAN and the second tag will be for whatever VLAN he is trying to access. Upon receipt the switch will then remove the Native VLAN tag and will leave the second VLAN tag in tact. This method also requires that the attacker and victim be separated by a trunk and a vulnerable switch.
+```
+                switch(config)# vlan dot1q tag native
+                switch(config)# interface fastethernet 1/10
+                switch(config-if)# switchport mode access
+                switch(config-if)# switchport nonegotiate
+                switch(config-if)# switchport access vlan 10
+                switch(config)# iterface gigabit 0/1
+                switch(config-if)# switchport trunk encapsulation dot1q
+                switch(config-if)# switchport mode trunk
+                switch(config-if)# switchport nonegotiate
+                switch(config-if)# switchport trunk native vlan 999
+
+```
 
 
 
