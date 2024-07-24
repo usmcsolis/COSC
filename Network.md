@@ -133,7 +133,7 @@ Most notably they developed standards for Local Area Networks (802 series) such 
 * 802.11 - Wireless LAN
 * 802.15 - Wireless PAN
 ```
-
+# Layer 1 Data
 ## Binary
 ```
 Base2- Two Symbols (0 and 1)
@@ -151,12 +151,6 @@ Word (32 bits)
 
 ![image](https://github.com/user-attachments/assets/edfb586b-f9a2-4730-a3f8-4e7a47fbed44)
 
-
-## Decimal
-```
-Base 10 - Ten Symbols ( 0 to 9)
-
-```
 
 ## Hexadeciaml
 ```
@@ -179,7 +173,6 @@ FF =
 ![image](https://github.com/user-attachments/assets/16d02c44-9008-4c7f-9d94-ebca2d0e4d5e)
 
 
-
 ## Base64
 ```
 Base64 = 64 Symbols (A-Z, a-z, 0-9, +, /)
@@ -191,7 +184,26 @@ Format = MTI= MTIzNA== MTIzNDU2Nzg=
 ![image](https://github.com/user-attachments/assets/50aa4e8c-2d16-4e2d-8e3e-1a00dcaf2054)
 
 
+# Lan Topologies
+## Bus
 
+![image](https://github.com/user-attachments/assets/e6915d00-fa55-4374-9ddd-0ede65939b17)
+
+## Star
+Central Node passes it to everyone else 
+![image](https://github.com/user-attachments/assets/2a299de8-66b6-42d8-bc7b-dc631f301926)
+
+## Ring
+Every workstation is plugged into everyone else and it goes 1 way in a ring
+![image](https://github.com/user-attachments/assets/ceded32a-f364-4af0-ad10-ddbb40173d24)
+
+## Mesh
+Everyone is connected to everyone 
+![image](https://github.com/user-attachments/assets/90699989-c44d-4b21-b06f-27527b9041b7)
+
+## Wireless
+
+## Hierarchial
 
 
 
