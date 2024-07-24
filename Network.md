@@ -1,5 +1,5 @@
 # Networking
-----
+
 ## Sites:
 CTFD - MASO-M-005@10.50.20.180:8000/challenges
 
@@ -15,7 +15,7 @@ Subnet Chart: https://www.engineeringradio.us/blog/wp-content/uploads/2013/01/Su
 
 Miro Whiteboard - https://miro.com/app/board/o9J_klSqCSY=/?share_link_id=16133753693
 
-----
+
 
 ## VPN Setup:
 ```
@@ -56,8 +56,6 @@ Miro Whiteboard - https://miro.com/app/board/o9J_klSqCSY=/?share_link_id=1613375
 
 # Lesson 1: Fundamentals
 
----
-
 ## Slides
 
 Network Access: https://net.cybbh.io/-/public/-/jobs/874001/artifacts/modules/networking/slides-v4/01_data.html
@@ -68,11 +66,7 @@ Transport to Application Layer: https://net.cybbh.io/-/public/-/jobs/874001/arti
 
 Traffic Capture: https://net.cybbh.io/-/public/-/jobs/874001/artifacts/modules/networking/slides-v4/06_traffic_cap.html
 
----
-
-
 # Network Access
----
 
 
 
