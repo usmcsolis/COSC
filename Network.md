@@ -1,5 +1,6 @@
 # Networking
 
+
 ## Sites:
 CTFD - MASO-M-005@10.50.20.180:8000/challenges
 
@@ -14,7 +15,6 @@ xfreerdp /v:10.50.x.x /u:student /p:password /size:1920x1000 +clipboard
 Subnet Chart: https://www.engineeringradio.us/blog/wp-content/uploads/2013/01/Subnet_Chart.pdf
 
 Miro Whiteboard - https://miro.com/app/board/o9J_klSqCSY=/?share_link_id=16133753693
-
 
 
 ## VPN Setup:
@@ -56,6 +56,7 @@ Miro Whiteboard - https://miro.com/app/board/o9J_klSqCSY=/?share_link_id=1613375
 
 # Lesson 1: Fundamentals
 
+
 ## Slides
 
 Network Access: https://net.cybbh.io/-/public/-/jobs/874001/artifacts/modules/networking/slides-v4/01_data.html
@@ -66,6 +67,7 @@ Transport to Application Layer: https://net.cybbh.io/-/public/-/jobs/874001/arti
 
 Traffic Capture: https://net.cybbh.io/-/public/-/jobs/874001/artifacts/modules/networking/slides-v4/06_traffic_cap.html
 
+
 ## OSI Model
 
 7 Layer OSI MODEL (PDNTSPA)
@@ -73,24 +75,66 @@ Traffic Capture: https://net.cybbh.io/-/public/-/jobs/874001/artifacts/modules/n
 
 PDU Protocol Data Unit -
 
-```
-Session Application = DATA
-Transport = Segment/DataGram
+But Free Pizza So Delicous(x4)
+
+Application = DATA
+
+Presentation = DATA
+
+Session = DATA
+
+Transport = SEGMENTS
+
 Network = PACKET
+
 DataLink = FRAME
+
 Physical = BIT
 
-```
 
 ## Internet Standard Organizations
 
-IETF - RFCs
+Internet Engineering Task Force (IETF) - RFCs are documents for standardization
+```
+Mostly known for developing and publishing "white paper" standards known as Request for Comment (RFC).
 
-IANA - Internet Numbers
+Some notable ones are:
+* IPv4 (791)
+* IPv6 (2460)
+* TCP (793)
+* UDP (768)
+* HTTP 1.1 (2616)
+* List of other from Wikipedia
+```
 
-IEEE - LAN/WAN Electrical Standards
+
+Internet Assigned Numbers Authority (IANA) - Internet Numbers 
+```
+Controls all internet numbers such as:
+* MAC OUI numbers
+* Ethertypes
+* IPv4 and IPv6 addresses
+* IPv4 and IPv6 Multi-cast addresses
+* Protocol Numbers
+* Port Numbers
+* 16/32-bit AS Numbers
+* Domain Names (Root)
+* ARP Operation Codes
+```
+
+Institute of Electrical and Electronics Engineers (IEEE) - LAN/WAN Electrical Standards
+```
+Most notably they developed standards for Local Area Networks (802 series) such as:
+
+* 802.1 - LAN and WAN bridging and security
+* 802.2 - LLC sub-layer
+* 802.3 - Ethernet (CSMA/CD)
+* 802.11 - Wireless LAN
+* 802.15 - Wireless PAN
+```
 
 
+## Layer 1 Data 
 
 
 
