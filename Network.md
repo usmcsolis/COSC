@@ -1429,6 +1429,771 @@ By default, switch ports can be either a trunk or access port depending on the d
      switchport nonegotiate
 ```
 
+# Network Layer
+
+## Why?
+```
+Internetworking was developed because Local Area Networks (LAN) needed the ability to communicate with one another.
 
 
- 
+
+    Addressing Schemes for Network (Logical Addressing)
+
+        Each device on the network has a logical addresses associated with it. This address is independent of the hardware device and must be unique in an internetwork.
+
+    Routing
+
+        The moving of data across a series of interconnected networks is the job of devices and software that exist at this layer. The network layer must handle incoming packets from various sources, determine their final destination, and send them to the appropriate interface and forwarding devices to be processed and routed once again.
+
+    Encapsulation
+
+        Encapsulation of messages received from higher layers must be performed to be passed on to the data-link layer.
+
+    IP Fragmentation and Reassembly
+
+        Due to constraints on bandwidth and other limiting factors, the network layer must be able to fragment packets that are too large and re-assemble the data in order at the destination device.
+
+    Error Handling and Diagnostics
+
+        The network layer uses special helper protocols like ICMP and ARP that allow logically connected devices to exchange information about the status of the network or devices themselves.
+
+
+```
+
+## Internet Protocol Versions
+```
+
+
+The network layer deals in two version of IP and ICMP, version 4 and version 6.
+
+    IPv4
+
+        Was the first working network layer protocol which has dominated the networking world since 1970s. At the time it was believed that 4.3 billion addresses would never be reached. In 1992 we started seeing the shortages take place and had to start developing methods of extending IPv4 until a permanent solution could be found. This is where and why subnetting, private ip addressing, and Network Address Translation protocol where developed and implemented.
+
+        The most significant issue with IPv4 is the exhaustion of available IPv4 addresses. The limited address space (32 bits) results in the depletion of available IPv4 addresses, making it challenging to assign unique addresses to new devices joining the network.
+
+        To assist in managing the eventual depletion of IPv4 address:
+
+            Subnetting and Address Allocation:
+
+                Efficiently allocate IPv4 address space through subnetting and address aggregation.
+
+                Use Variable Length Subnet Masking (VLSM) and Classless Inter-Domain Routing (CIDR) to allocate IP addresses based on the actual requirements of each subnet, avoiding wastage of address space.
+
+            RFC 1918 Private addresses:
+
+                RFC 1918 defines three blocks of IPv4 address space reserved for private use:
+
+                    10.0.0.0/8 (10.0.0.0 - 10.255.255.255)
+
+                    172.16.0.0/12 (172.16.0.0 - 172.31.255.255)
+
+                    192.168.0.0/16 (192.168.0.0 - 192.168.255.255)
+
+                These address ranges are designated for use within private networks and are not globally routable on the public Internet.
+
+            Network Address Translation (NAT):
+
+                Implement NAT to conserve IPv4 addresses by allowing multiple devices within a private network to share a single public IP address.
+
+                NAT translates private IP addresses to a single public IP address when communicating with devices outside the private network, reducing the number of globally routable IPv4 addresses required.
+
+    IPv6
+
+        In 2011 IPv6 was released to use world wide. IPv6 was released to eventually replace IPv4 because of IPv4’s lack of address space. Along with IPv6’s release the packet design was simplified from the IPv4 15 sections header IPv6 holds only 8 section with less wasted fields.
+
+        Transitioning to IPv6 is the most effective long-term solution to address IPv4 exhaustion. IPv6 offers a significantly larger address space, allowing for an almost infinite number of unique IP addresses.
+
+        Organizations are encouraged to plan and implement IPv6 deployment strategies to gradually transition their networks and services to IPv6.
+
+
+
+```
+
+## IPv4
+![image](https://github.com/user-attachments/assets/f9373ee2-0d33-4581-b2a6-8bbb6f94c244)
+
+```
+Broken into classes
+
+Class A
+
+Class B
+
+Class C
+
+Class D
+
+Class E
+
+
+
+IPv4 Address Types: There are several types of IPv4 addresses, including:
+
+    Unicast: Identifies a single network interface.
+
+    Broadcast: Sent to all devices on a network segment.
+
+    Multicast: Sent to a specific group of devices.
+
+    Anycast: Identifies the nearest of a group of devices.
+
+Private and Public Addresses:
+
+Private IPv4 addresses are reserved for use within private networks and are not routable on the public internet.
+
+Common private address ranges include:
+
+        10.0.0.0 to 10.255.255.255
+
+        172.16.0.0 to 172.31.255.255
+
+        192.168.0.0 to 192.168.255.255
+
+Public IPv4 addresses are globally unique and routable on the internet.
+
+Public address are any IP address that is not already reserved.
+
+
+```
+
+
+## IPv4 Header
+![image](https://github.com/user-attachments/assets/87cd17b8-3de1-4c88-99c2-a727e6053ea3)
+![image](https://github.com/user-attachments/assets/be32460a-31da-409a-b4e5-a087152a712e)
+
+```
+
+
+
+    Byte 0:
+
+        Version (High 4 bits): Indicates the version of the Internet Protocol used. For IPv4, the value is set to 4 or 0x40.
+
+        Header Length (IHL) (Low 4 bits): Specifies the length of the IPv4 header in 32-bit words.
+
+            The standard IHL is 5 (0x05) to indiate 5 WORDS (20 bytes) in the IP header.
+
+            Since the IPv4 header length can vary due to optional fields, this field helps identify where the data payload begins.
+
+            IHL from 6 to F (15) will indicate the presence of IPv4 options in multiples of 4 bytes.
+
+    Byte 1:
+
+        Type of Service (TOS) (8 bits): From origional RFC 791, it was used for Quality of Service (QoS) prioritization. In RFC 2474, this field was deprecated and replaced by Differentiated Services Code Point (DSCP) and Explicit Congestion Notification (ECN) fields in modern implementations.
+
+            DSCP (High 6 bits): Used to provide differentiated Quality of Service (QoS) treatment to packets as they traverse a network. It allows network administrators to prioritize certain types of traffic over others based on their requirements for latency, jitter, bandwidth, and reliability.
+
+                The DSCP field allows for 64 different values, ranging from 0 to 63 (RFC 4594). Use the DSCP chart to determine values.
+
+                These values are organized into several predefined classes, each representing a different level of service or treatment for packets.
+
+                Values in this field do not equate to decimal or hex. In actuality the values in this field are bit-shifted 2 places to the left (<<2). This means that a DSCP of (1) would be a (4) in decimal. A DSCP of (32) would be a (128) in decimal.
+
+            ECN (Low 2 bits): An extension to the Internet Protocol (IP) that enables end-to-end notification of network congestion without dropping packets. It allows network devices, such as routers, to notify endpoints (senders and receivers) of impending congestion in the network, allowing them to respond appropriately.
+
+                00 – Not ECN-Capable - codepoint indicates that the packet’s sender is not ECN-capable or does not wish to receive ECN notifications.
+
+                01 and 10 – ECN Capable - codepoint indicates that the packet’s sender is ECN-capable and willing to receive congestion notifications.
+
+                11 – Congestion Experienced - codepoint is set by routers to indicate that congestion has been encountered along the packet’s path.
+
+
+
+    Bytes 2 and 3:
+
+        Total Length (16 bits): Indicates the total length of the IPv4 packet, including the header and the data payload. The maximum value is 65,535 bytes.
+
+        This field is largely controled by the Maximum Transmission Unit (MTU) for the connected network.
+
+    Bytes 4 and 5:
+
+        Identification (16 bits): Used for fragmentation and reassembly of IP packets. Each packet sent by the sender is assigned a unique identification value.
+
+            The IP ID field is used to assign a unique identification value to each IPv4 packet sent by a host.
+
+            This identification value is incremented for each subsequent packet sent by the host.
+
+            The combination of the IP ID value and the source IP address uniquely identifies each packet, which helps in identifying and processing packets at the receiving end.
+
+            This allows the receiving host to identify fragments belonging to the same original packet and reassemble them in the correct order.
+
+    Bytes 6 and 7:
+
+        Flags (High 3 bits): Contains control flags related to fragmentation:
+
+            Bit 0: Reserved, must be zero. This bit is sometimes referred to as the "Evil Bit" as defined in RFC 3514.
+
+            Bit 1: Don’t Fragment (DF) flag. If set, indicates that the packet should not be fragmented.
+
+                Packets requiring fragmentation will be dropped by the router and an ICMP type 3 code 4 "Fragmentation Needed and Don’t Fragment was Set" will be sent back to the sender.
+
+            Bit 2: More Fragments (MF) flag. If set, indicates that this packet is a fragement and that more fragments will follow. This flag will be turned off for the very last fragment.
+
+        Fragment Offset (Low 13 bits): Indicates the position of the fragment within the original unfragmented packet, measured in units of 8 bytes.
+
+            The fragment offset is calculated by dividing the payload bytes by 8. This offset value is cumulative and is added to each fragment offset until the last fragement.
+
+            A payload of 1480 will have an offset of 1480/8 or 185. The offset values will be 0, 185, 370, 555, 740, etc.
+
+    Byte 8:
+
+        Time to Live (TTL) (8 bits): Represents the maximum number of hops (routers) the packet can traverse before being discarded. Decremented by one at each router hop.
+
+        Default TTLs:
+
+            Linux: 64
+
+            Windows: 128
+
+            Cisco: 255
+
+    Byte 9:
+
+        Protocol (8 bits): Specifies the protocol used in the data payload of the packet (e.g., TCP, UDP, ICMP).
+
+            ICMPv4: 1
+
+            TCP: 6
+
+            UDP: 17
+
+            EIGRP: 88
+
+            OSPF: 89
+
+    Bytes 10 and 11:
+
+        Header Checksum (16 bits): Provides error detection for the IPv4 header. Calculated based on the header contents and verified by the receiving host.
+
+    Bytes 12 to 15:
+
+        Source IP Address (32 bits): Specifies the IPv4 address of the sender of the packet.
+
+            Dotted decimal address are expresses as HEX.
+
+            10.0.0.1 would be 0x0a000001
+
+    Bytes 16 to 19:
+
+        Destination IP Address (32 bits): Specifies the IPv4 address of the intended recipient of the packet.
+
+            Dotted decimal address are expresses as HEX.
+
+            192.168.0.1 would be 0xc0a80001
+
+    Variable bytes from 20 to 59:
+
+        Options (variable length):
+
+            Always in multiples of 4 bytes (1 WORD).
+
+            Maximum options allowed is 40 bytes (10 WORDs).
+
+            Optional fields that may include various options such as Record Route, Timestamp, and Security.
+
+            Rarely used in practice due to limited support and potential security concerns.
+
+
+
+
+```
+
+## IPv4 Address Scope
+```
+
+
+    Public IP ranges are assigned by IANA throughout the world. These addresses are typically any Class A, B, or C address that is not otherwised reserved. For more information on public addressing visit https://www.iana.org/numbers.
+
+    Private These IPs are not globally routable across the Internet and are available for use by all for internal LANs. These addresses must be translated to a public address for traversal across the internet.
+
+        Class A scope 10.0.0.0/8 - 10.0.0.0 thru 10.255.255.255
+
+        Class B scope 172.16.0.0/12 - 172.16.0.0 thru 172.31.255.255
+
+        Class C scope 192.168.0.0/16 - 192.168.0.0 thru 192.168.255.255
+
+    Loopback address also called localhost. This is an internal address (127.0.0.1) linked back to the host machine. Can not be assigned to a device NIC. Can only be used to allow the system to address itself.
+
+        Scope 127.0.0.0/8 - 127.0.0.0 thru 127.255.255.255
+
+    Link-Local is used for direct node to node communications on the same physical or logical link, not a routable range. This range is used for Microsoft’s Automatic Private IP Addressing (APIPA). This is used to allow DHCP configured clients to resolve an IP address even if no DHCP servers are available. Systems will auto generate an address in this range if it fails to get an IP address from the DHCP server. These addresses allow devices to communicate with each other on the same network but not across any routed boundries.
+
+        Scope 169.254.0.0/16 - 169.254.0.0 thru 169.254.255.255
+
+    Multicast
+
+        224.0.0.0/24 - Link-Local - multicast for host on the same network segment. Cannot traverse routed bounderies.
+
+        239.255.0.0/16 - Local - scope is able to be controlled by an organization.
+
+        239.192.0.0/14 - Organizational-local - routable within an organizations network.
+
+        224.0.1.0-238.255.255.255 - Global - able to be routed across the internet.
+
+
+
+```
+
+## Fragmentation
+```
+P fragmentation breaks up a single IPv4 packet into multiple smaller packets. Every link in a network has a defined maximum transmission unit (MTU). Ethernet’s default MTU is 1500 bytes. An IP header is included in the 1500 byte MTU.
+
+The 14-22 byte Ethernet header is not counted within the 1500 byte MTU. Other Layer 2 framing protocols (Ethernet, Token Ring, FDDI, PPoE, etc) can have different MTUs.
+
+Routers are often the devices performing fragmentation in IPv4. Other devices can perform this action if they also perform in the routing capacity.
+
+In IPv4, routing devices perform fragmentation if the total size of the packet (header and data) coming from one network interface is greater than the MTU of the network out the exiting interface.
+
+IPv4 Flags: [IPv4 header byte offset 6], A 3 bit field that declares if the packet is a part of a fragmented data frame or not. Reading the field from left to right.
+
+    Bit 0 (128): reserved
+
+        should always be 0
+
+        See RFC 3514 for a description of the “evil bit.”
+
+    Bit 1 (64):
+
+        0 = May Fragment
+
+        1 = Don’t Fragment this packet
+
+            Packets requiring fragmentation with this bit set will be dropped by routers resulting an ICMP Type 3 Code 4 "Fragmentation Needed and Don’t Fragment was Set" message to be sent back to the source.
+
+    Bit 2 (32):
+
+        0 = Not fragemented or Last Fragment
+
+            Last fragment will have an offset value set.
+
+        1 = More Fragments follow (first fragement until 2nd to last fragement).
+
+            First fragment will not have an offset value set.
+
+Fragment Offset field is a 13-bit field found in the IPv4 header.
+
+    It indicates the position of the data payload of the current fragment relative to the beginning of the original unfragmented packet.
+
+    With only 13 bits assigned, the values can only be 0-8191.
+
+        The values in this field is determined by dividing the fragmented bytes per packet by 8.
+
+    It is determined by using the following formula:
+
+        Offset = (MTU - (IHL x 4)) ÷ 8
+
+        Value must divide evenly.
+
+        Decreases the MTU to ensure even division.
+
+        The fragment offset is calculated by dividing the payload bytes by 8. This offset value is cumulative and is added to each fragment offset until the last fragement.
+
+        A payload of 1480 will have an offset of 1480/8 or 185. The offset values will be 0, 185, 370, 555, 740, etc.
+
+
+
+```
+![image](https://github.com/user-attachments/assets/c99ce30d-a84d-435e-b26b-06e5f1cda2d6)
+
+## Decoding IPv4 Packet
+```
+00 1f 29 5e 4d 26 00 50　56 bb 3a a0 08 00 45 00
+00 3c 83 1b 40 00 40 06　15 0a c0 a8 14 46 4a 7d
+83 1b d5 1d 00 19 6b 7f　c7 2d 00 00 00 00 a0 02
+72 10 a2 b5 00 00 02 04　05 b4 04 02 08 0a 0a 99
+44 36 00 00 00 00 01 03　03 07
+```
+
+```
+    00 1f 29 5e 4d 26 is the destination MAC
+
+    00 50 56 bb 3a a0 is the source MAC
+
+    08 00 is the ethertype for IPv4
+
+    45 to identify the Version is 4 and the IHL is 5 which means the IP header is 20 bytes in length. (IHL x 4)
+
+    00 is the DSCP. Used for Quality of Service (QoS).
+
+    00 3c is the Total length of 60 bytes. This includes the 20 byte header and 40 bytes of payload.
+
+    83 1b is the Identification field. Value is 33563.
+
+    40 00 is the Flags and fragmentation offset field. This value has the Dont Fragement (DF) turned on and no fragmentation offset.
+
+        80 00 is the value for the Reserved (Evil bit).
+
+        20 00 to 3F FF is the range for the More Fragements (MF) bit and fragmentation offset.
+
+    40 is the Time to Live field. Currently set to 64.
+
+    06 is the Protocol field. Currently set to identify TCP.
+
+        01 is for ICMPv4
+
+        11 is for UDP
+
+    15 0a is the Checksum field
+
+    c0 a8 14 46 is the source IP address. Currently set to 192.168.20.70.
+
+    4a 7d 83 1b is the destination IP address. Currently set to 74.125.131.27.
+
+    The remaining will be the payload.
+
+```
+
+
+## IPv6 Fragmentation
+```
+
+
+
+    IPv6 inherently does not support fragmentation within it headers. It lacks the fields required. It can however include follow-on IPv6 Fragmentation headers should it be needed. IPv6 fragmentation must be done on the sending host using the fragmentation extension headers.
+
+    Routers in the traffic path will not fragment any IPv6 packets. Any packets larger than the supported MTU are dropped and an ICMPv6 Type 2 "packet too big" message is sent to the source. This is essentially like having the DF bit set to ON for all packets. Any needed fragmentation must be done by the source node.
+
+    The source node conducts a Path MTU Discovery (PMTU) by sending MTU discovery packets to the destination. If the source node receives a Type 2 "packet too big" message it will decrease the packet size. The smallest (generally) safe IPv6 MTU size is 1280 bytes. This guarantees delivery based on packet size but increases the number of packets needing to be sent. Even more if VPN or tunneling is used.
+
+    Fragmentation was removed in IPv6 for several reasons. Some thought fragmentation was inefficient. Any lost fragment makes the entire original packet unusable as there is no way to identify the missing fragment to be resent. Additionally security concerns of fragmentation overlapping attacks and the lack of a TCP/UDP header on fragment except the initial fragment were other reasons to remove fragmentation altogether.
+
+
+```
+
+## IP Fragment Overlapping
+```
+
+
+    IP fragment overlapping exploit happens when two or more packet fragments have fragment offsets that indicate that they overlap each other.
+
+    Example: a MTU of 1500 will have a offset of 185. 1500 MTU - 20 Bytes of IP header = 1480 Bytes. Each IP packet will include up to 1480 bytes of fragment information. To determine the offset value, this will be divided by 8 and will equal 185. So the first fragment will have the MF=1 and offset =185. The second fragment will increment the offset by 185 each time. So the second fragment offset will be 185, the third will be 370, the fourth 555, the fifth is 740 and so fourth. Each packet will have 1480 bytes of data.
+
+    In an overlap attack such as the teardrop attack, the offsets will not be sequential in chunks of 185 as it should. The offset could be changed to something like 175. This would mean that 80 bytes of the first fragment will be overwritten by the second fragment and so fourth. The resulting information will be much different than if each packet was examined individually.
+
+    This form of attack is successful if the attacker is aware of the host computers and networking equipment on the victim’s network. This is because different equipment types perform different process in order to reconstruct the fragmented packets. Armed with this knowledge, the attacker can craft his attack to reconstruct the fragmented packets in a more proprietary way to avoid detection. Using this process fragments can avoid detection by firewalls and IDS/IPS devices. This is because when they reconstruct the message using their reconstruction processes it will not see the intended information.
+
+
+```
+
+## Teardrop Attack
+```
+
+
+    In a Teardrop attack, the attacker will use overlapping packets as well as additional random data. When constructed properly, the random data portions will be overwritten and result in the malicious payload. Although firewalls and IDS/IPS devices may not detect this payload.
+
+    This is a form of denial-of-service (DoS) attack that uses fragmented packets to bypass firewalls to a target a victim’s machine. The victim’s computer receiving the packets won’t be able reconstruct the packet properly due to a bug in TCP/IP fragmentation reassembly process, the packets will overlap each another, thus crashing the victim’s network device. Typically only older operating systems such as Windows 3.1x, Windows 95, Windows NT and versions of the Linux kernel prior to 2.1.63 are vulnerable to this attack.
+
+
+```
+
+## OS Fingerprinting
+```
+OS fingerprinting is the process of analyze the TTL fields on a header packet to make an educated guess at which operating system sent the packet by your TTL maximum hops. Different systems can have varing TTLs that can help to identify them on the network, some of the systems are listed in the chart.
+
+
+
+    Unless you capture the packet immediately from the source host, the TTL will not likely be set to these values.
+
+    In general, it should not take more than about 30 hops to reach any destination on the internet.
+
+    With this in mind we can make the following determination:
+
+        Linux: TTL from 34-64
+
+        Windows: TTL from 98-128
+
+        Cisco: TTL from 225-255
+
+
+
+```
+![image](https://github.com/user-attachments/assets/cd984d65-0ade-43f1-8504-ba2975676b5b)
+
+
+
+## IPv4 Auto Configuration with Vulnerability
+
+```
+
+
+
+IPv4 auto-configuration refers to the process by which IPv4 addresses are automatically assigned to devices without manual intervention.
+
+    APIPA
+
+        Automatic Private IP Addressing (APIPA) is the automatic configuration of an ip address to a host machine and selects an address using a pseudo-random number generator with a uniform distribution in the range from 169.254.1.0 to 169.254.254.255.
+
+        The first 256 and last 256 addresses in the 169.254/16 prefix are reserved for future use and MUST NOT be selected by a host using this dynamic configuration mechanism.
+
+        When a host machine is set for Dynamic Host Configuration Protocol (DHCP) and is unable to locate a DHCP server, an APIPA address is given to the machine to allow it to communicate via Link-Local to other machines on the same physical or logical link.
+
+    DHCP
+
+        Dynamic Host Control Protocol (DHCP) when configured on a host machine will send a broadcast DHCPDISCOVER message to and availible DHCP servers.
+
+        DHCP D.O.R.A process
+
+            DHCP D iscover:
+
+                When a device (client) connects to a network and needs to obtain an IP address, it sends out a DHCP Discover message to discover DHCP servers on the network.
+
+                The DHCP Discover message is broadcasted as a DHCP broadcast packet, typically using the destination IP address 255.255.255.255 and the destination MAC address ff:ff:ff:ff:ff:ff.
+
+            DHCP O ffer:
+
+                DHCP servers on the network that receive the DHCP Discover message respond with a DHCP Offer message.
+
+                The DHCP Offer message contains an available IP address and other network configuration parameters (such as subnet mask, default gateway, DNS server addresses) that the DHCP server is offering to the client.
+
+                The DHCP Offer message is typically sent as a unicast packet to the client’s MAC address.
+
+            DHCP R equest:
+
+                Upon receiving one or more DHCP Offer messages, the client selects one DHCP server and sends a DHCP Request message to that server.
+
+                The DHCP Request message includes the IP address offered by the selected DHCP server.
+
+                If the client receives multiple DHCP Offer messages, it may send DHCP Request messages to multiple servers, but it will ultimately accept only one offer.
+
+            DHCP A cknowledge (ACK):
+
+                The DHCP server that receives the DHCP Request message verifies the requested IP address’s availability and reserves it for the client.
+
+                The DHCP server sends a DHCP Acknowledge (ACK) message to the client, confirming the IP address assignment and providing additional configuration parameters.
+
+                The DHCP Acknowledge message is sent as a unicast packet to the client’s MAC address.
+
+Vulnerability:
+
+
+
+        These processes do work as long as there are IPs available to be assigned, a legitimate DHCP server available, or trust of others hosts on the Link-Local. The vulnerability in that there is no verification or authorization being performed by default. These default auto configurations could allow an attacker to gain access into your network, assign out false IPs, and/or perform a denial/starvation attack.
+
+        Rougue DHCP servers are very common and easy to setup. A malicious person can setup a Rougue DHCP server to assign addresses for a particular network. In these configurations the attacker can assign whatever they want for the Gateway, DNS suffix and DNS server addresses. A malicious DNS server can result in legitimate Domain names being resolved to IP addresses of fake websites used to steal credentials or deploy malware.
+
+        DHCP Starvation attack. When a malicious user has to compete with the legitimate DHCP server for address assignments, the attacker can flood the DHCP server with several bogus DHCP requests in order to exaust its pool of addresses. Once this is done the rougue DHCP server is the only DHCP server with addresses to assign.
+
+        DHCP Security Considerations RFC2131 Section 7
+
+        Link-Local Security Considerations RFC3927 Section 5
+
+
+
+
+```
+
+
+## ICMPv4 Protocol
+![image](https://github.com/user-attachments/assets/4675efda-c6e2-4f73-be7b-b2bceedde01b)
+```
+
+
+ICMPv4
+
+    ICMP is used to provide feedback about network problems that may or do prevent packet delivery. This protocol was designed to provide error reporting, flow control and first-hop gateway redirection. While IP and UDP are unreliable, it is still important to have a way to notify the sender if something goes wrong in a transmission. TCP is able to realize and react when packets aren’t being delivered, but ICMP provides a method for discovering more serious problems like "TTL exceeded" or "need more fragments."
+
+    Echo Request (Type 8):
+
+        Sent by a device to request an Echo Reply from another device.
+
+        Often used by the "ping" utility to test network connectivity and measure round-trip time.
+
+        Depending on the operating system Echo Requests (PING) can have different packet sizes and default payloads.
+
+            Linux:
+
+                Default size: 64 bytes (16 byte ICMP header + 48 byte payload)
+
+                Payload message: !\”#\$%&\‘()*+,-./01234567
+
+            Windows:
+
+                Default size: 48 bytes (16 byte ICMP header + 32 byte payload)
+
+                Payload message: abcdefghijklmnopqrstuvwabcdefghi
+
+    Echo Reply (Type 0):
+
+        Sent by a device in response to an Echo Request.
+
+        Contains the same payload as the original Echo Request and is used to confirm network connectivity.
+
+    Destination Unreachable (Type 3):
+
+        Destination Network Unreachable (Code 0):
+
+            Indicates that the network hosting the destination address is unreachable.
+
+            This can occur if there is no route to the destination network in the routing table.
+
+        Destination Host Unreachable (Code 1):
+
+            Indicates that the specific destination host is unreachable.
+
+            This can occur if there is no route to the destination host in the routing table or if the destination host is down.
+
+        Destination Protocol Unreachable (Code 2):
+
+            Indicates that the transport protocol specified in the packet’s header is not supported by the destination.
+
+            For example, if a UDP packet is sent to a destination that does not have a process listening on the specified UDP port, this error may be generated.
+
+        Destination Port Unreachable (Code 3):
+
+            Indicates that the specified port on the destination host is unreachable.
+
+            This typically occurs when there is no process listening on the specified port or if a firewall is blocking access to the port.
+
+        Fragmentation Needed and Don’t Fragment was Set (Code 4):
+
+            Indicates that the packet is too large to be transmitted without fragmentation, but the Don’t Fragment (DF) flag is set in the packet’s header.
+
+            This error is generated to inform the sender that the packet needs to be fragmented to be transmitted successfully.
+
+        Source Route Failed (Code 5):
+
+            Indicates that the source route specified in the packet’s header is invalid.
+
+            Source routing allows the sender to specify the route that the packet should take through the network, but if the specified route is invalid, this error may be generated.
+
+        Destination Network Unknown (Code 6):
+
+            Indicates that the destination network is unknown.
+
+            This error typically occurs when the destination network is not listed in the routing table.
+
+        Destination Host Unknown (Code 7):
+
+            Indicates that the destination host is unknown.
+
+            This error typically occurs when the destination IP address is not reachable or is not assigned to any host.
+
+        Source Host Isolated (Code 8):
+
+            Indicates that communication with the source host is administratively prohibited.
+
+            This error is generated by a router or firewall to indicate that the source host is isolated or not allowed to communicate with the destination.
+
+        Communication with Destination Network Administratively Prohibited (Code 9):
+
+            Indicates that communication with the destination network is administratively prohibited.
+
+            This error typically occurs when access to the destination network is restricted by network policies or firewall rules.
+
+        Communication with Destination Host Administratively Prohibited (Code 10):
+
+            Indicates that communication with the destination host is administratively prohibited.
+
+            This error typically occurs when access to the destination host is restricted by network policies or firewall rules.
+
+        Network Unreachable for Type of Service (Code 11):
+
+            Indicates that the network is unreachable for the specified type of service.
+
+            This typically occurs when the network does not support the requested type of service or quality of service.
+
+        Host Unreachable for Type of Service (Code 12):
+
+            Indicates that the destination host is unreachable for the specified type of service.
+
+            This typically occurs when the destination host does not support the requested type of service or quality of service.
+
+        Communication Administratively Prohibited (Code 13):
+
+            Indicates that communication with the destination is administratively prohibited.
+
+            This can occur due to network policies or firewall rules that explicitly block communication with the destination.
+
+    Redirect (Type 5):
+
+        Used by routers to inform hosts of a better route to a particular destination.
+
+        Informs the host to update its routing table with the new route information.
+
+            Redirect Datagram for the Network (Code 0): This code indicates that the router has a better route to the destination network and is redirecting the packet to the sender’s specified gateway. It instructs the sender to update its routing table with the new gateway information.
+
+            Redirect Datagram for the Host (Code 1): This code indicates that the router has a better route to the destination host and is redirecting the packet to the sender’s specified gateway. It instructs the sender to update its routing table with the new gateway information.
+
+            Redirect Datagram for the Type of Service and Network (Code 2): This code is similar to Code 0 but also includes a Type of Service (ToS) component. It indicates that the router has a better route to the destination network with a specific Type of Service and is redirecting the packet accordingly.
+
+            Redirect Datagram for the Type of Service and Host (Code 3): This code is similar to Code 1 but also includes a Type of Service (ToS) component. It indicates that the router has a better route to the destination host with a specific Type of Service and is redirecting the packet accordingly.
+
+    Time Exceeded (Type 11):
+
+        Indicates that a packet’s Time-to-Live (TTL) value has reached zero or that the packet’s hop limit has been exceeded.
+
+        Subtypes of Time Exceeded include:
+
+            Time to Live Exceeded in Transit (Code 0): Indicates that the TTL of the packet expired while in transit.
+
+            Fragment Reassembly Time Exceeded (Code 1): Indicates that the time allowed for reassembly of fragments has expired.
+
+    Timestamp Request (Type 13):
+
+        Sent by a device to request a Timestamp Reply from another device.
+
+        Used to measure round-trip time and clock synchronization between devices.
+
+    Timestamp Reply (Type 14):
+
+        Sent by a device in response to a Timestamp Request.
+
+        Contains timestamps indicating the time the request was received and the time the reply was sent.
+
+
+
+
+```
+
+
+## Common ICMP attacks
+```
+
+
+    Fire-walking - Using traceroute and TTLs to map out a network. Using traceroute with TCP and UDP protocols an attacker could map the open ports on a firewall.
+
+        DEMO Firewalking
+
+            When performing traceroute. Linux will use UDP as its default. Windows will use ICMP Echo Requests as its default. Linux will require sudo when specifying any traceroute other than the default.
+```
+            traceroute 8.8.8.8
+```
+            Using traceroute with TCP. This will use TCP port 80 as the default.
+```
+            sudo traceroute 8.8.8.8 -T
+```
+            Using traceroute with TCP and a different port.
+```
+            sudo traceroute 8.8.8.8 -T -p 443
+```
+            Using traceroute with UDP and a different port.
+```
+            sudo traceroute 8.8.8.8 -U -p 123
+```
+             Using traceroute with ICMP (Windows Default)
+```
+            sudo traceroute 8.8.8.8 -I
+```
+    Over-sized ICMP informational messages - These over-sized ICMP packets can cause a system to crash. Typically packets should not be greater than 65,535 bytes in size and anything greater would violate RFC 791. Systems would not know how to process these packets and most likely would crash. The Ping-of-Death is one example of this. Attackers could use tools like hping2 to craft these packets.
+
+    ICMP redirects: - Routers use ICMP redirect messages to inform hosts that a better route is available for a particular destination is available through another router on the same network. Hosts can only be assigned one IP address as its default gateway but the network could have more than one router to lead to remote networks. If the default gateway receives a packet on an interface, and through its routing table lookup it determines that the next hop router towards that network is out the same interface that the packet was received, it will forward the packet to the next hop and send the ICMP redirect message back to the host. The host will update its internal routing tables for that specific destination address.
+
+        An attacker can use ICMP redirects to perform a Layer 3 man-in-the-middle attack. If the attacker can intercept a message they can send an ICMP redirect back to the victim to tell it to route traffic through the attacker rather than the router.
+
+        Note: ICMP redirects are disabled by default if Hot Standby Router Protocol (HSRP) is configured on the interface.
+
+    SMURF Attack: - SMURF attack is a form of amplification attack where an attacker can send very few packets and it will generate a lot of packets. The attack works by sending an ICMP echo request (PING) using a spoofed source address to a directed broadcast address of a network. This PING will reach all hosts on the network who will then respond to the spoofed IP address. All the hosts responding will create a lot of traffic and overload the victim’s device causing a DoS.
+
+    IP unreachable messages to map a network - By default, routers will send an ICMP unreachable message back to the source if it drops a packet for whatever reason. This action can be used by attackers to map out the network topology.
+
+    ICMP Covert Channel - Many networks allow ICMP traffic in and out of their networks. Malicious actors can disguise communication channels as ICMP traffic. This traffic will have typical ICMP headers but the payload will greatly vary depending on the type of traffic encapsulated.
+
+
+
+
+```
+
+
+
+
