@@ -138,14 +138,54 @@ Most notably they developed standards for Local Area Networks (802 series) such 
 ## Layer 1 Data 
 
 Binary
+```
+Base2- Two Symbols (0 and 1)
+
+Groups:
+Bit(1 bit)
+Nibble(4 bits
+Byte(8 bits)
+Halfword (16 bits)
+Word (32 bits)
+
+128    64    32    16    8    4    2    1
+ 0      0     0     0    0    0    0    0
+```
+
+![image](https://github.com/user-attachments/assets/edfb586b-f9a2-4730-a3f8-4e7a47fbed44)
 
 
 Decimal
+```
+Base 10 - Ten Symbols ( 0 to 9)
+
+```
 
 Hexadeciaml
+```
+Base 16 - Sixteen Symbols (0-9 and A-F)
+
+8    4    2    1    8    4    2    1
+0    1    0    1    0    0    0    1
+
+= 51
+
+FF =
+
+1    1    1    1    1    1    1    1
+
+
+```
+
+![image](https://github.com/user-attachments/assets/19762878-de97-4759-a413-4f224f77fd01)
+
+![image](https://github.com/user-attachments/assets/16d02c44-9008-4c7f-9d94-ebca2d0e4d5e)
+
 
 Base64
+```
 
+```
 
 
 
