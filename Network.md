@@ -186,24 +186,39 @@ Format = MTI= MTIzNA== MTIzNDU2Nzg=
 
 # Lan Topologies
 ## Bus
-
 ![image](https://github.com/user-attachments/assets/e6915d00-fa55-4374-9ddd-0ede65939b17)
 
 ## Star
 Central Node passes it to everyone else 
+
 ![image](https://github.com/user-attachments/assets/2a299de8-66b6-42d8-bc7b-dc631f301926)
 
 ## Ring
 Every workstation is plugged into everyone else and it goes 1 way in a ring
+
 ![image](https://github.com/user-attachments/assets/ceded32a-f364-4af0-ad10-ddbb40173d24)
 
 ## Mesh
 Everyone is connected to everyone 
+
 ![image](https://github.com/user-attachments/assets/90699989-c44d-4b21-b06f-27527b9041b7)
 
 ## Wireless
+Routes via APs and no need for centeralized transmissions
+
+![image](https://github.com/user-attachments/assets/3a9c938c-35be-4ede-88fa-4292432e439e)
 
 ## Hierarchial
+Information is broken down to tiers 
+```
+Core
+
+Distribution
+
+Access Layer
+```
+
+![image](https://github.com/user-attachments/assets/89c7d021-1ddc-486f-a8fa-517c50957e73)
 
 
 
