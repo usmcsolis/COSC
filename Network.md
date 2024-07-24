@@ -134,10 +134,7 @@ Most notably they developed standards for Local Area Networks (802 series) such 
 * 802.15 - Wireless PAN
 ```
 
-
-## Layer 1 Data 
-
-Binary
+## Binary
 ```
 Base2- Two Symbols (0 and 1)
 
@@ -155,13 +152,13 @@ Word (32 bits)
 ![image](https://github.com/user-attachments/assets/edfb586b-f9a2-4730-a3f8-4e7a47fbed44)
 
 
-Decimal
+## Decimal
 ```
 Base 10 - Ten Symbols ( 0 to 9)
 
 ```
 
-Hexadeciaml
+## Hexadeciaml
 ```
 Base 16 - Sixteen Symbols (0-9 and A-F)
 
@@ -182,10 +179,16 @@ FF =
 ![image](https://github.com/user-attachments/assets/16d02c44-9008-4c7f-9d94-ebca2d0e4d5e)
 
 
-Base64
+
+## Base64
 ```
+Base64 = 64 Symbols (A-Z, a-z, 0-9, +, /)
+Users (=) to represent a NULL value (max of 2)
+Format = MTI= MTIzNA== MTIzNDU2Nzg=
 
 ```
+
+![image](https://github.com/user-attachments/assets/50aa4e8c-2d16-4e2d-8e3e-1a00dcaf2054)
 
 
 
