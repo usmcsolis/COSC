@@ -3092,6 +3092,7 @@ Choose best path to remote networks
 Recalculate a new path to a remote network should the primary fail
 
 
+
 Dynamic routing provides some advantages over static routing, including:
 
 Easier to configure and maintain.
@@ -3099,6 +3100,7 @@ Easier to configure and maintain.
 Administrator does not need to intervene to update tables during network outages.
 
 Scales very well on growing networks.
+
 
 
 Dynamic routing has the following disadvantages:
