@@ -221,6 +221,35 @@ Access Layer
 ![image](https://github.com/user-attachments/assets/89c7d021-1ddc-486f-a8fa-517c50957e73)
 
 
+# Devices
+## Hub
+Passes information through everyone. Can have collisions where the packets are sent at the same time and clash
+
+## Repeaters
+Used to extended a signal to repeat and make it go further due to the limitations on some cabling
+
+## Switches
+Similar to hubs but can use Collision Domain and it knows what you are addressing using a MAC Addresss to reduce collisions.
+
+## Routers
+Allows you to cross networks using routing tables. Can connect different nets together. One router can connect a LAN to another LAN to create a WAN
+
+
+# Ethernet Timing (BIT-TIME)
+Bit Time - is the period of time is required for a bit to be placed and sensed on the media. Network speeds are measured by how many bits can be placed or sensed on the media in 1 second. Each increase in speed requires more bits to be sent during the same 1 second internal. To accomplish this the bit-times are reduced.
+
+```
+Speed       Bit-Time
+10 mbps     100ns
+100 mbps    10ns
+1 Gbps      1ns
+10 Gbps     .1ns
+100 Gbps    .01ns
+```
+
+#
+
+
 
 
 
