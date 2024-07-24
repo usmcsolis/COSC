@@ -433,8 +433,69 @@ Structure:
 
         Mathematical formula calculated on the entire frame. This calculation is appended in the FCS field so that the receiver can determine if the contents of the frame were corrupted in transit. This is stripped off at the NIC and not visible by packet analyzer software.
 
+```
+
+## VLANs (802.1Q)
+Virtual Local Area Network
+
+
+![image](https://github.com/user-attachments/assets/5d0a46c8-aa5f-4b16-b9b2-6f1001c29ccf)
 
 ```
+This tagging allows network administrators to logically segment a single physical network into multiple virtual networks, known as VLANs, to improve network performance, security, and manageability.
+802.1Q Frame
+
+Allows you to be able to seperate locally and logically seperated devices to be able to communicate with or without eachother via port assigning
+
+Assign VLANS Via Interfaces
+
+VLAN 10 = Users
+VLAN 22 = Printers
+VLAN 100 = SuperSecret
+```
+```
+    Structure:
+
+        MAC Header (12 byte field)
+
+            Initial 6 bytes contain the Destination MAC address
+
+            Next 6 bytes contain the Source MAC Address
+
+        VLAN Tag (4 byte field)
+
+            Tag Protocol ID (2 byte field)
+            Initial 2 bytes contain the new effective Ethertype field of 0x8100 indicating tagging
+
+            Tag Control Information (2 byte field)
+
+                Priority Code Point (3 bits)
+                This is used to add prioritization or QoS to VLANs
+
+                Drop Eligible Indicator (1 bit)
+                This adds drop eligibility to VLAN traffic in case of congestion
+
+            VLAN ID (12 bit field)
+            To specify the VLAN number. Can be 0x000 to 0xfff or 0* to 4095.
+
+                1 to 1005 Normal range
+
+                1003 to 1005 – reserved for Token Ring
+
+                1006 to 4094 – Extended Range
+
+        Ethertype (2 byte field)
+        Used to indicate the next protocol encapsulated in the frame.
+
+        Data / Payload (46-1500 byte field)
+        Consists of the encapsulated upper layer headers and data payload which may be 46-1500 bytes
+
+        FCS/CRC (Frame Check Sequence / Cyclical Redundancy Check) (4 byte field)
+        A new calculation is conducted to accommodate the addition of the new tag information. This calculation is done by the switch or router that added the tag. This also will be stripped off by the receiving NIC and will not be viable by the network analyzer.
+
+```
+
+
 
 
 
