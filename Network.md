@@ -1,6 +1,6 @@
 # Networking
 ----
-## Sites
+## Sites:
 CTFD - MASO-M-005@10.50.20.180:8000/challenges
 
 CTFD Resources - http://10.50.20.180:8000/resources
@@ -51,7 +51,7 @@ Miro Whiteboard - https://miro.com/app/board/o9J_klSqCSY=/?share_link_id=1613375
             You will be able to connect from there
 ```
 
-
+----
 
 
 ## OSI Model
