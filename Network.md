@@ -66,7 +66,20 @@ Transport to Application Layer: https://net.cybbh.io/-/public/-/jobs/874001/arti
 
 Traffic Capture: https://net.cybbh.io/-/public/-/jobs/874001/artifacts/modules/networking/slides-v4/06_traffic_cap.html
 
-# Network Access
+## OSI Model
+
+7 Layer OSI MODEL (PDNTSPA)
+![image](https://github.com/user-attachments/assets/6eb18223-a459-48a3-a01e-0fed85fb986a)
+
+TCP Connection Oriented
+
+UPD Connection-less Oriented
+
+
+
+
+
+
 
 
 
