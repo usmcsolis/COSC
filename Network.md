@@ -2135,48 +2135,69 @@ ICMPv4
 
 ```
 
+## ICMPv4 OS Fingerprinting
+```
+Linux
+64 bytes
+Payload Message 0123456abcdefg
+
+Windows
+40 bytes
+abcdefghijklmnopqrstuvwxyz
+
+```
 
 ## Common ICMP attacks
 
 
-    Fire-walking - Using traceroute and TTLs to map out a network. Using traceroute with TCP and UDP protocols an attacker could map the open ports on a firewall.
+Fire-walking - Using traceroute and TTLs to map out a network. Using traceroute with TCP and UDP protocols an attacker could map the open ports on a firewall.
 
-        DEMO Firewalking
+DEMO Firewalking
 
-            When performing traceroute. Linux will use UDP as its default. Windows will use ICMP Echo Requests as its default. Linux will require sudo when specifying any traceroute other than the default.
+When performing traceroute. Linux will use UDP as its default. Windows will use ICMP Echo Requests as its default. Linux will require sudo when specifying any traceroute other than the default.
 ```
             traceroute 8.8.8.8
 ```
-            Using traceroute with TCP. This will use TCP port 80 as the default.
+Using traceroute with TCP. This will use TCP port 80 as the default.
 ```
             sudo traceroute 8.8.8.8 -T
 ```
-            Using traceroute with TCP and a different port.
+Using traceroute with TCP and a different port.
 ```
             sudo traceroute 8.8.8.8 -T -p 443
 ```
-            Using traceroute with UDP and a different port.
+Using traceroute with UDP and a different port.
 ```
             sudo traceroute 8.8.8.8 -U -p 123
 ```
-             Using traceroute with ICMP (Windows Default)
+Using traceroute with ICMP (Windows Default)
 ```
             sudo traceroute 8.8.8.8 -I
 ```
-    Over-sized ICMP informational messages - These over-sized ICMP packets can cause a system to crash. Typically packets should not be greater than 65,535 bytes in size and anything greater would violate RFC 791. Systems would not know how to process these packets and most likely would crash. The Ping-of-Death is one example of this. Attackers could use tools like hping2 to craft these packets.
+Over-sized ICMP informational messages - These over-sized ICMP packets can cause a system to crash. Typically packets should not be greater than 65,535 bytes in size and anything greater would violate RFC 791. Systems would not know how to process these packets and most likely would crash. The Ping-of-Death is one example of this. Attackers could use tools like hping2 to craft these packets.
 
-    ICMP redirects: - Routers use ICMP redirect messages to inform hosts that a better route is available for a particular destination is available through another router on the same network. Hosts can only be assigned one IP address as its default gateway but the network could have more than one router to lead to remote networks. If the default gateway receives a packet on an interface, and through its routing table lookup it determines that the next hop router towards that network is out the same interface that the packet was received, it will forward the packet to the next hop and send the ICMP redirect message back to the host. The host will update its internal routing tables for that specific destination address.
+ICMP redirects: - Routers use ICMP redirect messages to inform hosts that a better route is available for a particular destination is available through another router on the same network. Hosts can only be assigned one IP address as its default gateway but the network could have more than one router to lead to remote networks. If the default gateway receives a packet on an interface, and through its routing table lookup it determines that the next hop router towards that network is out the same interface that the packet was received, it will forward the packet to the next hop and send the ICMP redirect message back to the host. The host will update its internal routing tables for that specific destination address.
 
-        An attacker can use ICMP redirects to perform a Layer 3 man-in-the-middle attack. If the attacker can intercept a message they can send an ICMP redirect back to the victim to tell it to route traffic through the attacker rather than the router.
+An attacker can use ICMP redirects to perform a Layer 3 man-in-the-middle attack. If the attacker can intercept a message they can send an ICMP redirect back to the victim to tell it to route traffic through the attacker rather than the router.
 
-        Note: ICMP redirects are disabled by default if Hot Standby Router Protocol (HSRP) is configured on the interface.
+Note: ICMP redirects are disabled by default if Hot Standby Router Protocol (HSRP) is configured on the interface.
 
-    SMURF Attack: - SMURF attack is a form of amplification attack where an attacker can send very few packets and it will generate a lot of packets. The attack works by sending an ICMP echo request (PING) using a spoofed source address to a directed broadcast address of a network. This PING will reach all hosts on the network who will then respond to the spoofed IP address. All the hosts responding will create a lot of traffic and overload the victim’s device causing a DoS.
+SMURF Attack: - SMURF attack is a form of amplification attack where an attacker can send very few packets and it will generate a lot of packets. The attack works by sending an ICMP echo request (PING) using a spoofed source address to a directed broadcast address of a network. This PING will reach all hosts on the network who will then respond to the spoofed IP address. All the hosts responding will create a lot of traffic and overload the victim’s device causing a DoS.
 
-    IP unreachable messages to map a network - By default, routers will send an ICMP unreachable message back to the source if it drops a packet for whatever reason. This action can be used by attackers to map out the network topology.
+IP unreachable messages to map a network - By default, routers will send an ICMP unreachable message back to the source if it drops a packet for whatever reason. This action can be used by attackers to map out the network topology.
 
-    ICMP Covert Channel - Many networks allow ICMP traffic in and out of their networks. Malicious actors can disguise communication channels as ICMP traffic. This traffic will have typical ICMP headers but the payload will greatly vary depending on the type of traffic encapsulated.
+ICMP Covert Channel - Many networks allow ICMP traffic in and out of their networks. Malicious actors can disguise communication channels as ICMP traffic. This traffic will have typical ICMP headers but the payload will greatly vary depending on the type of traffic encapsulated.
 
+
+## ICMPv4 Traceroute
+Windows ICMP
+
+
+Lunix does not
+
+traceroute -U 17.16.82.106
+
+sudo traceroute -T 172.16.82.106 -p 443
 
 
 ## IPv6 Addressing 
@@ -2500,25 +2521,27 @@ The remaining will be the payload.
 ## IPv6 Auto Configuration and Vilnerability
 
 
-    Stateless Address Autoconfiguration (SLAAC)(default):
+Stateless Address Autoconfiguration (SLAAC)(default):
 
-        SLAAC is the primary method of IPv6 address autoconfiguration and is similar to IPv4 DHCP in some respects but simpler.
+SLAAC is the primary method of IPv6 address autoconfiguration and is similar to IPv4 DHCP in some respects but simpler.
 
-        In SLAAC, routers on the local network periodically multicast Router Advertisement (RA) messages (FF02::1) to announce their presence and provide network configuration information.
+In SLAAC, routers on the local network periodically multicast Router Advertisement (RA) messages (FF02::1) to announce their presence and provide network configuration information.
 
-        Hosts on the network receive these RA messages and use the information contained within them to configure their IPv6 addresses and other parameters.
+Hosts on the network receive these RA messages and use the information contained within them to configure their IPv6 addresses and other parameters.
 
-        Hosts can also send Router Solicitation (RS) message (FF02::2) to request network information. This is commonly done when a host first powers on. The router will respond with a RA message to the host sent using FF02::1.
+Hosts can also send Router Solicitation (RS) message (FF02::2) to request network information. This is commonly done when a host first powers on. The router will respond with a RA message to the host sent using FF02::1.
 
-        Each host uses its unique identifier (based on the MAC address or another mechanism) and the network prefix advertised in the RA messages to generate its IPv6 address.
+Each host uses its unique identifier (based on the MAC address or another mechanism) and the network prefix advertised in the RA messages to generate its IPv6 address.
 
-    Stateful/Stateless Address Autoconfiguration (DHCPv6):
 
-        DHCPv6 is an extension of the DHCP protocol used in IPv4 networks, and it provides additional configuration options beyond basic address assignment.
 
-        With DHCPv6, hosts can obtain IPv6 addresses, DNS server information, and other network configuration parameters from a DHCPv6 server.
+Stateful/Stateless Address Autoconfiguration (DHCPv6):
 
-        DHCPv6 can be used in conjunction with SLAAC, allowing hosts to obtain additional configuration options from DHCPv6 while still using SLAAC for address assignment.
+DHCPv6 is an extension of the DHCP protocol used in IPv4 networks, and it provides additional configuration options beyond basic address assignment.
+
+With DHCPv6, hosts can obtain IPv6 addresses, DNS server information, and other network configuration parameters from a DHCPv6 server.
+
+DHCPv6 can be used in conjunction with SLAAC, allowing hosts to obtain additional configuration options from DHCPv6 while still using SLAAC for address assignment.
 
 
 
@@ -2594,6 +2617,18 @@ IPv6 zero configuration
 
 Man-in-th-Middle (MitM) attack with SLAAC - It is possible for a malicious actor to take advantage of SLAAC to create a MitM attack by impersonating a IPv6 router. IPv6 is not able to leverage ARP in order to perform MAC to IP resolutions for the local network. IPv6 utilizes a sub-set of the ICMPv6 protocol called "Neighbor Solicitation (NS)". One particular NS message called Router Advertisements (RA) messages are normally sent by routers to advertise the local network IPv6 Prefix. In addition to the prefix, these messages advertise the MAC address of the router. The hosts will accept this mesages and append their Interface-Id to generate their 128-bit IPv6 address for remote communication. If a malicious actor has percistance on the network they can send crafted RA messages for IPv6 clients to accept. By accepting these RA messages the hosts will record and save the sending MAC address as its "gateway" in the arp-cache.
 
+## Vulnerabilities
+
+Fingerprint
+
+ROUGUE DHCP
+
+Evil Twin
+
+DHCP Starvation
+
+
+
 
 
 ## ICMPv6 
@@ -2668,6 +2703,316 @@ ICMPv6 Ping Reply
         Routers may inform hosts of a better first hop router for a destination.
 
 
+# Analysing Internet Routing 
 
-some
+
+Internetworking is the ability of network to communicate with other networks via intermediate networking devices (routers, switches) and links (ethernet, fiber). IP, a layer 3 protocol, uses logical addresses. These logical addresses are used to determine how a packet gets forwarded from one network to another. To allow network-to-network communication a global addressing scheme is required so that each host can be uniquely distinguished. Every network is assigned a unique value (network ID) and all the hosts on that network share the same network ID but each has their own host ID. The combination of the network ID and host ID makes each address unique.
+
+
+Routers, also called Gateways, are layer 3 devices that make their forwarding decisions based on the layer 3 logical address. When a router receives a packet, the packet is decapsulated to read the destination IP address. The router then will make a routing decision based on the routing table, encapsulate the packet with new layer 2 information and then forward it out a interface.
+
+![image](https://github.com/user-attachments/assets/b5a3c2b9-5ad0-43eb-877a-33c34223567d)
+
+
+## Routing Tables
+
+![image](https://github.com/user-attachments/assets/88564ce0-3d11-4157-b4a1-2257c2088880)
+
+
+
+Ultimate route is any routing table entry that has a next-hop IPv4 address, exit interface, or both.
+
+Level 1 route is any route with the subnet mask (CIDR) is equal to or less than the classful mask of the network address. A level 1 route can be a:
+
+Network route - A network route that has a subnet mask equal to that of the classful mask.
+
+            Class A - 255.0.0.0 (/8)
+
+            Class B - 255.255.0.0 (/16)
+
+            Class C - 255.255.255.0 (/24)
+
+Supernet route - A network route with a mask less (smaller) than the classful mask.
+
+192.168.0.0/16
+
+These can be a range of IP addresses aggregated into a single, larger network address.
+
+Commonly used as network summary routes     
+
+Default route - A default route is a static route with the address 0.0.0.0/0 or ::.
+
+Parent route is a level 1 network that is subnetted. A parent route will never be an ultimate route.
+
+Level 2 child route are the subnets of a classful network address.
+
+
+
+## Cisco Routing Table 
+![image](https://github.com/user-attachments/assets/c65019b6-8231-4190-b043-2ad4e34000c9)
+
+## Foundry Routing Table 
+![image](https://github.com/user-attachments/assets/45676365-a85a-4fcf-bbe2-0e710b81d656)
+
+## Juniper Routing Table 
+![image](https://github.com/user-attachments/assets/96bbb988-fe7a-4e39-a889-ae3d30906860)
+
+## Dell Routing Table
+![image](https://github.com/user-attachments/assets/51d0e95c-bd12-470d-94bf-93ba1f255804)
+
+
+## Primary Function
+
+The primary functions of a router are to:
+
+Determine the best path to send packets.
+
+        Builds and maintains routing tables to make this determination.
+
+        Uses directly connected networks, static routes, and dynamic routing protocols to assist in building and maintaining this routing table.
+
+Forward packets toward their destination (this is called routing).
+
+        Strips the Frame header off packet from incoming interface.
+
+        Adds new Frame header to packet for outgoing interface.
+
+
+## Best Match
+
+
+Best Route = Longest Match
+
+    Routers compare the destination address in the incoming packet to its entries in the routing table. It matches the address (bit by bit) to all the table entries and looks for the longest bit match it can find. Starting at the far left, it compares the bits up to the amounts of bits in the CIDR mask. (i.e. a /12 mask will match 12 bits and a /24 will match 24 bits.)
+
+    Since the IP packet only contains the IP address and not the subnetmask, the router does not know what network the address belongs to. So this matching process tries to narrow down the address to a list of "known" networks.
+
+    Once a route with the most matched bits is found, it will forward the packet to the next-hop ip address in the table entry and re-encapsulate the packet into a new frame appropriate for the exiting interface.
+
+
+![image](https://github.com/user-attachments/assets/28055412-1be1-490b-8ed0-8d26222b6696)
+
+
+## Administrative Distance 
+
+
+
+Routers uses an AD to determine the best source route to install into the IP routing table. The AD represents the "trustworthiness" of the route; the lower the AD, the more trustworthy the route source.
+
+For example, if a router learned about the 10.0.0.0/24 from EIGRP, OSPF and RIP, the EIGRP route entry would be in installed into the routing table. This is because EIGRP AD 90 is lower than OSPF AD 110 and RIP AD 120.
+
+If anything should happen with the EIGRP route then the OSPF route is installed into the routing table.
+
+
+![image](https://github.com/user-attachments/assets/93d8a30e-3463-4fce-a225-34400da624fd)
+
+## Metric 
+
+
+
+Some of the most common metrics that routing protocols can use are:
+
+hop
+
+bandwidth
+
+delay
+
+reliability
+
+load
+
+MTU
+
+cost
+
+administratively defined
+
+## Routing Protocol with Metric Name 
+
+RIP
+Hop count
+
+EIGRP
+Bandwidth, Delay, Load, Reliability
+
+OSPF
+Cost (Bandwidth)
+
+IS-IS
+Cost (Assigned by Admin)
+
+BGP
+Policy assigned by Admin
+
+
+## Classful and Classless
+![image](https://github.com/user-attachments/assets/53377155-125a-40cd-99ff-5acdd1099409)
+
+
+Routing protocols are either Classful or Classless.
+
+Classful routing protocols (RIPv1 and IGRP) do not send subnet mask information with their routing updates.
+
+Classless routing protocols (RIPv2, EIGRP, OSPF, and IS-IS) support VLSM and CIDR which include the subnet mask information in their routing updates; classful protocols do not.
+
+IPv6 routing protocols are all considered classless.
+
+
+
+## Routing vs Routed Protocols
+![image](https://github.com/user-attachments/assets/8146ac06-01df-4b34-939f-dfa3d0614708)
+
+
+
+Routed protocols allows data to be routed. These protocols provide an addressing scheme and sub-netting. The addressing scheme identifies the individual host and the network to which it belongs. Each host address must be unique. All hosts on an internetwork must use the services of a routed protocol to communicate.
+
+IPv4
+
+IPv6
+
+IPX
+
+AppleTalk
+
+Routing Protocols are used by routers to communicate routing information with each other. Unless all routes are manually entered into the router, the router needs to learn from other routers about the networks that they know. They use this shared information to populate their routing tables so that they can make better decisions when forwarding routed protocols such as IPv4.
+
+Routing protocols are broken down to 2 types:
+
+Interior Gateway Protocol (IGP) - is a type of protocol used for exchanging routing information between gateways (commonly routers) within an autonomous system
+
+RIP (v1, v2, ng)
+
+EIGRP and EIGRP for IPv6
+
+OSPF (v2 and v3)
+
+IS-IS
+
+Exterior Gateway Protocol (EGP) - is a routing protocol used to exchange routing information between autonomous systems
+
+BGP
+
+Not all routing protocols support all "routed" protocols. If you are running more than one then its possible that you may have to run additional routing protocols to ensure that those routes are advertised.
+
+
+## IGP vs EGP
+![image](https://github.com/user-attachments/assets/0c4ed8aa-6383-4fb6-b4b3-045b409a1927)
+
+
+
+Interior Gateway Protocols (IGP):
+
+Routing protocols that are used within an Autonomous System (AS).
+
+Referred to as intra-AS routing.
+
+Organizations and service providers IGPs on their internal networks.
+
+IGPs include RIP, EIGRP, OSPF, and IS-IS.
+
+
+Exterior Gateway Protocols (EGP):
+
+Used primarily for routing between autonomous systems.
+
+Referred to as inter-AS routing.
+
+Service providers and large companies will interconnect their AS using an EGP.
+
+The Border Gateway Protocol (BGP) is the only currently viable EGP and is the official routing protocol used by the Internet.
+
+
+
+
+
+## Autonomous System 
+![image](https://github.com/user-attachments/assets/51458c72-7eab-44dc-ad1c-2dba4b895414)
+
+
+IANA Regional Internet Registries (RIR):
+
+RIRs work in coordination with IANA to ensure the fair and efficient distribution of IP address resources globally. IANA allocates large blocks of IP addresses to the RIRs, and the RIRs, in turn, allocate smaller blocks of IP addresses to ISPs, organizations, and end-users within their respective regions. This hierarchical distribution system helps manage the limited pool of IPv4 addresses and ensure that IP address resources are allocated efficiently and fairly.
+
+ARIN (American Registry for Internet Numbers):
+
+Responsible for the allocation and management of IP addresses in North America, parts of the Caribbean, and sub-equatorial Africa.
+
+RIPE NCC (Réseaux IP Européens Network Coordination Centre):
+
+Responsible for the allocation and management of IP addresses in Europe, Central Asia, and the Middle East.
+
+APNIC (Asia-Pacific Network Information Centre):
+
+Responsible for the allocation and management of IP addresses in the Asia-Pacific region.
+
+LACNIC (Latin America and Caribbean Network Information Centre):
+
+Responsible for the allocation and management of IP addresses in Latin America and parts of the Caribbean.
+
+AfriNIC (African Network Information Centre):
+
+Responsible for the allocation and management of IP addresses in Africa.
+
+
+
+Autonomous systems
+
+An Autonomous System (AS) is a collection of IP networks and routers under the control of one entity (such as an Internet service provider, a university, or a large enterprise) that presents a common routing policy to the Internet.
+
+Autonomous Systems are identified by unique numbers called Autonomous System Numbers (ASNs), which are assigned by regional Internet registries (RIRs) such as ARIN, RIPE NCC, APNIC, LACNIC, and AfriNIC.
+
+Each administrative entity is assigned a 16-bit (prior to 2007) or 32-bit number (after 2007) to uniquely identify itself to everyone on the internet.
+
+
+## Distance Vector Routing Protocol
+
+![image](https://github.com/user-attachments/assets/e1dd32b3-2901-45e0-bd0e-0c268c021dfa)
+
+
+
+Distance Vector protocols are simplistic in their operation. They share entire routing tables with their directly connected neighbors and from these shared tables they determine two factors:
+
+Distance: This identifies how far away the destination network is from the router and is based on a metric such as the hop count, cost, bandwidth, delay, and more. It takes the learned distance from their neighbor, adds the distance to their neighbor, and this gives them a total distance.
+
+Vector: This specifies the direction to the remote network. The router advertises a path that it has learned which allows access to a remote network via one of its interfaces.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
