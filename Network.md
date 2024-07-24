@@ -2665,10 +2665,7 @@ ICMPv6 Ping Reply
     The last image shows the router’s ping reply to the PC.
 
 
-
-
-# NDP
-## NEighbor Discovery Protocol
+## Neighbor Discovery Protocol
 
 
 
