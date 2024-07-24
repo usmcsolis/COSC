@@ -904,15 +904,23 @@ An attacker can intercept ARP requests for a gateway and respond with its own MA
 ```
 
 
-## VTP 
+# VTP 
+```
+CISCO Proprietary
+MODES:
 
+Server
+Client
+Transparent
+
+```
 ## VLAN Trunking Protocol
 Simplifies an administrators job
 
 ![image](https://github.com/user-attachments/assets/aa27e9b7-0a71-4a89-a25a-ef0ec9b8771e)
 
 ```
-
+Centrally manage everything
 
 VLAN Trunking Protocol (VTP) is a Cisco proprietary protocol that propagates the definition of Virtual Local Area Networks (VLAN) on the whole local area network. VLAN Trunk Protocol (VTP) was developed to help reduce the administration of creating VLANs on all switches within a switched network. To do this, VTP sends VLAN information to all the switches in a VTP domain.
 
@@ -934,21 +942,486 @@ There are three versions of VTP, version 1, version 2, version 3.
 
 ```
 
+## VTP Issues
+```
+Can dumkp all VLAN information
+Cause a DoS as a switch will not support conifured VLANs
+
+VTP uses the configuration revision number to determine what is the most "up-to-date" VLAN information. Each time the server makes an update it will send a VTP message with a higher revision number. The other switches will see that the message revision number is higher than what they have recorded so they will adopt the information in the message believing it to be more current.
+
+The concern is that if you add a new switch to the current VTP domain that has a higher VTP revision number. This could be because it was previously on another VTP domain and was not properly erased. Once connected, that switch will not accept any VTP messages from the server since its revision number is higher. But when that switch sends its own VTP message advertising what it believes the current revision number is, all the other switches will see that it has a higher revision number and will cause all switches to dump all their information and request the information from the new switch. This in effect will bring down your entire VLAN infrastructure.
+
+Additionally, an attacker can use this same process to perform a Denial of Service on your VTP-switched network. The attacker can craft their own VTP message and send it over the network. This will cause all the switches in the VTP domain to flush all their VLAN information. This however does not change the VLANs assigned to the ports. The ports will stay assigned to the programmed VLANs. The switch however will no longer be forwarding traffic for those VLANS so the hosts will be isolated until the VLANs are re-introduced to the switch.
+
+
+
+```
+
+
+# DTP
+## Dynamic Trunking Protocol
+Used to dynamically create trunks when it sees trunk data
+
+```
+Modes:
+
+Dynamic - Auto (DEFAULT)
+
+Dynamic - Desirable
+
+Can disable by using NO NEGOTIATE    
+```
+
+![image](https://github.com/user-attachments/assets/67423205-f7ba-423c-b478-11663a5afb4d)
+
+
+
+# CDP, FDP, LLDP
+## Cisco Discovery Protocol
+```
+
+
+Cisco Discovery Protocol (CDP) is a Layer 2, Cisco proprietary protocol used to share information with other directly connected Cisco devices. CDP is protocol and media independent and runs on all Cisco routers, switches, and other devices.
+
+    CDP Shares information such as:
+
+        Type of device
+
+        Hostname
+
+        Number and type of interface
+
+        IP address
+
+        IOS software version
+
+    CDP can be used as a Network Discovery tool as well as assist in network design decisions and troubleshooting.
+
+
+
+```
+
+## Foundry Discovery Protocol
+```
+Foundry Discovery Protocol (FDP) is a proprietary data link layer protocol, originally developed by Foundry Networks, which was bought by Brocade. Similar to CDP, FDP enables Brocade devices to advertise to other directly connect Brocade devices on the network.
+```
+
+
+## Link Layer Discovery Protocol
+```
+Link Layer Discovery Protocol (LLDP) was designed by IEEE 802.1AB to be a vendor-neutral neighbor discovery protocol similar to CDP. LLDP also operates at layer 2 and shares similar information as does CDP with directly connected devices that support LLDP.
+```
+
+## EXPLOIT CDP Attack
+```
+
+
+Due to the nature of how CDP works, it can be easily used by malicious actors to map out your network infrastructure. It also shares alot of device information that an attacker can use in preparation of an attack; information like IP addresses, router models, software versions and so on can be sensitive for your organization. All information is sent in clear text and unauthenticated. Any attacker sniffing the network is able to see this information and is possible to impersonate (spoof) another device.
+
+It is recommended to disable CDP/LLDP if not needed in your organization. It is however required for many VOIP phones to operate. Cisco VOIP send CDP messages to the switch. This is how switches know to place the phones on the "voice" vlan and not the "data" vlan.
+
+    Disable Globally with no cdp run
+
+    Disable on an interface with no cdp enable
 
 
 
 
+```
+
+# STP
+## Spanning Tree Protocol
+![image](https://github.com/user-attachments/assets/6244b64c-cf77-4a90-a8b8-34f8c536551d)
+
+```
+ROOT - Has access to the internet
+Every port gets assigned a value
+R - is to the Root Device
+D - is for designated traffic
+Without STP it would potentially get sent an undesirable path to find the router out
+You can have a secondary Root
+```
+```
+
+
+We previously mentioned that there is no TTL at Layer 2 to eventually kill a frame that never reaches its destination. This will result in frames endlessly circulating a L2 infrastructure and eventually bringing down the network. This can be caused by simply adding redundant links in your network architecture that could allow frames to potentially circulate.
+
+Spanning Tree Protocol (STP) (802.1D) was developed to resolve this issue. STP is a Layer 2 protocol that builds a loop-free logical topology for Ethernet networks in a network that physically has loops. The basic function of STP is to prevent switching loops and the broadcast storms that can result. Spanning tree allows a network design to include physical "backup links" to provide fault tolerance if the active link fails.
+
+STP works by creating "tree" within a network of connected layer-2 switches, and disable any links that are not part of this tree. The root of the tree determined by electing a Root Bridge and all the other switches are the branches. This essentially leaves only a single active path between any two network switches. STP is based on the algorithm invented by Radia Perlman.
+
+STP operates by flooding Bridge Protocol Data Units (BPDUs) to all other switches in the network. BPDUs consist of:
+
+    Switches priority value (default 32768. Lower numbers are preferred.)
+
+    MAC address (lowest one on the switch. Lower MAC address are preferred.)
+
+
+These BPDUs are used to:
+
+    Elect the Root Bridge
+
+    Identify the Root port on each non-root bridge
+
+    Identify the Designated port for each segment
+
+
+After the election of the Root Bridge, all BPDUs will come from the root only and each switch will forward these BPDUs out their Trunk ports. This ensures that all switches know that the root is still active.
+
+IEEE introduced Rapid Spanning Tree Protocol (RSTP) as 802.1w in 2001. RSTP allowed ports to transition from blocking to forwarding in about 10 seconds.
+
+In 2005, the IEEE introduced 802.1s, alternatively referred to as Multiple Spanning Tree Protocol (MSTP), extending the foundational Spanning Tree Protocol (STP) delineated by IEEE 802.1D. MSTP enriches STP by enabling the mapping of multiple VLANs to a solitary spanning tree instance, thereby aiding in the optimization of network assets and the acceleration of convergence time.
+
+```
+
+
+## STP Versions
+```
+
+
+    Open Standards-Based Versions:
+
+        STP (802.1D):
+
+            Open standard defined by the IEEE 802.1D specification.
+
+            Basic version of the Spanning Tree Protocol, widely supported by networking equipment from various vendors.
+
+            Defines the original spanning tree algorithm for loop prevention in Ethernet networks.
+
+            Convergence Time: 30 to 50 seconds.
+
+        RSTP (802.1w):
+
+            Open standard defined by the IEEE 802.1w specification.
+
+            Improves upon the original STP by providing faster convergence and better performance.
+
+            Offers faster link failover times and better utilization of redundant links compared to STP.
+
+            Widely supported across networking equipment from multiple vendors.
+
+            Convergence Time: 6 seconds or less.
+
+        MSTP (802.1s):
+
+            Open standard defined by the IEEE 802.1s specification.
+
+            Extends RSTP to support multiple spanning tree instances, each of which can encompass multiple VLANs.
+
+            Helps reduce the number of spanning tree instances needed in large networks with multiple VLANs, improving scalability and manageability.
+
+            Convergence Time: Similar to RSTP (6 seconds or less).
+
+    Cisco Proprietary Versions:
+
+        Per-VLAN Spanning Tree (PVST) and PVST+ (Per-VLAN Spanning Tree Plus):
+
+            Proprietary spanning tree protocol developed by Cisco.
+
+            PVST and PVST+ extend the functionality of STP by creating a separate spanning tree instance for each VLAN.
+
+            Allows for finer control over spanning tree behavior on a per-VLAN basis, optimizing network performance and stability.
+
+            Convergence Time: Typically similar to STP (30 to 50 seconds).
+
+        Rapid Per-VLAN Spanning Tree (Rapid PVST):
+
+            Cisco’s proprietary version of RSTP, tailored for use with PVST+.
+
+            Offers faster convergence and better performance compared to traditional PVST+.
+
+            Provides rapid failover times for individual VLANs, enhancing network resilience and uptime.
+
+            Convergence Time: Typically similar to RSTP (6 seconds or less).
+
+        Cisco Multiple Spanning Tree Protocol (MSTP) Implementation:
+
+            Cisco offers its implementation of MSTP, which is compatible with the IEEE 802.1s standard.
+
+            Allows Cisco devices to participate in MSTP environments alongside equipment from other vendors.
+
+            Offers enhanced features and integration with other Cisco networking technologies.
+
+            Convergence Time: Typically similar to RSTP (6 seconds or less).
 
 
 
 
+```
 
 
+## STP BPDUs
+```
 
 
+Spanning Tree Protocol (STP) uses Bridge Protocol Data Units (BPDUs) to exchange information between switches and determine the topology of the network. BPDUs contain vital information necessary for STP operation, including bridge IDs, port IDs, path costs, and other parameters.
+
+    Contents of a BPDU:
+
+        Bridge ID (BID):
+
+            The BID uniquely identifies each bridge (switch) in the network and consists of two components: bridge priority and bridge MAC address.
+
+            The bridge priority is a numerical value (default is 32768) used to determine the root bridge.
+
+            The bridge MAC address is the MAC address of the bridge.
+
+        Port ID:
+
+            The Port ID uniquely identifies each port on a bridge.
+
+            It consists of two components: port priority and port number.
+
+            The port priority is a numerical value (default is 128) used to determine the designated port.
+
+            The port number is the identifier of the port on the bridge.
+
+        Path Cost:
+
+            The path cost represents the cumulative cost of the path from the sending bridge to the root bridge.
+
+            Each port calculates its path cost based on the speed of the link. For example, a higher speed link (e.g., Gigabit Ethernet) has a lower path cost than a lower speed link (e.g., Fast Ethernet).
+
+        Root Bridge ID:
+
+            The Root Bridge ID (RID) is the bridge ID of the root bridge, which is initially set to the bridge ID of the sending bridge.
+
+            As BPDUs propagate through the network, switches update the RID in the received BPDUs to reflect the bridge ID of the root bridge.
+
+        Message Type:
+
+            BPDUs can be either Configuration BPDUs or Topology Change Notification (TCN) BPDUs.
+
+            Configuration BPDUs are used for regular STP operations, such as root bridge election, topology discovery, and path selection.
+
+            TCN BPDUs are used to notify other switches of changes in the network topology, such as link failures or port state changes.
+
+    BPDU Exchange Process:
+
+        Transmission:
+
+            Each switch sends BPDUs out of all its designated ports at regular intervals (hello time), usually every 2 seconds by default.
+
+            BPDUs are sent as multicast frames to the well-known address 01:80:C2:00:00:00.
+
+        Reception:
+
+            Switches receive BPDUs from neighboring switches on their designated ports.
+
+            Upon receiving a BPDU, a switch compares the information in the BPDU with its own information to determine the best path to the root bridge.
+
+        Processing:
+
+            Switches process incoming BPDUs to update their internal spanning tree information, including root bridge selection, port roles (root, designated, or blocked), and path costs.
+
+            After the root bridge election, only the root will transmit BPDUs and non-root switches will process the BPDUs sent by the root.
+
+        Decision Making:
+
+            Based on the information in received BPDUs, switches make decisions about the state of their ports (forwarding, blocking, or listening/learning) and adjust their forwarding tables accordingly.
+
+            Switches use BPDUs to decide the root bridge in a STP environment. They determine the root as the one with the lowest priority. If there is a tie for priority then the lowest MAC address is used.
 
 
+```
 
+## Spanning Tree Attack
+
+```
+
+
+Spanning Tree Denial of Service attack.
+
+Its goal is to disrupt the switch’s spanning-tree process, destabilize their CAM tables and hold the network in a repetitive state of re-electing the root bridge. This is possible because there is no authentication mechanism built into the STP and its BPDU frames.
+
+This is done by repeatedly sending (crafted) Topology Change Notification (TCN) messages that will disrupt the system’s current understanding of the network. This will force renegotiation of the Root Bridge, resulting in a DoS attack because of the 50 second time period it takes to recalculate.
+
+
+Root Bridge Election Manipulation
+
+Another option is for the attacker to try to become the root bridge. Depending on the location of the attacker’s system, this can have a dramatic effect on the traffic flow throughout the L2 network. This can potentially cause traffic to traverse towards or thru the attacker’s device.
+
+This attack can be done by sending specially crafted BPDUs by giving itself a more preferred BPDU. Typically specifying a lower priority value. Once this is accomplished it is possible for the attacker to see packets that are sent through them. This requires the attacker to stay connected to two switches, running bridging software, so that they can continue to send the BPDU to advertise themselves as the root bridge.
+
+
+Both attacks require that the attacker be physically connected to the network.
+
+The industry standard of 802.1D there is only 1 spanning tree instance no matter how many vlans are running on the network. So to attack STP will affect every vlan in the network. However Cisco’s proprietary STP called PVST and PVST+, there is a spanning tree instance for each vlan in the network. So to attack one will not affect the others. Each vlan spanning tree instance would need to be attacked for a full network DoS.
+
+To mitigate STP attack you can:
+
+    Enable portfast to have a port immediately come up to the forwarding state.
+
+        Globally by using spanning-tree portfast default
+
+        By interface using spanning-tree portfast
+
+    Enable BPDU guard to prevent BPDUs from beign allowed on a switchport.
+
+        On each access port interface use spanning-tree bpduguard enable
+
+        Must not use this command on any trunk or switch to switch connections.
+
+
+```
+
+# Port Security
+## Modes
+```
+
+
+The following are the possible modes:
+
+    protect - Drops any frames with an unknown source addresses.
+
+    restrict - Same as protect except it additionally creates a violation counter report.
+
+    shutdown - Places the interface into an "error-disabled" state immediately and sends an SNMP trap notification. This is typically the default mode.
+
+
+```
+
+## Info
+```
+
+
+The purpose of configuring port security technologies is to limit, restrict, and protect network access. Configuring port security can be done on active access ports to limit the number of users or MAC addresses allowed to access onto the network. This will help to alleviate attacks such as DoS, MAC Address Flooding, and most unauthorized access.
+
+    MAC Address Limit:
+
+        Port security allows administrators to specify the maximum number of MAC addresses allowed on a switch port.
+
+        When enabled, the switch monitors the MAC addresses of devices connected to the port and takes action if the number of MAC addresses exceeds the configured limit.
+
+    MAC Address Learning:
+
+        When a device sends traffic through a switch port, the switch learns the device’s MAC address and associates it with the port.
+
+        The switch maintains a table, known as the MAC address table or CAM table, which maps MAC addresses to switch ports.
+
+    Violation Actions:
+
+        Administrators can define violation actions to be taken when port security violations occur.
+
+        Common violation actions include shutting down the port, sending an SNMP trap, or logging a message.
+
+        These actions help alert administrators to potential security breaches and mitigate unauthorized access attempts.
+
+        The following are the possible modes:
+
+            protect - Drops any frames with an unknown source addresses.
+
+            restrict - Same as protect except it additionally creates a violation counter report.
+
+            shutdown - Places the interface into an "error-disabled" state immediately and sends an SNMP trap notification. This is typically the default mode.
+
+
+```
+
+# Layer 2 Mitigation (Best Practices)
+## Best Practices
+The following are some mechanisms that can be be configured to better secure your switched network:
+
+## Shutdown unused ports - 
+Bare minimum to secure access ports is to simply shut down any and all inactive ports.
+```
+    interface fastethernet 0/1
+    shutdown
+```
+## Switchport Port Security - 
+Can be used to limit the number of MAC addresses that can be dynamically learned on a port or static MAC addresses can be assigned to one. Violation modes of shut down can be used to secure the port should a violation occur.
+```
+    switchport port-security
+    switchport port-security maximum 1
+    switchport port-security mac-address sticky
+    switchport port-security violation shutdown
+```
+## IP Source Guard - 
+Mitigates the effects of IP address spoofing attacks on the Ethernet LAN. With IP source guard enabled, the source IP address in the packet sent from an untrusted access interface is validated against the DHCP snooping database. If the packet cannot be validated, it is discarded.
+```
+    interface fastethernet 0/1
+    ip verify source
+    ip source binding 0100.0230.0002 vlan 11 10.10.0.40 interface fastethernet 0/1
+```
+## Manually assign STP Root - 
+Manually assign the Spanning Tree Protocol (STP) root bridge allows for a deterministic root bridge election rather than the bridge with the lowest bridge priority. This allows the central most switch to be the root that will best allow traffic to flow in an efficent manner.
+```
+    spanning-tree vlan <vlan-id> priority 0
+```
+## BPDU Guard - 
+BPDU Guard is a feature used in network switches to enhance network security by protecting against unintentional loops and rogue devices. It works by automatically shutting down a port if it receives Bridge Protocol Data Units (BPDUs), which are indicative of spanning tree protocol (STP) activity.
+```
+    interface fastethernet 0/1
+    spanning-tree bpduguard enable
+```
+## DHCP Snooping - 
+DHCP Snooping is a security feature commonly found in network switches that helps prevent rogue or unauthorized DHCP servers from distributing incorrect or malicious IP configuration information to network clients. It operates by monitoring and controlling DHCP messages exchanged between DHCP clients and servers. Configuration is done on ports that are connected to (or leading to) the DHCP server.
+```
+    ip dhcp snooping
+    interface fastethernet 0/1
+     ip dhcp snooping trust
+     ip dhcp snooping vlan <vlan-id>
+```
+## 802.1x - 
+The 802.1x standard defines a client-server-based access control and authentication protocol that prevents unauthorized clients from connecting to a LAN through ports until they are properly authenticated. The authentication server authenticates each client connected to a switchport before making available any services offered by the switch or the LAN.
+```
+    aaa new-model
+    aaa authentication dot1x default group radius
+    dot1x system-auth-control
+    identity profile default
+
+    interface fastethernet 0/1
+    access-session port-control auto
+    dot1x pae authenticator
+```
+## Dynamic ARP inspection (DAI) -
+Prevents Address Resolution Protocol (ARP) spoofing or “man-in-the-middle” attacks. ARP requests and replies are compared against entries in the DHCP snooping database, and filtering decisions are made on the basis of the results of those comparisons.
+```
+    ip arp inspection vlan {vlan-id> | <vlan-range>}
+
+    interface fastethernet 0/1
+    ip arp inspection [ trust | untrust ]
+
+    ip arp inspecion filter <arp-acl-name> vlan {vlan-id> | <vlan-range>} [static]
+```
+## Static CAM entries - 
+Static CAM (Content Addressable Memory) entries refer to manually configured entries in the CAM table of Ethernet switches. These entries map specific MAC addresses to specific switch ports and are used to optimize network performance and facilitate specific network configurations.
+```
+    mac-address-table static 1234:abcd:5678 vlan 1 interface fastethernet 0/1
+```
+## Static ARP entries - 
+Static ARP (Address Resolution Protocol) entries are manually configured mappings between IP addresses and MAC addresses in the ARP table of network devices. These entries are used to ensure stable communication between specific devices on the network.
+```
+    Linux:
+    sudo ip neighbor add 10.10.0.50 lladdr 11:22:33:44:55:66 nud permanent dev eth0
+    sudo ip neighbor delete 10.10.0.50 lladdr 11:22:33:44:55:66 nud permanent dev eth0
+
+    Windows:
+    arp -s 10.10.0.50 11:22:33:44:55:66
+```
+## Disable DTP negotiations - 
+To disable Dynamic Trunking Protocol (DTP) negotiations on a Cisco switch interface, you need to manually configure the interface as an access port or set it to operate in a specific trunking mode, such as "trunk" or "nonegotiate."
+```
+    interface fastethernet 0/1
+     switchport mode trunk
+     switchport nonegotiate
+
+    interface fastethernet 0/2
+     switchport mode access
+     switchport nonegotiate
+```
+## Manually assign Access/Trunk ports - 
+By default, switch ports can be either a trunk or access port depending on the device connected to the port and dynamic negotiations that take place. Manually assigning ports as either trunk or access ports provides greater control and ensures that the network operates as intended.
+```
+    interface fastethernet 0/1
+     switchport mode trunk
+     switchport nonegotiate
+
+    interface fastethernet 0/2
+     switchport mode access
+     switchport nonegotiate
+```
 
 
 
