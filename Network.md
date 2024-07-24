@@ -1780,20 +1780,9 @@ Fragment Offset field is a 13-bit field found in the IPv4 header.
         The values in this field is determined by dividing the fragmented bytes per packet by 8.
 
     It is determined by using the following formula:
-
-        Offset = (MTU - (IHL x 4)) ÷ 8
-
-        Value must divide evenly.
-
-        Decreases the MTU to ensure even division.
-
-        The fragment offset is calculated by dividing the payload bytes by 8. This offset value is cumulative and is added to each fragment offset until the last fragement.
-
-        A payload of 1480 will have an offset of 1480/8 or 185. The offset values will be 0, 185, 370, 555, 740, etc.
-
-
-
 ```
+## Offset = (MTU - (IHL x 4)) ÷ 8
+
 ![image](https://github.com/user-attachments/assets/c99ce30d-a84d-435e-b26b-06e5f1cda2d6)
 
 ## Decoding IPv4 Packet
@@ -2190,8 +2179,321 @@ ICMPv4
 
 
 
+## IPv6 Addressing 
 
 
 
 
+    IPv6 (Internet Protocol version 6) is the most recent version of the Internet Protocol, designed to succeed IPv4. IPv6 addresses are used to uniquely identify and locate devices on a network. IPv6 was introduced to address the limitations of IPv4, primarily the exhaustion of available IPv4 addresses due to the rapid growth of the internet.
+
+    IPv6 addresses are 128 bits long, compared to the 32-bit addresses used in IPv4. This significantly expands the address space, allowing for a virtually unlimited number of unique addresses. The IPv6 address format is expressed as eight groups of four hexadecimal digits, separated by colons.
+
+        Hexadecimal Representation: IPv6 uses hexadecimal digits (0-9 and A-F) in groups of four, separated by colons. These groupings of 4 HEX are called "Hextets". This representation makes IPv6 addresses more concise than the dotted-decimal format used in IPv4.
+
+        Expanded Address Space: With 128 bits, IPv6 provides an enormous address space compared to the 32-bit address space of IPv4. The number of unique IPv6 addresses is approximately 2128, allowing for an abundance of unique addresses.
+
+            The 128-bit space if split into 2 64-bit parts called the Prefix and Interface ID.
+
+            In theory this grants the ability to create 264 of prefixs (Networks) with 264 of interface IDs (hosts) per network.
+
+        IPv6 Address Types: IPv6 defines different types of addresses, including unicast, multicast, and anycast addresses. Unicast addresses identify a single interface, multicast addresses represent a group of interfaces, and anycast addresses identify the nearest among a group of interfaces.
+
+        Global Unicast Addresses: Similar to public IPv4 addresses, global unicast IPv6 addresses are routable on the internet. They are assigned by Internet Assigned Numbers Authority (IANA) to Regional Internet Registries (RIRs), which then allocate them to Internet Service Providers (ISPs) and organizations.
+
+        Link-Local Addresses: Link-local addresses are used for communication on a single network segment (link). They are automatically configured by devices when no DHCP server is available, and they are not routable beyond the local network.
+
+        Unique Local Addresses: Unique local addresses are similar to IPv4 private addresses and are used for local communication within an organization. They are not routable on the global internet.
+
+        IPv6 Prefix Notation: IPv6 addresses often use a prefix notation to specify the network portion. For example, in the address 2001:0db8:85a3:0000:0000:8a2e:0370:7334, the prefix is 2001:0db8:85a3::/48, indicating the network portion.
+
+
+## IPv6 Addressing and Subnetting 
+    Pv6 addressing
+
+        In 2011 IPv6 was released to use world wide. IPv6 was released to eventually replace IPv4 because of IPv4’s lack of address space. Along with IPv6’s release the packet design was simplified from the IPv4 15 sections header IPv6 holds only 8 sections with less wasted fields.
+
+        IPv6 addresses are 128 bits in length and will support up to 340 undecillian addresses.
+
+            64-bit Prefix (4 hextets) - Generally this is the network portion of the address.
+
+                Organizations asigned a 48-bit Prefix by IANA.
+
+                Last 16-bits of prefix is used for subnetting (allows upto 65,536 subnets).
+
+            64-bit Interface ID (4 hextets) - Generally this is the host portion of the address.
+
+                Allows for 264 hosts or 18,446,744,073,709,551,616 (eighteen quintillion, four hundred forty-six quadrillion, seven hundred forty-four trillion, seventy-three billion, seven hundred nine million, five hundred fifty-one thousand, six hundred sixteen).
+
+        IPv6 addresses are typically represented as eight groups of hexadecimal digits separated by colons, such as 2001:0db8:85a3:0000:0000:8a2e:0370:7334.
+
+        Leading zeros within each group can be omitted, and consecutive groups of zeros can be abbreviated with a double colon (::), but the double colon can only be used once in an address to avoid ambiguity.
+
+    Obstacles to transition:
+
+        Compatibility and Interoperability: During the transition period, both IPv4 and IPv6 networks need to coexist, requiring mechanisms for compatibility and interoperability. Dual-stack configurations, transition technologies, and network address translation (NAT) mechanisms are used to facilitate communication between IPv4 and IPv6 networks.
+
+        Legacy Infrastructure: Many existing networks, devices, and applications are built on IPv4 and may require significant updates or replacements to support IPv6. Legacy infrastructure poses a significant obstacle to IPv6 migration, especially for organizations with large and complex networks.
+
+        Cost and Investment: Transitioning to IPv6 often requires significant investments in equipment, software, training, and operational changes. For organizations with limited resources or competing priorities, the cost of migration can be a barrier.
+
+        Security Concerns: IPv6 introduces new security considerations and challenges, including the need for updated security policies, mechanisms, and tools. Organizations may be hesitant to adopt IPv6 due to concerns about potential security vulnerabilities and risks. Complexity of Deployment: Deploying IPv6 in large-scale networks or complex environments can be challenging due to the need for careful planning, coordination, and testing. Organizations may encounter technical issues, configuration errors, or unforeseen challenges during deployment.
+
+        Resistance to Change: Resistance to change or inertia within organizations can impede IPv6 adoption, especially in environments where IPv4 has been the standard for many years. Overcoming organizational resistance and fostering a culture of innovation and adaptation are essential for successful IPv6 migration.
+
+        IPv6 adoption chart from Google
+
+    IPv6 Subnetting
+
+
+![image](https://github.com/user-attachments/assets/017db043-fa9a-4852-9db4-98d4babfb8ee)
+
+## IPv6 Header
+![image](https://github.com/user-attachments/assets/99b6b872-891a-42d9-919c-3d29ea90bdde)
+![image](https://github.com/user-attachments/assets/ec891f00-9809-419e-aaa2-ddf7bcf43d17)
+```
+
+
+Version (4 bits): Indicates the version of the Internet Protocol being used. For IPv6, this field is set to 6.
+
+Traffic Class (8 bits): Combines the functions of the IPv4 Type of Service (ToS) and Differentiated Services Code Point (DSCP) fields.
+
+    Used for quality of service (QoS) and packet prioritization.
+
+Flow Label (20 bits): Used to label packets belonging to the same flow, allowing routers to apply specialized handling to those packets.
+
+    It allows routers and network devices to identify packets belonging to the same flow or traffic stream and apply consistent treatment, such as prioritization or routing policies.
+
+Payload Length (16 bits): Specifies the length of the IPv6 payload, including any extension headers, in octets (8-bit units).
+
+Next Header (8 bits): Indicates the type of the next header following the IPv6 header.
+
+    Comparable to the protocol field in the IPv4 header with alot of the same values.
+
+    If the value corresponds to an IPv6 extension header, the processing of the packet continues with the specified extension header.
+
+    If the value corresponds to an upper-layer protocol (such as TCP or UDP), the packet payload is handed over to that protocol for further processing.
+
+        TCP: 6
+
+        UDP: 17
+
+        ICMPv6: 58
+
+        EIGRP: 88
+
+        OSPF: 89
+
+Hop Limit (8 bits): Similar to the Time-to-Live (TTL) field in IPv4, specifies the maximum number of hops (routers) the packet can traverse before being discarded.
+
+    This field is comparable to the TTL field in the IPv4 Header.
+
+    Decremented by one by each router that forwards the packet.
+
+Source Address (128 bits): Specifies the IPv6 address of the packet’s source.
+
+    Address is expressed in HEX.
+
+    Examples:
+
+        fe80:0000:0000:0000:0000:0000:0000:1
+
+        2001:0db8:85a3:0000:0000:8a2e:0370:7334
+
+Destination Address (128 bits): Specifies the IPv6 address of the packet’s intended destination.
+
+    Address is expressed in HEX.
+
+    Examples:
+
+        fd00:1234:5678:9abc:0000:0000:0000:1
+
+        ff02:0000:0000:0000:0000:0000:0000:1
+
+        2001:0db8:85a3:0000:0000:8a2e:0370:7334 
+```
+
+## Decoding IPv6 Packet
+```
+38 c9 86 2d 92 61 00 e0　4c 36 1c 43 86 dd 60 04
+82 45 00 10 3a 40 20 01　0d b8 00 01 00 00 00 00
+00 00 00 00 00 01 20 01　0d b8 00 02 00 00 00 00
+00 00 00 00 00 02 80 00　31 e7 21 c1 00 07 5c 98
+25 e4 00 02 4e 0f
+```
+
+
+```
+
+
+38 c9 86 2d 92 61 is the destination MAC address
+
+00 e0 4c 36 1c 43 is the source MAC address
+
+86 dd is the Ethertype for IPv6
+
+60 04 82 45 is the Version, Traffic Class, and Flow Label fields.
+
+    6 is to identify the version is 6.
+
+    0 0 is the Traffic class. Similar to the DSCP field in IPv4.
+
+    4 82 45 is the Flow Label field. Used by IPv6 to tell routers to route all packets together.
+
+00 10 is the Payload Length field. Does not measure the header size as it is always 40 bytes. Currently set to 16 bytes.
+
+3a is the Next Header field. Currently set to identify ICMPv6.
+
+    06 is for TCP
+
+    11 is for UDP
+
+40 is the Hop Limit field. Currently set to 64.
+
+20 01　0d b8 00 01 00 00 00 00 00 00 00 00 00 01 is the source IP address. Currently set to 2001:db8:1::1.
+
+20 01　0d b8 00 02 00 00 00 00 00 00 00 00 00 02 is the destination IP address. Currently set to 2001:db8:1::2.
+
+The remaining will be the payload.
+
+```
+
+![image](https://github.com/user-attachments/assets/d0e07e29-9f5c-4605-a870-a941ffe5a69c)
+
+
+
+## Differences Between v4 and v6
+
+![image](https://github.com/user-attachments/assets/ab6bb520-a14d-4387-9358-d4059d5b7467)
+
+
+
+    Some fields were kept the same (version, source, and destination address fields).
+
+        Version 4 or 6
+
+        IPv4 addresses are 32-bits in length
+
+        IPv6 addresses are 128-bits in length
+
+    Other fields perform the same function but have different names
+
+        TTL → Hop count
+
+        Protocol → Next header
+
+        Type of Service (TOS) (otherwise known as DSCP/ECN) → Traffic class.
+
+    IPv6 does have one new field defined by RFC6437. The flow label field enhances the traffic class field by allowing the association of traffic belonging to the same "flow" or "conversation". Additionally, extension headers defined in RFC2460 Section 4 are supported to enhance the functionality of the IPv6 header for specific functions.
+
+    IPv6 does not have an IHL field. This is because it has a static length of 40 bytes whereas IPv4 has a variable length header from 20 bytes (IHL=5) to 60 bytes (IHL=F).
+
+    IPv4 supports options that are appended to the header in 4-byte increments. Up to 40 bytes of options can be used. IPv6 does not use options but does support Extension Headers. Extension headers are not appended to the IPv6 header but rather are extra headers that follow the IPv6 header before the actual data.
+
+
+
+## IPv6 Representation
+
+
+
+    There are 128 bits in an IPv6 address that are divided into eight 16 bit groupings separated by colons (:). In IPv6 the term for a 16 bit grouping are called a hextet. Within each hextet the 16 bits are represented by 4 hex digits. When displaying the IPv6 address, leading zeros can be dropped. This same thing is done with IPv4.
+
+    When looking at an IPv4 addresses you can not diffrentiate the network portion or the host portion without pairing it with it’s subnet mask.
+
+        100.10.10.10 for example is a unique address. But looking at it we do not know the actual network/subnet it resides on.
+
+            100.10.10.10 /8 would mean that the first 8 bits are "network bits" and the remaining 24 bits are "host bits". This would put the host on the 100.0.0.0 /8 network.
+
+            100.10.10.10 /16 would mean that the first 16 bits are "network bits" and the remaining 16 bits are "host bits". This would put the host on the 100.10.0.0 /16 network.
+
+            100.10.10.10 /24 would mean that the first 24 bits are "network bits" and the remaining 8 bits are "host bits". This would put the host on the 100.10.10.0 /24 network.
+
+    IPv6 addresses are inheriently split into 2 main parts.
+
+        The first 64 bits (or "Prefix") is used to represent the network portion.
+
+        The remaining 64 bits (or "Interface ID") is used to represent the host portion.
+
+    IPv6 CIDR expresses the number of bits in the network portion of the address. In the case of IPv6 addresses this can be up to /64 and not more. The exception to this rule is when using the /128 CIDR which is used to express the host IP address such as ::1/128 or 2001:ABCD:1234:DEF0:1111:2222:3333:4444 /128
+
+    IPv6 addresses can be very long. A method to help shorten the address is by dropping any leading zeros "0’s"
+
+        :0001: can be shortened to :1:
+
+        A series of 0’s can be shortened by replacing it with ::.
+
+            FE80:0000:0000:0000:0000:0000:0000:0001 can be simply expressed as FE80::1
+
+        When 2 or more consecutive 0’s are present, only one can be shortened with the ::. It is the user’s choice which.
+
+            FE80:0000:0000:0000:abcd:0000:0000:0001 can be shortned to FE80::abcd:0:0:1 or FE80:0:0:0:abcd::1.
+
+            The "::" notation can only be used once within an IPv6 address to avoid ambiguity. If it were allowed to appear multiple times in an address, it would be challenging to determine how many groups of zeros should be compressed at each occurrence.
+
+![image](https://github.com/user-attachments/assets/507384e0-8ebd-4d98-b95f-4d044c73c6c3)
+
+
+
+
+## IPv6 Address Types and Scopes
+
+
+
+    IPv6 address types:
+
+        Unicast Addresses IPs are a "one to one" communication between two nodes.
+
+            These are similar in function to that of IPv4 unicast addresses.
+
+        Multicast Addresses Used for one to many communications and routing protocols.
+
+            These perform the same function as the Class D or multicast addresses of IPv4.
+
+            Range ff00::/8 - ff00:: thru ffff::
+
+        Anycast Addresses These addresses can fall within the Global, Unique-Local, or Link-Local address scopes. They differ from unicast in that more than one device can be configured with the same address. These are typically used to address several network gateways. Each gateway can be configured with the same anycast address. Any of these devices can supply the service request for the client. These can also be used for servers when trying to load balance a particular service.
+
+
+    IPv6 address scope:
+
+        Loopback Address IPv6 address used by a node on a vitural interface to send packets to itself. This is the same as the 127.0.0.1 is for IPv4.
+
+            Scope is ::1/128
+
+        Global Unicast Addresses IPv6 addressess that are routable over the Internet.
+
+            Scope is 2000::/3 - 2000:: thru 3fff::
+
+                2001:0000:/32 - reserved for Teredo tunneling
+
+                2001:20::/28 - reserved for ORCHIDv2
+
+                2002::/16 - reserved for 6to4 tunneling
+
+        Unique-Local Addresses IPv6 addresses the are routable locally within a site, not globally routable across the Internet. These perform a similar function as the RFC 1918 private IPv4 addresses and will require NAT to translate the address to a Global Unicast address for communication over the Internet.
+
+            Scope is fc00::/7 - fc00:: thru fdff::
+
+        Multicast addresses
+
+            Scope ff00::/8 - ff00:: thru ffff::
+
+                ffx0::/8 - reserved
+
+                ffx1::/8 - interface-local - spans only a single interface on a host. Used for loopback multicast.
+
+                ffx2::/8 - link-local - spans the local network. Does not traverse network bounderies. Comparable to 224.0.0.0/24 for IPv4.
+
+                ffx3::/8 - realm-local - spans farther than link-local but under determination of the administrator. Should not bound farther than those below.
+
+                ffx4::/8 - admin-local - smallest scope that can be administratively configured.
+
+                ffx5::/8 - site-local - spans a single site of an organization.
+
+                ffx8::/8 - organization-local - spans to all sites in a single organization.
+
+                ffxe::/8 - global - spans all hosts on the internet and is unbounded.
+
+                ffxf::/8 - reserved
+
+        Link-Local Addresses IPv6 addresses that are assigned to a IPv6 enabled interface for direct link on link communcations. Automatic link-local assignment is done if a one is not manually assigned. Each IPv6 enabled device must have a link-local address defined for local communicaiton. These can not be used as routable addresses.
 
