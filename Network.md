@@ -2148,7 +2148,6 @@ ICMPv4
 
 
 ## Common ICMP attacks
-```
 
 
     Fire-walking - Using traceroute and TTLs to map out a network. Using traceroute with TCP and UDP protocols an attacker could map the open ports on a firewall.
@@ -2192,7 +2191,6 @@ ICMPv4
 
 
 
-```
 
 
 
