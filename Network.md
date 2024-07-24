@@ -2390,7 +2390,7 @@ The remaining will be the payload.
     IPv4 supports options that are appended to the header in 4-byte increments. Up to 40 bytes of options can be used. IPv6 does not use options but does support Extension Headers. Extension headers are not appended to the IPv6 header but rather are extra headers that follow the IPv6 header before the actual data.
 
 
-
+# IPv6
 ## IPv6 Representation
 
 
@@ -2497,3 +2497,103 @@ The remaining will be the payload.
 
         Link-Local Addresses IPv6 addresses that are assigned to a IPv6 enabled interface for direct link on link communcations. Automatic link-local assignment is done if a one is not manually assigned. Each IPv6 enabled device must have a link-local address defined for local communicaiton. These can not be used as routable addresses.
 
+## IPv6 Auto Configuration and Vilnerability
+
+
+    Stateless Address Autoconfiguration (SLAAC)(default):
+
+        SLAAC is the primary method of IPv6 address autoconfiguration and is similar to IPv4 DHCP in some respects but simpler.
+
+        In SLAAC, routers on the local network periodically multicast Router Advertisement (RA) messages (FF02::1) to announce their presence and provide network configuration information.
+
+        Hosts on the network receive these RA messages and use the information contained within them to configure their IPv6 addresses and other parameters.
+
+        Hosts can also send Router Solicitation (RS) message (FF02::2) to request network information. This is commonly done when a host first powers on. The router will respond with a RA message to the host sent using FF02::1.
+
+        Each host uses its unique identifier (based on the MAC address or another mechanism) and the network prefix advertised in the RA messages to generate its IPv6 address.
+
+    Stateful/Stateless Address Autoconfiguration (DHCPv6):
+
+        DHCPv6 is an extension of the DHCP protocol used in IPv4 networks, and it provides additional configuration options beyond basic address assignment.
+
+        With DHCPv6, hosts can obtain IPv6 addresses, DNS server information, and other network configuration parameters from a DHCPv6 server.
+
+        DHCPv6 can be used in conjunction with SLAAC, allowing hosts to obtain additional configuration options from DHCPv6 while still using SLAAC for address assignment.
+
+
+
+
+
+
+
+IPv6 zero configuration
+
+    When a node has IPv6 enabled on it’s interface it is setup with an automatic assigning of link-local addresses that will work with zero configuration in the range of fe80::/10. Upon powering on, an IPv6 device will configured its own Link-Local address in the range of FE80::/10.
+
+    If configured for DHCPv6 it will perfom a process called Stateless Address Autoconfiguration (SLAAC) as defined in RFC 4862, Neighbor Discovery Protocol (NDP) using ICMPv6. The host will send a Router Solicitation (RS) message to the multicast address of FF02::2 (all routers). This message is intended to reach any IPv6 configured routers on the same network link as itself. The router will respond with a Router Advertisement (RA) message sent to the requesting node at its solicited node multicast address of FF02::1:FFxx:xxxx (xx:xxxx is the last 24 bits of the requestors interface ID). The RA is also sent to the multicast address of FF02::1 (all nodes) at regular intervals. In the message it will include:
+
+        IPv6 Global routing prefix (first 64 bits)
+
+        Prefix length (up to a /64)
+
+        Gateway address (the router’s IP address)
+
+        Other additional options such as instructions to get further information from DHCPv6
+
+    The host will initiate the process to generate its own interface ID (last 64 bits). It will use either:
+
+        EUI-64 - The host will use its 48-bit MAC address and insert "FFFE" between the 3 Byte OUI and 3 Byte Vendor assigned ID. This insertion of 16-bits will make the full 64-bit Interface ID. It will then "flip" the 7th bit of the interface ID. Changing that bit from a 0 to a 1 or 1 to a 0.
+
+            Typically *Nix systems and Cisco devices use EUI-64 by default.
+
+            Windows devices use Random Generation by default, but can be configured to use EUI-64.
+
+            a MAC address of fa:16:3e:c3:68:f2 will resolve an EUI-64 address of FE80::f816:3e ff:fe c3:68f2.
+
+            There are security concerns of EUI-64 in being able to reverse engineer it to a specific host MAC address.
+
+            Example 1 (Link-Local):
+
+                MAC: fa:16:3e:c3:68:f2
+
+                Append: ff:fe between OUI and Vendor assigned
+
+                Flip 7th bit
+
+                Result: FE80::f816:3eff:fec3:68f2
+
+            Example 2 (Global):
+
+                Prefix from RA: 2001:ABCD:1234:DEF0::
+
+                MAC: fa:16:3e:c3:68:f2
+
+                Append: ff:fe between OUI and Vendor assigned
+
+                Flip 7th bit
+
+                Result: 2001:ABCD:1234:DEF0:f816:3eff:fec3:68f2
+
+        Random generation - Random generation was developed to generate the interface ID using psudo random generation to avoid device fingerprinting.
+
+            Windows Vista and up use this process by default.
+
+            Can not be reversed to a MAC address but knowing that Windows using this method by default can be an indicator.
+
+            Examples:
+
+                Prefix from RA: 2001:ABCD:1234:DEF0::
+
+                Link-Local: FE80::cdc3:b3ac:1623:f552
+
+                Global: 2001:ABCD:1234:DEF0:182f:dd86:f2be:653b
+
+
+
+## MITM With SLAAC
+
+Man-in-th-Middle (MitM) attack with SLAAC - It is possible for a malicious actor to take advantage of SLAAC to create a MitM attack by impersonating a IPv6 router. IPv6 is not able to leverage ARP in order to perform MAC to IP resolutions for the local network. IPv6 utilizes a sub-set of the ICMPv6 protocol called "Neighbor Solicitation (NS)". One particular NS message called Router Advertisements (RA) messages are normally sent by routers to advertise the local network IPv6 Prefix. In addition to the prefix, these messages advertise the MAC address of the router. The hosts will accept this mesages and append their Interface-Id to generate their 128-bit IPv6 address for remote communication. If a malicious actor has percistance on the network they can send crafted RA messages for IPv6 clients to accept. By accepting these RA messages the hosts will record and save the sending MAC address as its "gateway" in the arp-cache.
+
+
+
+## ICMPv6 
