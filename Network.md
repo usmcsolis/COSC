@@ -3965,6 +3965,32 @@ RPC (Any Port)
 
 ## SSH (TCP 22)
 
+Keys:
+
+User Asymmetric
+
+Host Asymmetric
+
+Session Symmetric
+
+ssh-keygen -f "/home/student/.ssh/known_hosts" -R "172.16.82.106"
+ssh-keygen -t rsa -b 4096 -C "Student"
+```
+VIEW/CHANGE SSH PORT
+
+    To view the current configured SSH port
+
+    cat /etc/ssh/sshd_config | grep Port
+
+    Edit file to change the SSH Port
+
+    sudo nano /etc/ssh/sshd_config
+
+    Restart the SSH Service
+
+    systemctl restart ssh
+```
+
 ## HTTP(s) (TCP 80/443)
 
 ## HTTPs QUIC
