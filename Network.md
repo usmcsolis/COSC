@@ -4041,3 +4041,555 @@ DNS (QUERY/RESPONSE) (TCP/UDP 53)
         DNS Zone transfers are typically over 512-bytes so TCP is used for the transmission.
 
 
+
+
+DNS-over-UDP/53 ("Do53")
+
+    DNS has primarily answered queries using UDP 53, queries consist of a clear-text request sent in a single UDP packet from the client, responded to with a clear-text reply sent in a single UDP packet from the server. Lacks transport-layer encryption, authentication, reliable delivery, and message length.
+
+DNS-over-TCP/53 ("Do53/TCP")
+
+    DNS can use TCP for DNS queries, replies but particularly is used in zone transfers. Transfer of DNS records between a Primary and Secondary DNS Servers require the use of TCP protocol. The requirement here is that TCP, due to its reliability makes sure zone data is consistent across DNS servers. When a client doesn’t receive a response from DNS, it re-transmits the query using TCP after 3-5 seconds of interval.
+
+
+## DNS Records
+
+
+```
+Type A
+
+    IPv4 Address record, used to map hostnames to an IP address of the host.
+
+Type AAAA
+
+    IPv6 address record, used to map hostnames to an IPv6 address of the host.
+
+Type MX
+
+    Mail exchange record, Maps a domain name to a list of message transfer agents for that domain.
+
+Type TXT
+
+    Text record, human-readable text in a DNS record, but can also store machine-readable data. Often used for verification and authentication.
+
+Type NS
+
+    Name Server record, specifies the authoritative name servers for a domain.
+
+Type SOA
+
+    Start of authority, provides authoritative information about the zone, including administrative details and zone-level settings.
+
+Type AXFR
+
+    AXFR facilitates the transfer of the entire DNS zone data, including all resource records, from one DNS server (the master) to another DNS server (the slave).
+
+Type CNAME
+
+    Canonical Name creates an alias for a domain name, pointing it to another canonical domain.
+
+Type PTR
+
+    Used for reverse DNS lookups to map an IP address to a domain name.
+
+```
+
+
+## DNS Architecture 
+![image](https://github.com/user-attachments/assets/5d7980ba-182e-40fc-b5b6-dbaa74e467b5)
+
+
+```
+
+
+    DNS Root Zone. Authoritative name servers managed by IANA with 13 root servers around the world.
+
+        a.root-servers.net 198.41.0.4, 2001:503:ba3e::2:30 Verisign, Inc.
+
+        b.root-servers.net 199.9.14.201, 2001:500:200::b University of Southern California,
+
+        c.root-servers.net 192.33.4.12, 2001:500:2::c Cogent Communications
+
+        d.root-servers.net 199.7.91.13, 2001:500:2d::d University of Maryland
+
+        e.root-servers.net 192.203.230.10, 2001:500:a8::e NASA (Ames Research Center)
+
+        f.root-servers.net 192.5.5.241, 2001:500:2f::f Internet Systems Consortium, Inc.
+
+        g.root-servers.net 192.112.36.4, 2001:500:12::d0d US Department of Defense (NIC)
+
+        h.root-servers.net 198.97.190.53, 2001:500:1::53 US Army (Research Lab)
+
+        i.root-servers.net 192.36.148.17, 2001:7fe::53 Netnod
+
+        j.root-servers.net 192.58.128.30, 2001:503:c27::2:30 Verisign, Inc.
+
+        k.root-servers.net 193.0.14.129, 2001:7fd::1 RIPE NCC
+
+        l.root-servers.net 199.7.83.42, 2001:500:9f::42 ICANN
+
+        m.root-servers.net 202.12.27.33, 2001:dc3::35 WIDE Project
+
+    Top Level Domains (Level 1). Top-Level Domains (TLDs) are the highest level of domain names in the hierarchical Domain Name System (DNS) structure.
+
+        Generic:
+
+            .com: Commercial organizations
+
+            .org: Non-profit organizations
+
+            .net: Network infrastructure providers
+
+            .edu: Educational institutions
+
+            .gov: U.S. government agencies
+
+            .mil: U.S. military organizations
+
+            .int: International organizations
+
+            .info: General information websites
+
+            .biz: Business-related websites
+
+            .name: Personal websites
+
+        Country Code:
+
+            .us: United States
+
+            .uk: United Kingdom
+
+            .de: Germany
+
+            .fr: France
+
+            .jp: Japan
+
+            .au: Australia
+
+            .ca: Canada
+
+            .in: India
+
+            .br: Brazil
+
+            .cn: China
+
+            .ru: Russia
+
+    2nd Level Domains. Second-level domains are commonly used to identify specific organizations, businesses, or individuals on the internet.
+
+        .com TLD:
+
+            google.com
+
+            amazon.com
+
+            microsoft.com
+
+            apple.com
+
+        .org TLD:
+
+            wikipedia.org
+
+            mozilla.org
+
+            redcross.org
+
+            eff.org
+
+        .net TLD:
+
+            stackoverflow.net
+
+            behance.net
+
+            etsy.net
+
+            change.org
+
+        Country Code TLDs (ccTLDs):
+
+            bbc.co.uk (United Kingdom)
+
+            alibaba.cn (China)
+
+            naver.com (South Korea)
+
+            lefigaro.fr (France)
+
+    DNS Sub-Domain. A subdomain is a part of a larger domain, placed to the left of the main domain name, that allows further organization and subdivision of the DNS hierarchy. It allows website owners to create additional sections or subdivisions under their primary domain.
+
+        Organization-based Subdomains:
+
+            sales.example.com
+
+            hr.companyname.com
+
+            support.domainname.com
+
+        Geographic-based Subdomains:
+
+            us.example.com
+
+            uk.domainname.com
+
+            ca.website.com
+
+        Service-based Subdomains:
+
+            blog.domainname.com
+
+            shop.example.com
+
+            forum.domainname.com
+
+        Product-based Subdomains:
+
+            product1.domainname.com
+
+            product2.example.com
+
+            app.domainname.com
+
+        Mobile-specific Subdomains:
+
+            m.domainname.com
+
+            mobile.example.com
+
+            mobileapp.domainname.com
+
+        Language-based Subdomains:
+
+            en.example.com
+
+            fr.domainname.com
+
+            es.website.com
+
+
+
+```
+
+
+
+## FTP (TCP 20/21)
+FTP has two modes of operation, Active and Passive.
+
+## FTP Active
+Active
+A client initiates a connection with a server on port 21 from the client’s ephemeral high port. The three way handshake is completed and the client listens on its ephemeral high port + 1, the client sends the port N+1 command to the server on port 21 (control port). Ex: if the command to the server is from ephemeral port 1026, it would listen on port 1027. Once that is done, the server initiates a connection to the client’s ephemeral high (1027) from the server’s data port (20) and the data is transferred.
+
+![image](https://github.com/user-attachments/assets/0a651eb3-11cb-4618-8d76-86b9fe8e07e2)
+
+
+## FTP Passive
+Passive
+Passive FTP sidesteps the issue of Active mode by reversing the conversation. The client initiates both the command and data connections.
+
+![image](https://github.com/user-attachments/assets/8fb2e227-5463-4ce1-8ab2-7285b6dae43e)
+
+
+
+## TFTP (UDP 69)
+
+
+TFTP (UDP 69)
+
+Trivial File Transfer Protocol (TFTP) is a simple File Transfer Protocol which allows a client to get/put a file from/to a remote host. One of its primary uses is in the early stages of nodes booting from a local area network.
+
+TFTP has been popular due to its simple easy of implementation.
+
+IT pros and Sys Admins typically use TFTP configuration for:
+
+Transferring files
+
+Remote-booting without hard drives
+
+Upgrading codes
+
+Backing up network configurations
+
+Backing up router configuration files
+
+Saving IOS images
+
+Booting PCs without a disk
+
+
+## SMTP (TCP 25)
+
+
+SMTP (TCP 25)
+
+Simple Mail Transfer Protocol (SMTP) is an internet standard used for sending electronic mail. SMTP is not encrypted and will require other methods to secure the data.
+
+## POP (TCP 110)
+
+
+POP (TCP 110)
+
+Post Office Protocol (POP) is an older internet standard used to retrieve electronic mail from a server. Most implementations of POP will delete the server stored mail once the client downloads them. This meant that the client can only read the email from the system that was used to download them. The latest version is POP3.
+
+## IMAP (TCP 143)
+
+
+IMAP (TCP 143)
+
+Similar to POP in that it is used to download electronic mail from a server. It differs from POP in that it typically synchronizes with the server so that the client can download the mail but have it still stored on the server. This allowed clients to retrieve their emails from multiple systems. The current implementation is IMAP4.
+
+## DHCP (v4 and v6) (UDP 67/68)
+
+
+DHCP (UDP 67/68)
+
+Dynamic Host Configuration Protocol (DHCP) is an internet standard used to assign IP address parameters across an enterprise. This prevent administrators from having to manually assign IP configuration on each host individually. Clients communicate with the server over UDP port 67 and the server communicates with the client over UDP port 68.
+
+IPv4 DHCP process (D.O.R.A)
+
+Discover - Sent as a L2 and L3 broadcast by the client to discover a DHCP server. Broadcast can only reach devices on the same network. If the DHCP server is not on the local network then the router must use the ip helper command to relay these requests to a centralized DHCP server.
+
+Offer - Sent as a unicast to the client. The offer will contain the offered IP address configurations.
+
+Request - Sent as a broadcast back to the server. This is broadcasted because the client could have received 2 or more offers. The broadcast will announce to all DHCP servers as to which offer was accepted. The client will send a gratuitous ARP to attempt to determine if the IP address is already in use.
+
+Acknowledge - Final response from the server sent as a unicast to the client to confirm the lease reservation. Will contain the expiration timeframe of the lease.
+
+IPv6 DHCP process - Similar to the process of DHCPv4 except the names and communication methods differ.
+
+Solicit - Sent to the server as a multicast.
+
+Advertise - Unicast response from server.
+
+Request - Multicast to the server.
+
+Reply - Unicast server response.
+
+## DORA and SAAR
+
+## DHCP Vulnerabities
+
+
+
+DHCP is a very useful protocol but is not impervious to its share of attacks and vulnerabilities.
+
+Rogue DHCP - (Sometimes referred to as Pineapple) - This is where a malicious person places their own DHCP server on a victim’s network. The IP address assignments will still be in the valid scope for the network but the attacker can use himself as the gateway to easily perform MitM attacks. The attacker can also assign their own DNS server address for domain to IP resolution. This means that the attacker can resolve and valid domain name to an IP address of their choosing. This can cause victims to go to the attacker’s specially crafted websites to steal credentials and other information.
+
+DHCP Starvation - The attacker may not want to compete with a valid DHCP server for address assignments. To ensure that their configurations are accepted they will attempt to send numerous fake DHCP requests to the valid server to exhaust their pool of addresses. This will force all users to get their IP configurations from the rogue DHCP.
+
+## NTP (UDP 123)
+
+```
+
+
+NTP (UDP 123)
+
+The Network Time Protocol (NTP) is a networking protocol for clock synchronization between computer systems over packet-switched, variable-latency data networks. NTP is intended to synchronize all participating computers to within a few milliseconds of Coordinated Universal Time (UTC).
+
+    Uses stratum levels to determine the distance from the "authoritative" time source.
+
+        Stratum 0 - Identifies the device as the "authoritative" time source.
+
+        Stratum 1 - Syncs their time from Stratum 0.
+
+        Stratum 2 - Syncs their time from Stratum 1.
+
+        Stratum 3 to 15 - Follows same scheme as above. Stratum 15 is the highest level.
+
+        Stratum 16 - Signifies that the device is unsynchronized.
+
+
+Vulnerabilities:
+
+Time synchronization is critical for certain communications. Microsoft Active Directory uses time synchronization for all hosts in the domain. It allows for a certain margin of time error and once that is exceeded the client is "disjoined" from the domain and users can no longer log in. Other systems and protocols also use time synchronization and can easily be exploited. A malicious person can craft NTP messages in attempt to throw off the domain timing and create issues.
+
+
+```
+
+
+## TACACS (TCP 49)
+
+
+TACACS (TCP 49) SIMPLE/EXTENDED
+
+The Terminal Access Controller Access-Control System Plus (TACACS+) is a network security protocol used for centralized authentication, authorization, and accounting (AAA) services in network devices such as routers, switches, and firewalls. Developed by Cisco Systems, TACACS+ provides a robust framework for controlling access to network resources and enforcing security policies.
+
+
+## RADIUS (UDP  1645/1646 and 1812/1813)
+
+
+RADIUS (UDP 1645/1646 AND 1812/1813)
+
+Remote Authentication Dial-In User Service (RADIUS) is a open standard networking protocol used for centralized authentication, authorization, and accounting (AAA) services in network environments. It enables devices like network access servers (NAS), VPN gateways, and wireless access points to authenticate users and authorize their access to network resources.
+
+## DIAMETER (TCP 3836)
+
+
+Diameter is a networking protocol used for Authentication, Authorization, and Accounting (AAA) functions in network systems, primarily in telecommunications networks. It is an evolution of the older RADIUS (Remote Authentication Dial-In User Service) protocol, providing enhanced features and capabilities.
+
+Diameter protocol was develop to enhance the AAA capablities that RADIUS does not support. Such as:
+
+Supports application-layer acknowledgments and defines failover algorithms and the associated state machine.
+
+ Transmission-level security support via TLS/TCP and DTLS/SCTP. Diameter can work over TCP, Stream Control Transmission Protocol (SCTP), or UDP. SCTP is recommended.
+
+ Diameter includes support for error handling, capability negotiation, and mandatory/non-mandatory Attribute-Value Pairs (AVPs).
+
+## SNMP (UDP 161/162)
+
+```
+
+
+SNMP (UDP 161/162)
+
+Simple Network Management Protocol (SNMP) is an Internet Standard protocol for collecting and organizing information about managed devices on IP networks. Devices that typically support SNMP include cable modems, routers, switches, servers, workstations, printers, and more.
+
+    3 Key SNMP Components
+
+        SNMP Manager - It is a centralized system used to monitor the network. It is also known as Network Management Station (NMS)
+
+        SNMP agent - It is a software management software module installed on a managed device. Managed devices can be network devices like PC, router, switches, servers, etc.
+
+        Management Information Base - MIB consists of information on resources that are to be managed. This information is organized hierarchically. It consists of objects instances which are essentially variables.
+
+    SNMP Versions
+
+        SNMPv1 – This was the first implementation, operating within the structure management information specification, and described in RFC 1157. It uses community strings for authentication and UDP only.
+
+        SNMPv2c – This version has improved support for efficiency and error handling and is described in RFC 1901. It was first introduced in RFC 1441 and is more appropriately known as SNMP v2c. It uses community strings for authentication. It uses UDP but can be configured to use TCP.
+
+        SNMPv3 – This version improves security and privacy. It was introduced in RFC 3410. It uses Hash-based MAC with MD5 or SHA for authentication and DES-56 for privacy. This version uses TCP. Therefore, the higher the version of SNMP, the more secure it will be.
+
+            noAuthNoPriv – This (no authentication, no privacy) security level uses community string for authentication and no encryption for privacy.
+
+            authNopriv – This security level (authentication, no privacy) uses HMAC with MD5 or SHA for authentication and no encryption is used for privacy.
+
+            authPriv – This security level (authentication, privacy) uses HMAC with MD5 or SHA for authentication and encryption uses DES-56(56-bit) algorithm, 3DES(168-bit), AES(128/192/256-bit).
+
+
+Vulnerabilities:
+
+SNMP v1 and v2 traffic is sent as clear text. It also has generally weak passwords. This means that attackers can potentially sniff the network this traffic and can be used to gather sensitive information about the network and its devices. Should the passwords be compromised, the attacker can probe SNMP enabled devices for information and disable SNMP traps that would otherwise trigger when certain actions occur.
+
+
+```
+
+
+## RTP (UDP 1023+)
+
+```
+RTP (Real-time Transport Protocol) is primarily used for streaming real-time media over IP networks. It is a protocol specifically designed for transmitting audio and video data in a way that supports time-sensitive applications, such as voice and video communication, streaming media, and live broadcasts.
+
+    Voice over IP (VoIP): RTP is widely used in VoIP applications to transport real-time voice data packets over IP networks. It works in conjunction with protocols like SIP (Session Initiation Protocol) to enable voice communication over the internet.
+
+    Video Conferencing: RTP forms the basis of video conferencing systems, allowing participants to transmit and receive real-time video streams during live meetings or conferences.
+
+    Streaming Media: RTP is commonly used for streaming media services, such as online video streaming platforms, live broadcasts, and webinars. It facilitates the efficient transmission of video and audio data to multiple clients in real-time.
+
+    IPTV (Internet Protocol Television): RTP is used in IPTV systems to deliver television content over IP networks, enabling users to stream television programs and video-on-demand services over the internet.
+
+    Multimedia Applications: RTP is utilized in various multimedia applications, including gaming, remote monitoring, video surveillance, and interactive multimedia services. It provides a reliable and efficient transport mechanism for transmitting time-sensitive media data.
+
+    Real-time Data Transmission: RTP can be used for real-time data transmission scenarios where timely delivery is crucial. For example, it may be employed in sensor networks, control systems, or any application that requires the transmission of real-time data streams.
+```
+
+
+## RDP (TCP 3389)
+
+
+RDP (TCP 3389)
+
+Developed by Microsoft to offer remote access to a computer’s desktop GUI as if they was physically at the system rather than just a command-line interface.
+
+The protocol is widely supported across most Windows, Unix, Linux, and macOS operating systems. Other proprietary options were developed to provide remote desktop support but the administrator typically must install the client software on each device before being able to remotely access devices with these 3rd party tools.
+
+## Kerberos (UDP 88)
+
+
+
+Kerberos (UDP 88)
+
+Kerberos is a network authentication protocol that ensures secure authentication for client-server applications. It was created by MIT as a network authentication protocol using secret-key cryptography. It relies on a trusted Key Distribution Center (KDC) server.
+
+Here’s a simplified explanation of the Kerberos process:
+
+    Authentication Request:
+
+        The client sends an authentication request to the KDC, providing its identity (username) and the desired server’s identity (service principal name).
+
+    Ticket Granting Ticket (TGT) Request:
+
+        The KDC verifies the client’s identity and issues a TGT if the credentials are valid.
+
+        The TGT is encrypted using the client’s password or a shared secret key.
+
+    TGT Issuance:
+
+        The KDC sends the encrypted TGT to the client, which stores it securely.
+
+    Service Ticket Request:
+
+        When the client wants to access a specific service, it requests a Service Ticket (ST) for that service from the KDC.
+
+        The request includes the TGT and the desired service’s identity.
+
+    ST Issuance:
+
+        The KDC verifies the TGT and issues an ST for the requested service if the TGT is valid.
+
+        The ST is encrypted using a session key shared between the client and the service.
+
+    Service Access:
+
+        The client presents the ST to the service, proving its authenticity and intent to access the service.
+
+        The service decrypts the ST using the session key and verifies its validity.
+
+        If the ST is valid, the service grants access to the client.
+
+Kerberos utilizes symmetric key cryptography for secure ticket encryption and decryption, ensuring data confidentiality and integrity. It also supports mutual authentication between the client and server.
+
+Kerberos is widely used in enterprise environments, particularly in Microsoft Windows with Active Directory. It ensures secure authentication and access to network resources while protecting against unauthorized access and replay attacks.
+
+
+
+## LDAP (TCP 389)
+
+
+
+LDAP (TCP 389 and 636)
+
+The Lightweight Directory Access Protocol (LDAP) is an application protocol used for accessing and managing distributed directory information services. LDAP provides a standardized method for querying, modifying, and authenticating against directory services, such as Active Directory and OpenLDAP.
+
+LDAPS (LDAP over SSL/TLS) is a secure communication protocol used to encrypt LDAP traffic between LDAP clients and servers. It provides a layer of security to LDAP authentication and directory access by encrypting data exchanged over the network, protecting it from eavesdropping and tampering.
+
+    LDAP provides access to distributed directory services that act in accordance with X.500 data and service models. These protocol elements are based on those described in the X.500 Directory Access Protocol (DAP).
+
+    LDAP as an authentication service follows the client/server model. The LDAP model has two main steps when a user requests non-TLS bind authentication. These are (in order):
+
+        TCP three-way handshake (SYN, SYN/ACK, ACK)
+
+        LDAP bind() function (performed synchronous or asynchronous)
+
+LDAP:
+
+    LDAP (unencrypted): TCP Port 389
+
+    LDAPS (LDAP over SSL/TLS): TCP Port 636
+
+    follows a client-server model, where LDAP clients send requests to directory servers, which in turn provide responses.
+
+    hierarchical data stores that organize and store structured information, such as user profiles, organizational units, and network resources.
+
+    uses a directory schema to define the structure and attributes of directory entries, allowing for flexible data modeling.
+
+    supports various operations, including search, add, modify, delete, and bind (authentication).
+
+    uses a string-based query language called the LDAP Data Interchange Format (LDIF) to search and retrieve data from directory servers.
+
+        LDAP servers are vulnerable from DoS attacks (SYN Flooding) and protecting user passwords from being discovered over a network.
+
+
