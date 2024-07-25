@@ -3767,3 +3767,277 @@ RPC (Any Port)
 
             NFS
 
+
+
+
+# Layer 6 
+## Presentation Layer
+
+```
+
+
+    Presentation Layer - This layer deals with the Translating, Formatting, Encryption, and Compression of data.
+
+        Data Translation and Transformation:
+
+            The Presentation Layer can translate data between different character encoding schemes, such as ASCII, Unicode, EBCDIC, etc., ensuring compatibility between systems with different encoding requirements.
+
+                ASCII Encoding: American Standard Code for Information Interchange represents text characters using 7 or 8 bits, mapping each character to a numeric value.
+
+                Unicode Encoding: A character encoding standard that encompasses most of the world’s writing systems, assigning unique numerical values to characters, emojis, and symbols.
+
+                UTF-8 Encoding: A variable-width character encoding capable of encoding all Unicode characters using one to four bytes, commonly used in web pages and email.
+
+                UTF-16 Encoding: A character encoding capable of encoding all Unicode characters using two or four bytes, often used in programming languages like Java and JavaScript.
+
+                UTF-32 Encoding: A fixed-width encoding scheme that represents each Unicode code point with four bytes, ensuring straightforward indexing but resulting in larger file sizes compared to UTF-8 and UTF-16.
+
+                Base64 Encoding: Converts binary data into ASCII characters, useful for encoding binary data such as images or attachments in emails or transmitting binary data over text-based protocols.
+
+                URL Encoding: Converts special characters into a format that can be transmitted over the Internet, replacing reserved characters with percent-encoded representations.
+
+        Data Formatting and Syntax Parsing:
+
+            The Presentation Layer can format data according to predefined standards or protocols, ensuring that the data conforms to the expected syntax and structure. It parses the incoming data to extract relevant information and present it to the application layer in a meaningful way.
+
+                Text-Based Formats:
+
+                    Plain Text (.txt): Simplest format containing unformatted text without any styling or formatting.
+
+                    Comma-Separated Values (.csv): Tabular format where data values are separated by commas, commonly used for storing and exchanging spreadsheet or database data.
+
+                    Extensible Markup Language (.xml): Markup language for encoding structured data in a human-readable format, widely used in web services, configuration files, and data exchange.
+
+                    JavaScript Object Notation (.json): Lightweight data interchange format commonly used for transmitting data between a server and a web application, as well as storing configuration data.
+
+                Document Formats:
+
+                    Portable Document Format (.pdf): A format developed by Adobe that preserves document formatting and layout across different platforms, widely used for sharing and distributing documents.
+
+                    Microsoft Word Document (.docx): Word processing format developed by Microsoft, used for creating and editing text-based documents with rich formatting, images, and other multimedia elements.
+
+                    Rich Text Format (.rtf): Cross-platform document format that supports text formatting, images, and other media, compatible with various word processors.
+
+                Image Formats:
+
+                    Joint Photographic Experts Group (.jpg/.jpeg): Commonly used format for storing compressed digital images, suitable for photographs and complex images with many colors.
+
+                    Graphics Interchange Format (.gif): Format supporting animated images and short video clips, widely used for web animations and memes.
+
+                    Portable Network Graphics (.png): Lossless image format that supports transparency and compression, commonly used for web graphics and digital images.
+
+                Audio Formats:
+
+                    MP3 (.mp3): Compressed audio format that reduces file size while preserving audio quality, widely used for storing and sharing music and audio files.
+
+                    Waveform Audio File Format (.wav): Uncompressed audio format that preserves original audio data without loss of quality, commonly used for professional audio editing and recording.
+
+                    Advanced Audio Coding (.aac): Format for encoding digital audio data, known for its high compression efficiency and widespread support in multimedia applications.
+
+                Video Formats:
+
+                    Moving Picture Experts Group-4 (.mp4): Standard format for storing digital video and multimedia content, widely supported by video playback software and devices.
+
+                    Audio Video Interleave (.avi): Multimedia container format developed by Microsoft, capable of storing audio and video data in a single file, commonly used for video editing and playback.
+
+                    Flash Video (.flv): Format developed by Adobe for streaming video content over the internet, commonly used for web-based video players and online streaming platforms.
+
+        Data Encryption and Decryption:
+
+            The Presentation Layer can perform encryption and decryption of data to ensure its confidentiality and integrity during transmission. It encrypts data before transmission and decrypts it upon receipt, allowing secure communication between systems.
+
+                Symetric: AES, Blowfish, Twofish, DES, and RC4
+
+                Asymetric: PKI, Diffie-Hellman, DSS, RSA, Elliptic curve
+
+                TLS (Transport Layer Security):
+
+                    TLS is primarily a transport layer protocol that provides secure communication over a network. However, cryptographic algorithms used in TLS (such as RSA, Diffie-Hellman, and AES) may be invoked at the presentation layer for encrypting data before presentation to the user.
+
+                    In web browsers, TLS encryption ensures secure communication between the client and server, protecting sensitive data such as login credentials, payment information, and personal details during transmission.
+
+                SSL (Secure Sockets Layer):
+
+                    SSL is the predecessor to TLS and operates similarly to TLS in providing secure communication over a network. Like TLS, SSL may involve cryptographic operations at the presentation layer to encrypt data before rendering.
+
+                    Although SSL has been largely deprecated in favor of TLS, some legacy systems and applications may still use SSL for securing data.
+
+                PGP (Pretty Good Privacy):
+
+                    PGP is an encryption program that provides cryptographic privacy and authentication for data communication. It can be used for encrypting and decrypting emails, files, and other forms of data.
+
+                    While PGP is commonly associated with email encryption (which operates at the application layer), it may also involve cryptographic operations at the presentation layer for rendering encrypted messages in email clients.
+
+                S/MIME (Secure/Multipurpose Internet Mail Extensions):
+
+                    S/MIME is a standard for secure email messaging that provides encryption and digital signature functionality. It enables users to send encrypted and digitally signed emails using cryptographic algorithms such as RSA and AES.
+
+                    S/MIME operations may involve cryptographic processing at the presentation layer for rendering encrypted email messages and verifying digital signatures.
+
+                OpenPGP (Open Pretty Good Privacy):
+
+                    OpenPGP is an open-source standard that builds upon PGP for secure communication. It defines formats for encrypted messages, digital signatures, and key management.
+
+                    OpenPGP implementations may involve cryptographic operations at the presentation layer for rendering encrypted messages and verifying digital signatures.
+
+                End-to-End Encryption (E2EE):
+
+                    E2EE is a method of secure communication that ensures only the communicating users can read the messages. Encryption and decryption occur exclusively at the endpoints, providing strong confidentiality guarantees.
+
+                    While E2EE is typically implemented at the application layer, cryptographic techniques used for encryption and decryption may involve operations at the presentation layer for data rendering.
+
+        Data Compression and Decompression:
+
+            The Presentation Layer can compress data to reduce its size before transmission, optimizing network bandwidth and speeding up data transfer. It decompresses the data upon receipt, restoring it to its original format.
+
+            Sometimes data gets to big to transmit over the network so the Presentation layer handles compression.The primary role of Data compression is to reduce the number of bits to be transmitted. It is important in transmitting multimedia such as audio, video, text etc.
+
+                Zip, TAR, RAR, 7zip, CAB
+
+            Lossless Compression:
+
+                Lempel-Ziv (LZ) Compression: This family of algorithms, including LZ77 and LZ78, identifies repeated patterns in the data and replaces them with shorter codes, achieving compression without loss of information.
+
+                DEFLATE Compression: DEFLATE combines LZ77 with Huffman coding and is used in popular formats like ZIP, gzip, and PNG for lossless compression.
+
+                Run-Length Encoding (RLE): RLE replaces sequences of repeated data with a single value and a count, making it effective for compressing data with long runs of identical values.
+
+                Burrows-Wheeler Transform (BWT): BWT rearranges the characters in the input data to facilitate compression. It’s often used in conjunction with other techniques like Move-to-Front (MTF) and Huffman coding.
+
+                Huffman Coding: Huffman coding generates variable-length codes for characters based on their frequencies in the input data, achieving efficient compression without loss of information.
+
+                Arithmetic Coding: Arithmetic coding encodes a sequence of symbols into a single floating-point number within a specified range, offering high compression ratios for lossless data.
+
+                Bzip2 Compression: Bzip2 uses the Burrows-Wheeler Transform (BWT) and Huffman coding to achieve high compression ratios, particularly effective for compressing text files.
+
+                Delta Encoding: Delta encoding compresses data by encoding the differences between consecutive values in a sequence, suitable for compressing data with predictable patterns or incremental updates.
+
+                PPM (Prediction by Partial Matching): PPM predicts the next symbol in a sequence based on its context, achieving high compression ratios for text and structured data.
+
+                LZMA (Lempel-Ziv-Markov chain Algorithm): LZMA combines LZ77 with additional modeling techniques like Markov chains for high compression ratios, commonly used in formats like 7z and XZ.
+
+                LZ77 and LZ78: These are foundational algorithms in the LZ family, used for identifying and encoding repeated patterns in data for compression.
+
+                Shannon-Fano Coding: Similar to Huffman coding, Shannon-Fano coding generates prefix codes based on symbol probabilities to achieve lossless compression.
+
+                Gzip Compression: Gzip uses DEFLATE compression and is commonly used for compressing files on Unix-based systems.
+
+                Zstandard (Zstd): Zstd is a modern compression algorithm that offers a good balance between compression speed and ratio, suitable for various types of data.
+
+                LZW (Lempel-Ziv-Welch) Compression: LZW is used in formats like GIF and compresses data by replacing repeating patterns with codes from a dictionary.
+
+                CAB (Cabinet File Format): CAB is a Microsoft-developed file archive format commonly used for software installation packages and system files, often employing the LZX compression algorithm.
+
+            Lossy Compression:
+
+                JPEG Compression: JPEG (Joint Photographic Experts Group) is widely used for compressing digital images. It achieves compression by discarding high-frequency information and optimizing color representation, resulting in smaller file sizes but some loss of image quality.
+
+                GIF Compression: Although GIF (Graphics Interchange Format) primarily supports lossless compression, it can also be used in a lossy mode by reducing the color palette or by discarding color information. This can result in smaller file sizes but may degrade image quality, particularly for complex images.
+
+                MPEG Compression: MPEG (Moving Picture Experts Group) is a suite of standards for compressing audio and video data. It typically uses lossy compression techniques such as motion compensation, discrete cosine transform (DCT), and quantization to achieve compression while maintaining perceptual quality.
+
+                MP3 Compression: MP3 is a popular lossy compression algorithm for audio data. It achieves compression by removing parts of the audio signal that are less audible to humans, such as frequencies outside the normal hearing range and quiet sounds masked by louder ones.
+
+                AAC (Advanced Audio Coding): AAC is a more advanced audio compression format compared to MP3. It offers better sound quality at lower bit rates and is commonly used for streaming audio and digital music distribution.
+
+                OGG Compression: OGG is a container format that typically uses lossy compression for audio data. It’s often associated with the Vorbis codec, which offers high-quality audio compression at lower bit rates compared to formats like MP3.
+
+                WebP Compression: WebP is an image format developed by Google that uses both lossy and lossless compression techniques. It’s designed to offer smaller file sizes and faster loading times for web images compared to formats like JPEG and PNG.
+
+                HEVC (High-Efficiency Video Coding): HEVC, also known as H.265, is a video compression standard that offers better compression efficiency compared to previous standards like H.264. It’s widely used for streaming video and digital television.
+
+                FLAC (Free Lossless Audio Codec): Although FLAC is primarily a lossless compression format, it can also be used in a lossy mode where certain non-essential audio data is discarded to achieve smaller file sizes while still retaining high audio quality.
+
+                WAVPACK: WAVPACK is a hybrid audio compression format that offers both lossy and lossless compression modes. It’s capable of achieving high compression ratios while preserving audio quality through its lossy mode.
+
+                DCT (Discrete Cosine Transform) Compression: DCT is commonly used in lossy compression algorithms for images and video, such as JPEG and MPEG. It transforms spatial data into frequency domain coefficients, allowing for efficient compression while sacrificing some image or video quality.
+
+
+
+
+```
+
+
+# Layer 7
+## Application Layer
+
+## Telnet (TCP 23)
+
+## SSH (TCP 22)
+
+## HTTP(s) (TCP 80/443)
+
+## HTTPs QUIC
+
+
+HTTPs QUIC (UDP 443)
+
+    QUIC (Quick UDP Internet Connections): Developed by Google, QUIC serves as a cutting-edge transport layer protocol meticulously crafted to elevate the speed and security of web applications, strategically designed to surmount limitations inherent in conventional transport protocols like TCP (Transmission Control Protocol).
+
+    UDP-Based Operation: Functioning over the User Datagram Protocol (UDP), QUIC introduces a nimble and connectionless communication paradigm, optimizing the transmission of data.
+
+    Latency Reduction Engineering: At its core, QUIC is an engineering marvel dedicated to mitigating latency compared to TCP. This achievement is realized through innovative mechanisms, including connection multiplexing and a streamlined round-trip handshake process.
+
+    Integration with HTTP/3: Inextricably linked with the HTTP/3 protocol, QUIC seamlessly provides a secure and highly efficient transport layer, propelling the evolution of the Hypertext Transfer Protocol into its next generation.
+
+
+## HTTP Vulnerabilities
+
+```
+
+
+    HTTP (Hypertext Transfer Protocol) is a fundamental protocol for communication on the World Wide Web. While it is the foundation for data communication on the web, it has had historical vulnerabilities that could pose risks to security.
+
+    HTTP is vulnerable to various Denial of Service (DoS) attacks.
+
+        Flooding the HTTP Server:
+
+            HTTP flood: floods the target server with a high volume of legitimate-looking HTTP requests, consuming its resources and causing it to become unresponsive.
+
+            HTTP GET/POST Flood: The attacker sends a large number of HTTP GET or POST requests to overwhelm the server and exhaust its resources.
+
+            SYN Flood: The attacker sends massive amounts of SYNs to try to consume all the connections.
+
+        HTTP Amplification: the attacker leverages misconfigured or vulnerable web servers to amplify the attack traffic, making it appear as if the requests are originating from multiple sources.
+
+        Low and Slow attacks:
+
+            Slow Loris: attack functions by opening connections to a targeted Web server and then keeping those connections open as long as it can.
+
+            R U Dead Yet? (RUDY): aims to keep a web server tied up by submitting form data at an absurdly slow pace.
+
+        Drive by Downloads: is the unintentional downloading of malicious software onto a user’s device when visiting a website or clicking on a compromised advertisement or link. The term "drive-by" implies that the download happens automatically and without the user’s knowledge or consent. Drive-by downloads take advantage of vulnerabilities in web browsers, browser plugins, or operating systems to initiate the download of malicious files.
+
+        BeEF Framework: The Browser Exploitation Framework. It is a penetration testing tool that focuses on the web browser. It is a tool designed to enable an attacker to use a target’s browser as an attack point.
+
+    Man-in-the-Middle Attack: Attackers can intercept and alter communication between a client and server, leading to unauthorized access, data manipulation, or eavesdropping.
+
+    Session Hijacking: Attackers may steal session identifiers, allowing them to impersonate a user and gain unauthorized access to sensitive information.
+
+    Cross-Site Scripting (XSS): Malicious scripts are injected into web pages viewed by other users, potentially leading to the theft of sensitive information or session hijacking.
+
+    Cross-Site Request Forgery (CSRF): Unauthorized commands are transmitted from a user that the web application trusts, potentially leading to actions performed on behalf of the user without their consent.
+
+    Directory Traversal Attacks: Attackers exploit insufficient security controls to access files or directories beyond the intended scope, potentially exposing sensitive data.
+
+        http://example.com/view?file=../../etc/passwd
+
+
+
+```
+
+## DNS (TCP/UDP 53)
+
+
+
+DNS (QUERY/RESPONSE) (TCP/UDP 53)
+
+    Used as a means to resolve domain names to an IP addresses usable by the client system. Typically used to resolve IP addresses of web domains.
+
+    Client queries and server responses are typically sent using UDP port 53.
+
+    TCP is used when DNS responses are larger than 512-bytes.
+
+        DNS Zone transfers are typically over 512-bytes so TCP is used for the transmission.
+
+
