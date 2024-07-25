@@ -3188,21 +3188,582 @@ To usurp the active router, the attacker only needs to inject false HSRP hellos 
 
 
 
+# Layer 4 Transport Layer
+## Ports, Headers, Protocols 
+TCP Transmission Control Protocol
+
+UDP User Datagram Protocol
+
+Port Ranges:
+    Well Known 0-1023
+
+    Registered 1024-49151
+
+    Dynamic/ Private 49152-65535
+
+
+## TCP and UDP
+```
+
+
+Connection-oriented (TCP-Segments-Unicast traffic)
+
+    Requires that a connection with specific agreed-upon parameters be established before data is sent.
+
+    Provides segmentation and sequencing.
+
+    Provides connection establishment and acknowledgments to provide reliability.
+
+    Provides flow control (or windowing).
+
+    Common application layer protocols or functions that rely on TCP are SSH, Telnet, FTP, SMTP, POP, IMAP, and HTTP(s).
+
+    Get more information in RFC 793
+
+
+Connection-less (UDP-Datagrams-Broadcast, Multicast, Unicast Traffic)
+
+    Requires no connection before data is sent.
+
+    Provides no ordering, duplicate protection or delivery guarantee.
+
+    Application layer protocols will normally provide the reliability if needed.
+
+    Does provide integrity checking using the checksum.
+
+    Common application layer protocols or functions that rely on UDP are DNS, TFTP, and QUIC (Quick UDP Internet Connections).
+
+    Get more information in RFC 768
+
+
+
+```
+
+## TCP Header, States, and Flags
+
+
+![image](https://github.com/user-attachments/assets/0780cf82-0bdf-42fa-94ee-77ed269900c8)
+
+![image](https://github.com/user-attachments/assets/93c4b105-f741-4588-882a-4f433849b2a4)
+
+![image](https://github.com/user-attachments/assets/a06eb908-6d4b-4aaf-b5c9-285156b99c35)
+
+```
+
+
+CWR: Congestion Windows Reduced - The congestion window reduced flag is used by the sending host to indicate it received a packet with the ECE flag set. (Not comonly used unless Explicit Congestion Notification (ECN) is used in the TCP header.)
+
+ECE: Explicit Congestion Notification (ECN) Echo - This flag is responsible for indicating if the TCP peer is ECN capable. (Not comonly used unless Explicit Congestion Notification (ECN) is used in the TCP header.)
+
+URG: Urgent - Indicates that the urgent pointer field is valid and contains urgent data. The urgent flag is used to notify the receiver to process the urgent packets before processing all other packets. Has become less relevant for modern TCP communications.
+
+ACK: Acknowledgment - The acknowledgment flag is used to acknowledge the successful receipt of a packet.
+
+PSH: Push - The push flag is somewhat similar to the URG flag and tells the receiver to process these packets as they are received instead of buffering them. This flag is only used during the established phase when sending data. Should be sent with an ACK flag.
+
+RST: Reset - The reset flag gets sent from the receiver to the sender when a packet is sent to a particular host that was not expecting it. Most commonly used in response to a TCP connection on a closed port.
+
+SYN: Synchronize - The synchronization flag is used as a first step in establishing a three way handshake between two hosts. Is only legitimately used during the 3-way handshake.
+
+FIN: Finished - The finished flag means no more data from sender. Used as part of the 4-way TCP connection termination. Should be sent with an ACK flag.
+
+
+```
+
+![image](https://github.com/user-attachments/assets/cb8e261d-7fcd-4274-9cb0-1c755149a43c)
+
+```
+
+
+LISTEN - represents waiting for a connection request from any remote TCP and port.
+
+SYN-SENT - represents waiting for a matching connection request after having sent a connection request.
+
+SYN-RECEIVED - represents waiting for a confirming connection request acknowledgment after having both received and sent a connection request.
+
+ESTABLISHED - represents an open connection, data received can be delivered to the user. The normal state for the data transfer phase of the connection.
+
+FIN-WAIT-1 - represents waiting for a connection termination request from the remote TCP, or an acknowledgment of the connection termination request previously sent.
+
+FIN-WAIT-2 - represents waiting for a connection termination request from the remote TCP.
+
+CLOSE-WAIT - represents waiting for a connection termination request from the local user.
+
+CLOSING - represents waiting for a connection termination request acknowledgment from the remote TCP.
+
+LAST-ACK - represents waiting for an acknowledgment of the connection termination request previously sent to the remote TCP (which includes an acknowledgment of its connection termination request).
+
+TIME-WAIT - represents waiting for enough time to pass to be sure the remote TCP received the acknowledgment of its connection termination request.
+
+CLOSED - represents no connection state at all.
+
+```
+
+
+
+## UDP and Header
+
+![image](https://github.com/user-attachments/assets/85c8e7c7-89ef-4ef6-adeb-058827139d13)
+
+```
+00 1f 29 5e 4d 26 00 50　56 bb 3a a0 08 00 45 00
+00 3c 83 1b 40 00 40 11　15 0a c0 a8 14 46 4a 7d
+83 1b dc de 00 35 00 36　7c 15 03 c4 01 20 00 01
+00 00 00 00 00 01 04 6f　63 73 70 08 76 65 72 69
+73 69 67 6e 03 6e 65 74　00 00 1c 00 01 00 00 29
+10 00 00 00 00 00 00 00
+```
+```
+
+
+    Ethernet Header:
+
+        00 1f 29 5e 4d 26 is the destination MAC
+
+        00 50 56 bb 3a a0 is the source MAC
+
+        08 00 is the ethertype for IPv4
+
+    IPv4 Header:
+
+        45 to identify the Version is 4 and the IHL is 5 which means the IP header is 20 bytes in length. (IHL x 4)
+
+        00 is the DSCP. Used for Quality of Service (QoS).
+
+        00 3c is the Total length of 60 bytes. This includes the 20 byte header and 40 bytes of payload.
+
+        83 1b is the Identification field. Value is 33563.
+
+        40 00 is the Flags and fragmentation offset field. This value has the Dont Fragement (DF) turned on and no fragmentation offset.
+
+            80 00 is the value for the Reserved (Evil bit).
+
+            20 00 to 3F FF is the range for the More Fragements (MF) bit and fragmentation offset.
+
+        40 is the Time to Live field. Currently set to 64.
+
+        11 is the Protocol field. Currently set to identify UDP.
+
+            01 is for ICMPv4
+
+            06 is for TCP
+
+        15 0a is the Checksum field
+
+        c0 a8 14 46 is the source IP address. Currently set to 192.168.20.70.
+
+        4a 7d 83 1b is the destination IP address. Currently set to 74.125.131.27.
+
+    UDP Header:
+
+        dc de is the source port field. Currently set to 56542.
+
+        00 35 is the destination port field. Currently set to 53.
+
+        00 36 is the length field. Currently set to 54 bytes. This includes 8 bytes of UDP header and 46 bytes of payload.
+
+        7c 15 is the checksum field.
+
+    Anything after this will be payload.
+
+
+```
+
+
+# Layer 5 Protocols and Headers
+## Session Layer
+
+## Virtual Private Networks
+
+Virtual Private Networks (VPN) allows connections through a network that is not accessible to everyone else. This "private" connection makes is look like a direct connection, when in fact it is not. VPNs work by encapsulating an IP packet into another IP packet for traversal across a (generally) public network. The outer IP packet headers used for the traversal is then removed and the original packet headers are then used for further routing decisions.
+
+![image](https://github.com/user-attachments/assets/2d69abba-00c7-4115-8efc-8101e4c76786)
+
+
+
+VPN connections are typically unencrypted but can be secured using encryption, such as IPSEC or TLS/SSL, to make it more secure for sensitive information. Some protocols used to provide confidentiality for VPN tunnels.
+
+IPsec: Provides a suite of protocols for secure IP communication, including Authentication Header (AH), Encapsulating Security Payload (ESP), and Internet Key Exchange (IKE).
+
+SSL/TLS: Utilizes the SSL/TLS protocol suite to create secure connections between clients and servers, commonly used in SSL VPNs.
+
+OpenVPN: An open-source VPN protocol that uses SSL/TLS for encryption and authentication, known for its flexibility and cross-platform compatibility.
+
+## Types of VPNS
+
+Remote Access VPN (Client to Site)
+![image](https://github.com/user-attachments/assets/d87ee830-81aa-41dd-93d6-d47dbe783172)
+
+
+Site to Site VPN (aka router to router VPN))
+![image](https://github.com/user-attachments/assets/86af426c-b4b7-463c-b808-aa5b981338b2)
+
+
+## L2TP TCP 1701
+
+
+Layer Two Tunneling Protocol (L2TP) serves as an extension of the Point-to-Point Tunneling Protocol (PPTP) commonly employed by internet service providers (ISPs) to establish virtual private networks (VPNs). The primary objective of L2TP is to enable secure data transmission through the creation of tunnels. To uphold security and privacy standards, L2TP necessitates the use of an encryption protocol within the established tunnel.
+
+L2TP exhibits the capability to transport a diverse range of Layer 2 (L2) data types across an Internet Protocol (IP) or Layer Three (L3) network. The initiation of this process involves the establishment of a tunnel connecting an L2TP Access Concentrator (LAC) and an L2TP Network Server (LNS) on the internet. This configuration facilitates the implementation of a Point-to-Point Protocol (PPP) link layer, which is encapsulated and seamlessly transferred across the internet for secure and efficient communication.
+
+
+## PPTP 1723
+
+
+
+Point-to-Point Tunneling Protocol (PPTP) stands as a foundational networking protocol that empowers the secure deployment of Virtual Private Networks (VPNs) over the Internet. Conceived by Microsoft and collaborative contributors, PPTP is intricately designed to forge a private and encrypted communication conduit between clients and servers, guaranteeing the secure transmission of data.
+
+Authentication Mechanisms: PPTP boasts support for a range of robust authentication mechanisms, including Password Authentication Protocol (PAP), Challenge Handshake Authentication Protocol (CHAP), and Microsoft CHAP (MS-CHAP). These mechanisms play a pivotal role in fortifying the verification processes, ensuring the genuine identity of the connecting parties.
+
+Encapsulation and Encryption Expertise: PPTP demonstrates its prowess by encapsulating data within its proprietary packets, establishing a secure tunnel for data transmission. Furthermore, it incorporates encryption protocols such as Microsoft Point-to-Point Encryption (MPPE) to safeguard the confidentiality of the transmitted data. This dual-layered approach enhances the privacy and integrity of the communication channel.
+
+Awareness of Limitations: Recognizing its historical prevalence, it’s crucial to acknowledge the limitations associated with PPTP. While it was widely adopted in the past, PPTP has exhibited security vulnerabilities, prompting a gradual decline in usage. Organizations and users have increasingly favored more secure VPN protocols like L2TP/IPsec and OpenVPN to address evolving security standards and ensure a higher level of data protection.
+
+## IPSec
+
+
+
+IPsec (Internet Protocol Security) is a suite of protocols used to secure IP communications by providing encryption, authentication, and integrity protection at the network layer (Layer 3) of the OSI model. It is widely used to establish Virtual Private Networks (VPNs) and secure data transmission over IP networks, including the internet.
+
+Transport mode and Tunnel mode are two operational modes of IPsec (Internet Protocol Security) used to provide security for IP communications.
+
+
+
+```
+    Headers used by IPSec:
+
+        ESP Header (Encapsulating Security Payload):
+
+            Uses IP protocol number 50 to indicate IPSec with ESP Header payload.
+
+            The Encapsulating Security Payload provides confidentiality, integrity, and optional authentication for IP packets.
+
+            It encrypts the payload of IP packets to protect the confidentiality of the data being transmitted.
+
+            The ESP header includes fields for the Security Parameters Index (SPI), sequence number, padding, authentication data (MAC), and other parameters.
+
+            ESP can operate in either Transport mode (encrypts only the IP payload) or Tunnel mode (encrypts the entire IP packet).
+
+            Performs integrity check only on ESP header and payload. Not the outer IP header.
+
+            Does support protocols like NAT that alter the outer header.
+
+            Modification or changes to the outer header does not affect ESP.
+
+        AH Header (Authentication Header):
+
+            Uses IP protocol number 51 to indicate IPSec with AH Header payload.
+
+            The Authentication Header provides data integrity, authentication, and anti-replay protection for IP packets.
+
+            It is used to ensure that the data received has not been altered or tampered with during transmission.
+
+            The AH header includes fields for the Security Parameters Index (SPI), sequence number, authentication data (Message Authentication Code, MAC), and other parameters.
+
+            AH can operate in either Transport mode (protects only the IP payload) or Tunnel mode (protects the entire IP packet).
+
+            Performs integrity check on entire packet to include outer IP header.
+
+            Integrity done only on immutable fields: Version, Length, Next Header/protocol, Source address, Destination address
+
+            Mutable fields: DSCP/Traffic Class, Flow Label, TTL/Hop Limit
+
+            Does not support protocols like NAT that alter the outer header.
+
+            "mostly" obsolete
+
+        IKE Header (Internet Key Exchange):
+
+            IKE typically uses UDP port 500 for its main communication channel.
+
+            IKEv2 may use UDP port 4500 for NAT traversal (UDP encapsulation) to overcome NAT (Network Address Translation) issues.
+
+            IKE is used to establish Security Associations (SAs) and negotiate cryptographic parameters for IPsec.
+
+            It operates at the application layer (Layer 7) and is used to exchange keying material, negotiate encryption and authentication algorithms, and authenticate IPsec peers.
+
+            The IKE header includes fields for message type, exchange type, cryptographic algorithms, key exchange data, and other parameters.
+
+            IKE is typically used in conjunction with IPsec to establish secure VPN connections.
+
+```
+
+## Transport MODE IPSec
+
+![image](https://github.com/user-attachments/assets/1afbff8e-bd41-420e-b99c-0e00d1bfba64)
+
+```
+
+
+    Transport Mode:
+
+        In Transport mode, IPsec only encrypts the payload (data) of the original IP packet, leaving the original IP header intact.
+
+        Transport mode is typically used for end-to-end communication between two hosts or devices.
+
+        When using Transport mode, only the data portion of the IP packet is protected by IPsec, while the original IP header, including the source and destination IP addresses, remains visible to intermediate devices.
+
+        Transport mode is often used for scenarios where the communicating endpoints need to establish a secure connection while maintaining direct communication with each other.
+
+        Example use cases for Transport mode include securing communication between individual hosts or devices within a private network or securing VoIP (Voice over IP) traffic between two endpoints.
+
+
+
+```
+
+## Tunnel Mode IPSec
+
+![image](https://github.com/user-attachments/assets/ca699e76-595e-4529-b454-bb5aa9a376cd)
+
+```
+
+
+Tunnel Mode:
+
+In Tunnel mode, IPsec encapsulates the entire original IP packet within a new IP packet, adding an additional IP header. Tunnel mode is commonly used to create secure VPN (Virtual Private Network) connections between networks or network devices, such as routers or firewalls.
+
+When using Tunnel mode, the original IP packet, including its header and payload, is encrypted and encapsulated within a new IP packet.
+
+The new IP header contains the IP addresses of the VPN gateway devices (tunnel endpoints), which are responsible for encrypting and decrypting the data as it passes through the VPN tunnel.
+
+Tunnel mode provides network-level security, ensuring that all traffic between the VPN gateway devices is encrypted and protected from eavesdropping or tampering.
+
+Example use cases for Tunnel mode include connecting branch offices to a central headquarters network over the internet, creating secure connections between remote users and a corporate network, or establishing site-to-site VPN connections between data centers.
+
+
+
+```
+
+
+## OpenVPN
+
+```
+
+
+OpenVPN is an open-source VPN (Virtual Private Network) software that provides secure communication over the internet by creating encrypted tunnels between devices or networks. It is widely used for remote access VPNs, site-to-site VPNs, and other secure networking applications.
+
+OpenVPN requires special software that implements the OpenVPN protocol. There are client and server versions. The client software runs on your device (computer, phone, etc.) and the server software runs on the VPN provider’s server. This software creates the encrypted tunnel and manages the data transmission.
+
+It’s known for being very secure due to strong encryption algorithms and multiple authentication methods. OpenVPN uses the OpenSSL library to provide encryption of both the data and control channels.
+
+It offers a high degree of customization, making it suitable for a wide range of uses. Because of the customization options, setting up OpenVPN can be more complex for non-technical users compared to some other VPN solutions.
+
+OpenVPN can be configured to use UDP or TCP as it’s transport layer protocols:
+
+UDP Protocol (Default):
+
+OpenVPN often uses UDP for communication, providing a lightweight and connectionless transport protocol suitable for VPNs.
+
+The default UDP port number for OpenVPN is 1194.
+
+TCP Protocol:
+
+OpenVPN can also be configured to use TCP for communication, which can be useful in scenarios where UDP traffic is restricted or blocked.
+
+The default TCP port number for OpenVPN is 1194, but it can be configured to use other port numbers such as port 443.
+
+
+
+```
+
+
+## Socks Protocol
+
+```
+    SOCKS (Socket Secure) is a protocol that facilitates communication between clients and servers through a proxy server.
+
+        Initiates connections through a proxy
+
+        Uses various Client / Server exchange messages
+
+        Client can provide authentication to server
+
+        Client can request connections from server
+
+        Defined in RFC 1928
+
+        Versions:
+
+            SOCKS4
+
+                Initial version of the SOCKS protocol, introduced in the early 1990s.
+
+                No Authentication, meaning that it does not require clients to authenticate themselves before connecting to the proxy server.
+
+                Only IPv4
+
+                Only TCP support. No UDP support.
+
+                No Proxy binding. Client’s IP is not relayed to destination.
+
+            SOCKS5
+
+                Support for Authentication, allowing clients to authenticate themselves using various methods, such as username/password, GSS-API (Generic Security Services Application Program Interface), or digital certificates.
+
+                IPv4 and IPv6 support
+
+                TCP and UDP support
+
+                Supports Proxy binding. Client’s IP is relayed to destination.
+```
+![image](https://github.com/user-attachments/assets/f29f71a3-d8ec-4d0c-9a93-ac2f0e315682)
+
+
+
+## NetBios Protocol
+Network Basic Input/Output System
+
+
+
+    NetBIOS, an acronym for Network Basic Input/Output System, emerged as a protocol suite crafted by IBM during the early 1980s. This suite offers a collection of services along with an application programming interface (API), facilitating network communication across local area networks (LANs). Initially conceived for IBM’s PC Network, NetBIOS eventually evolved into a de facto standard for LAN communication within the Microsoft Windows ecosystem.
+
+    NetBIOS provides services related to the session layer of the OSI model allowing applications on separate computers to communicate over a local area network. The outputs from NetBIOS can provide computer names, group assignments, and MAC addresses of nodes.
+
+    NetBIOS vs. DNS: The Domain Name System (DNS) is a directory for communication between devices over the internet. An internet connection is required to use DNS, but NetBIOS is available to all machines on a local area network. If a windows system is unable to resolve a name via DNS, then it will look for a WINS server, then finally uses NetBIOS.
+
+For more indepth information NetBIOS
+
+    Windows:
+
+    nbtstat -A <IP Address>
+
+Output will provide the NetBIOS Remote Machine Name Table which has Name, Type(group), and MAC Address.
+
+    Linux:
+
+    nbtscan -r <IP Address>
 
 
 
 
+## SMB Protocol
+
+
+
+SMB/CIFS (TCP 139/445 AND UDP 137/138)
+
+    The Server Message Block (SMB) protocol serves as a communication protocol predominantly utilized by Microsoft Windows-equipped computers. Its primary function is to facilitate the sharing of files, printers, serial ports, and various communications among network nodes. For user authentication, SMB employs either the NTLM or Kerberos protocols.
+
+    Additionally, SMB offers an authenticated inter-process communication (IPC) mechanism. Originally conceived in 1983 by Barry A. Feigenbaum at IBM, SMB aimed to provide shared access to files and printers within a network of systems running IBM’s OS/2.
+
+    Subsequently, in 1987, Microsoft and 3Com implemented SMB in LAN Manager for OS/2. During this period, SMB utilized the NetBIOS service atop the NetBIOS Frames protocol as its foundational transport. Over time, Microsoft integrated SMB into Windows NT 3.1, continuously updating it to function with newer underlying transports, such as TCP/IP and NetBT. A notable development is the introduction of SMB over QUIC, which made its debut in Windows Server 2022.
+
+![image](https://github.com/user-attachments/assets/73535f80-6390-4ed1-856a-5c8c39d4d802)
+
+## SMB Vulnerabilities
+
+
+
+Many vulnerabilities to SMB have been discovered since it was developed in 1984. Over the years, several vulnerabilities have been discovered in the SMB protocol that could potentially be exploited by attackers. Here are a few notable SMB protocol vulnerabilities:
+
+    EternalBlue (CVE-2017-0144): EternalBlue is a vulnerability in the SMBv1 protocol that gained significant attention following its use in the WannaCry ransomware attack of 2017. It enabled remote code execution on Windows systems vulnerable to the exploit and quickly propagated through networks.
+
+    Vulnerabilities in SMBv1: The SMBv1 protocol has been found to have multiple vulnerabilities, including flaws that allow remote code execution. It is recommended to disable SMBv1 due to its inherent security weaknesses.
+
+    SMB Signing Downgrade (CVE-2017-0290): This vulnerability enables an attacker to downgrade the SMB signing negotiation process, potentially facilitating the interception and modification of SMB communications.
+
+    SMB Relay Attack: SMB relay attacks exploit the authentication mechanism of SMB, allowing an attacker to relay user credentials and gain unauthorized access to network resources. This attack is particularly effective when SMB signing is disabled or weak.
+
+    Denial of Service (DoS) Attacks: Various vulnerabilities in the SMB protocol have been discovered that could lead to denial of service attacks. By sending specially crafted requests, an attacker can overwhelm an SMB server, causing it to become unresponsive or crash.
+
+    Man-in-the-Middle Attacks: In certain scenarios, attackers can intercept SMB traffic using a man-in-the-middle (MITM) position. This allows them to capture and manipulate sensitive data transmitted over the SMB protocol.
+
+To mitigate these vulnerabilities, it is crucial to maintain up-to-date SMB implementations, disable older versions like SMBv1, enforce secure configurations (such as enabling SMB signing), and regularly apply security patches provided by vendors. Additionally, implementing network segmentation, strong authentication mechanisms, and monitoring systems can aid in detecting and preventing potential attacks targeting the SMB protocol.
+
+Many organizations are moving away from SMB file and printer sharing and moving to cloud or enterprise based solutions.
+
+Some alternatives to file storage:
+
+    Enterprise Content Management (ECM) Systems
+
+        Microsoft Sharepoint
+
+        OpenText Content Suite
+
+        IBM FileNet
+
+    Cloud Storage Services
+
+        Onedrive
+
+        Google Drive
+
+        Amazon S3
+
+        Microsoft Azure Blob Storage
+
+Some alternatives to printer sharing are:
+
+    Printing directly to the printer
+
+    Print Management Software
+
+        PaperCut
+
+        Equitrac
+
+        Pharos
+
+    Managed Print Services (MPS)
+
+        Xerox
+
+        HP
+
+        Lexmark
+
+        Ricoh
+
+    Enterprise Output Management (EOM)
+
+        HP Exstream
+
+        OpenText Output Management
+
+        ISIS Papyrus.
+
+    Cloud-Based Printing Solutions
+
+        Google Cloud Print
+
+        PrinterLogic
+
+    Mobile Printing Solutions ..HP ePrint
+
+        Apple AirPrint
 
 
 
 
+## RPC Remote Procedure Call 
 
 
 
+RPC (Any Port)
 
+    Remote Procedure Call (RPC) is a protocol that allows a program to request a service from another program located on the same system or on remote computer. It allows these programs to request services without having to understand details of the program. In essence, it standardizes the inter-communication with formalized requests for information. A procedure call is also sometimes known as a function call or a subroutine call.
 
+    In essence, Remote Procedure Call (RPC) serves as a method for computer programs to communicate across a network as if they were in close proximity. This enables one program to ask another program on a different computer to perform a service or function. Picture it as requesting a favor from a friend, but in the realm of computers where programs work together to accomplish tasks. RPC simplifies the intricacies of communication, creating the illusion that the distant program is actually a local one. This approach finds extensive use in activities such as distributed computing and networked applications.
 
+        RPC is a request/response protocol.
 
+        RPC Wiki Reference
 
+        User application will:
 
+            Sends a request for information to a external server
+
+            Receives the information from the external server
+
+            Display collected data to User
+
+        Examples of RPC are:
+
+            SOAP - SOAP Example PCAP from Cloudshark
+
+            XML
+
+            JSON
+
+            NFS
 
