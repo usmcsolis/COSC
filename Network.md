@@ -5511,3 +5511,4 @@ tcpdump -i eth0 'icmp[0] = 3 and icmp[1] = 9'
 https://miro.com/app/board/o9J_klSqCSY=/?moveToWidget=3074457350284827156&cot=14
 
 
+tcp[13] % 0x01 = 1
