@@ -4619,3 +4619,42 @@ LDAP:
         LDAP servers are vulnerable from DoS attacks (SYN Flooding) and protecting user passwords from being discovered over a network.
 
 
+
+
+# Network Capture
+
+## Packet Sniffing
+Practical Use
+
+Network Troubleshooting
+
+Diagnosing Improper routing or switching
+
+Identifying port/protocol misconfigurations
+
+Monitor Networking Consumption
+
+Disadvantages
+
+Require elevated permissions
+
+Can only capture what NIC can see
+
+Cannot capture local traffic
+
+Can consume massive amounts of system resources
+
+
+## Modes
+
+
+
+    Hardware Packet Sniffers - In the past, the process of traffic sniffing was typically done by using hardware devices because the act of capturing packets was too intensive for computers. It is a purpose-built device that is plugged into a network segment to collect and store network packets. Packets are forwarded to a separate system for further analysis. With the improvement of computer CPUs, stand-alone hardware-based sniffers are rarely used anymore.
+
+    Software Packet Sniffers - remaining packet sniffers will fall into this category. The local system is used to collect the packets and the software then provides immediate analysis. Software-based sniffers rely on the network interface card (NIC) in the host system to pass traffic to the OS. NICs are set into one of two modes:
+
+        Non-promiscuous: Default for most NICs. NIC will only process traffic destined for its host MAC address. Multicast MAC address groups and broadcast addresses are also received and processed.
+
+        Promiscuous: Requires root/kernel permissions to enable. The NIC receives and processes all traffic. Most operating systems can support promiscuous mode. Support can be limited by the NIC hardware and/or drivers.
+
+
