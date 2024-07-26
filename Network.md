@@ -1,5 +1,5 @@
 # Networking
-
+https://miro.com/app/board/o9J_klSqCSY=/
 
 ## Sites:
 CTFD - MASO-M-005@10.50.20.180:8000/challenges
@@ -5509,4 +5509,5 @@ tcpdump -i eth0 'ip6[7] < 128'
 tcpdump -i eth0 'icmp[0] = 3 and icmp[1] = 9'
 
 https://miro.com/app/board/o9J_klSqCSY=/?moveToWidget=3074457350284827156&cot=14
+
 
