@@ -5729,6 +5729,13 @@ nc -luvp 1111  **UDP needs U option**
 ./script.py
 
 
+IP_ADDR
+
+PORT
+
+IP
+
+MESSAGE
 
 **SENDER**
 ```
@@ -5767,6 +5774,359 @@ while True:
 ```
 
 
-## RAW IPv4 Sockets
+## RAW IPv4 Sockets DEMO
+
+    RAW Socket scripts must include the IP header and the next headers.
+
+    Requires guidance from the "Request for Comments" (RFC) to follow header structure properly.
+
+        RFCs contain technical and organizational documents about the Internet, including specifications and policy documents.
+
+    See RFC 791, Section 3 - Specification for details on how to construct an IPv4 header.
+    Testing specific defense mechanisms - such as triggering and IDS for an effect, or filtering
+
+    Avoiding defense mechanisms
+
+    Obfuscating data during transfer
+
+    Manually crafting a packet with the chosen data in header fields
+
+ 
+**IPRAW.PY**
+```
+#!/usr/bin/python3
+# For building the socket
+import socket
+# For system level commands
+import sys
+# For establishing the packet structure (Used later on), this will allow direct access to the methods and functions in the struct module
+from struct import pack
+# For encoding
+import base64    # base64 module
+import binascii    # binascii module
+# Create a raw socket.
+try:
+    s = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_RAW)
+except socket.error as msg:
+    print(msg)
+    sys.exit() 
+# 0 or IPPROTO_TCP for STREAM and 0 or IPPROTO_UDP for DGRAM. (man ip7). For SOCK_RAW you may specify a valid IANA IP protocol defined in RFC 1700 assigned numbers.
+# IPPROTO_IP creates a socket that sends/receives raw data for IPv4-based protocols (TCP, UDP, etc). It will handle the IP headers for you, but you are responsible for processing/creating additional protocol data inside the IP payload.
+# IPPROTO_RAW creates a socket that sends/receives raw data for any kind of protocol. It will not handle any headers for you, you are responsible for processing/creating all payload data, including IP and additional headers. (link)
+packet = ''
+src_ip = "127.0.0.1" 
+dst_ip = "127.0.0.1" 
+
+##################
+##Build Packet Header##
+##################
+# Lets add the IPv4 header information
+# This is normally 0x45 or 69 for Version and Internet Header Length
+ip_ver_ihl = 69
+# This combines the DSCP and ECN feilds.  Type of service/QoS
+ip_tos = 0
+# The kernel will fill in the actually length of the packet
+ip_len = 0
+# This sets the IP Identification for the packet. 1-65535
+ip_id = 24518
+# This sets the RES/DF/MF flags and fragmentation offset
+ip_frag = 0 
+# This determines the TTL of the packet when leaving the machine. 1-255
+ip_ttl = 64
+# This sets the IP protocol to 16 (CHAOS) (reference IANA) Any other protocol it will expect additional headers to be created.
+ip_proto = 16
+# The kernel will fill in the checksum for the packet
+ip_check = 0
+# inet_aton(string) will convert an IP address to a 32 bit binary number
+ip_srcadd = socket.inet_aton(src_ip)
+ip_dstadd = socket.inet_aton(dst_ip)
+
+#################
+## Pack the IP Header ##
+#################
+# This portion creates the header by packing the above variables into a structure. The ! in the string means 'Big-Endian' network order, while the code following specifies how to store the info. Endian explained. Refer to link for character meaning.
+ip_header = pack('!BBHHHBBH4s4s' , ip_ver_ihl, ip_tos, ip_len, ip_id, ip_frag, ip_ttl, ip_proto, ip_check, ip_srcadd, ip_dstadd)
+
+##########
+##Message##
+##########
+# Your custom protocol fields or data. We are going to just insert data here. Add your message where the "?" is. Ensure you obfuscate it though...don't want any clear text messages being spotted! You can encode with various data encodings. Base64, binascii
+message = b'last_name'                  #This should be the student's last name per the prompt
+hidden_msg = binascii.hexlify(message)  #Students can choose which encodeing they want to use.
+# final packet creation
+packet = ip_header + hidden_msg
+# Send the packet. Sendto is used when we do not already have a socket connection. Sendall or send if we do.
+s.sendto(packet, (dst_ip, 0))
+# socket.send is a low-level method and basically just the C/syscall method send(3) / send(2). It can send less bytes than you requested, but returns the number of bytes sent.
+# socket.sendall is a high-level Python-only method that sends the entire buffer you pass or throws an exception. It does that by calling socket.send until everything has been sent or an error occurs.
 
 
+```
+
+
+chmod +x ipraw.py
+
+sudo tcpdump
+
+tcpdump 'ip[4:2]=24518' -vvXX
+```
+tcpdump: listening on eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
+13:27:38.667260 IP (tos 0x0, ttl 64, id 24518, offset 0, flags [none], proto unknown (16), length 30)
+    localhost > 172.16.82.106:  chaos 10
+	0x0000:  fa16 3ea3 4c94 fa16 3e6c 549f 0800 4500  ..>.L...>lT...E.
+	0x0010:  001e 5fc6 0000 4010 9d8e 7f00 0001 ac10  .._...@.........
+	0x0020:  526a 3533 3666 3663 3639 3733            Rj536f6c6973
+```
+
+
+
+**TCPRAW.PY**
+```
+#!/usr/bin/python3
+# For building the socket
+import socket
+# For system level commands
+import sys
+# For doing an array in the TCP checksum
+import array
+# For establishing the packet structure (Used later on), this will allow direct access to the methods and functions in the struct module
+from struct import pack
+# For encoding
+import base64    # base64 module
+import binascii    # binascii module
+# Create a raw socket.
+try:
+    s = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_RAW)
+except socket.error as msg:
+    print(msg)
+    sys.exit() 
+# 0 or IPPROTO_TCP for STREAM and 0 or IPPROTO_UDP for DGRAM. (man ip7). For SOCK_RAW you may specify a valid IANA IP protocol defined in RFC 1700 assigned numbers.
+# IPPROTO_IP creates a socket that sends/receives raw data for IPv4-based protocols (TCP, UDP, etc). It will handle the IP headers for you, but you are responsible for processing/creating additional protocol data inside the IP payload.
+# IPPROTO_RAW creates a socket that sends/receives raw data for any kind of protocol. It will not handle any headers for you, you are responsible for processing/creating all payload data, including IP and additional headers. (link)
+
+src_ip = "127.0.0.1"
+dst_ip = "1.1.1.1"
+
+##################
+##Build Packet Header##
+##################
+# Lets add the IPv4 header information
+# This is normally 0x45 or 69 for Version and Internet Header Length
+ip_ver_ihl =
+# This combines the DSCP and ECN feilds.  Type of service/QoS
+ip_tos =
+# The kernel will fill in the actually length of the packet
+ip_len = 0
+# This sets the IP Identification for the packet. 1-65535
+ip_id = 1775
+# This sets the RES/DF/MF flags and fragmentation offset
+ip_frag = 0
+# This determines the TTL of the packet when leaving the machine. 1-255
+ip_ttl = 128
+# This sets the IP protocol to 16 (CHAOS) (reference IANA) Any other protocol it will expect additional headers to be created.
+ip_proto = 6 
+# The kernel will fill in the checksum for the packet
+ip_check = 0
+# inet_aton(string) will convert an IP address to a 32 bit binary number
+ip_srcadd = socket.inet_aton(src_ip)
+ip_dstadd = socket.inet_aton(dst_ip)
+
+#################
+## Pack the IP Header ##
+#################
+# This portion creates the header by packing the above variables into a structure. The ! in the string means 'Big-Endian' network order, while the code following specifies how to store the info. Endian explained. Refer to link for character meaning.
+
+ip_header = pack('!BBHHHBBH4s4s' , ip_ver_ihl, ip_tos, ip_len, ip_id, ip_frag, ip_ttl, ip_proto, ip_check, ip_srcadd, ip_dstadd)
+
+################
+##Build TCP Header##
+################
+# source port. 1-65535
+tcp_src = 30
+# destination port. 1-65535
+tcp_dst = 322
+# sequence number. 1-4294967296
+tcp_seq = 7
+# tcp ack sequence number. 1-4294967296
+tcp_ack_seq = 0
+# can optionaly set the value of the offset and reserve. Offset is from 5 to 15. RES is normally 0.
+#tcp_off_res = 
+# data offset specifying the size of tcp header * 4 which is 20
+tcp_data_off = 5
+# the 3 reserve bits + ns flag in reserve field
+tcp_reserve = 0
+# Combine the left shifted 4 bit tcp offset and the reserve field
+tcp_off_res = (tcp_data_off << 4) + tcp_reserve   
+# can optionally just set the value of the TCP flags
+#tcp_flags =
+# Tcp flags by bit starting from right to left
+tcp_fin = 0                    # Finished
+tcp_syn = 1                    # Synchronization
+tcp_rst = 0                    # Reset
+tcp_psh = 1                    # Push
+tcp_ack = 1                    # Acknowledgement
+tcp_urg = 0                    # Urgent
+tcp_ece = 0                    # Explicit Congestion Notification Echo
+tcp_cwr = 0                    # Congestion Window Reduced
+# Combine the tcp flags by left shifting the bit locations and adding the bits together
+tcp_flags = tcp_fin + (tcp_syn << 1) + (tcp_rst << 2) + (tcp_psh << 3) + (tcp_ack << 4) + (tcp_urg << 5) + (tcp_ece << 6) + (tcp_cwr << 7)
+# maximum allowed window size reordered to network order. 1-65535 (socket.htons is deprecated)
+tcp_win = 65535
+# tcp checksum which will be calculated later on
+tcp_chk = 0
+# urgent pointer only if urg flag is set
+tcp_urg_ptr = 0
+
+# The ! in the pack format string means network order
+tcp_hdr = pack('!HHLLBBHHH', tcp_src, tcp_dst, tcp_seq, tcp_ack_seq, tcp_off_res, tcp_flags, tcp_win, tcp_chk, tcp_urg_ptr)
+
+##########
+##Message##
+##########
+
+# Your custom protocol fields or data. We are going to just insert data here.
+# Ensure you obfuscate it though...don't want any clear text messages being spotted!
+# You can encode various data encodings. Base64, binascii
+
+message = b'Solis'                                    # This should be the student's last name per the prompt
+hidden_msg = base64.b64encode(message)                    # base64.b64encode will encode the message to Base 64
+
+######################
+##Create the Pseudo Header##
+######################
+
+# After you create the tcp header, create the pseudo header for the tcp checksum.
+
+src_address = socket.inet_aton(src_ip)
+dst_address = socket.inet_aton(dst_ip)
+reserved = 0
+protocol = socket.IPPROTO_TCP
+tcp_length = len(tcp_hdr) + len(hidden_msg)
+
+#####################
+##Pack the Pseudo Header##
+#####################
+
+ps_hdr = pack('!4s4sBBH', src_address, dst_address, reserved, protocol, tcp_length)
+ps_hdr = ps_hdr + tcp_hdr + hidden_msg
+
+#########################
+##Define the Checksum Function##
+#########################
+
+def checksum(data):
+        if len(data) % 2 != 0:
+                data += b'\0'
+        res = sum(array.array("H", data))
+        res = (res >> 16) + (res & 0xffff)
+        res += res >> 16
+        return (~res) & 0xffff
+
+tcp_chk = checksum(ps_hdr)
+
+##############
+##Final TCP Pack##
+##############
+
+# Pack the tcp header to fill in the correct checksum - remember checksum is NOT in network byte order
+tcp_hdr = pack('!HHLLBBH', tcp_src, tcp_dst, tcp_seq, tcp_ack_seq, tcp_off_res, tcp_flags, tcp_win) + pack('H', tcp_chk) + pack('!H', tcp_urg_ptr)
+
+# Combine all of the headers and the user data
+packet = ip_header + tcp_hdr + hidden_msg
+
+# s.connect((dst_ip, port)) # typically used for TCP
+# s.send(packet)
+
+# Send the packet. Sendto is used when we do not already have a socket connection. Sendall or send if we do.
+s.sendto(packet, (dst_ip, 0))
+
+# socket.send is a low-level method and basically just the C/syscall method send(3) / send(2). It can send fewer bytes than you requested, but returns the number of bytes sent.
+#socket.sendall ﻿is a high-level Python-only method that sends the entire buffer you pass or throws an exception. It does that by calling socket.send ﻿ until everything has been sent or an error occurs.
+
+```
+
+chmod +x tcpraw.py
+
+sudo tcpdump 'tcp[4:4] = 7' -vvXX (sequence number in tcp header)
+
+sudo ./tcpraw.py
+
+cyberchef the hex
+
+
+
+## Encoding and Decoding
+
+Encoding - taking bits and converting them 
+
+Decoding - reversing
+
+Encoding converts the data into a different format
+
+Encryption scrambles that data to make it unreadable without a secret key
+
+![image](https://github.com/user-attachments/assets/959f0a3b-4fa4-4539-a5c3-5b5afd9948e9)
+
+
+
+## HEX, BASE64 Encoding (Commands)
+
+
+Encode text to Hex:
+```
+    echo "Message" | xxd
+```
+
+
+Encode file to Hex:
+```
+    xxd file.txt file-encoded.txt
+```
+
+
+Decode file from Hex:
+```
+    xxd -r file-encoded.txt file-decoded.txt
+```
+
+
+Encode text to base64:
+```
+    echo "Message" | base64
+```
+
+
+Endode file to Base64:
+```
+    base64 file.txt > file-encoded.txt
+```
+
+
+Decode file from Base64:
+```
+    base64 -d file-encoded.txt > file-decoded.txt
+```
+
+
+
+
+## Python HEX,BASE64 ENCODING (Commands)
+
+HEX
+```
+import binascii
+
+message = b'Message'
+hidden_msg = binascii.hexlify(message)
+
+
+```
+
+
+BASE64
+```
+import base64
+
+message = b'Message'
+hidden_msg = base64.b64encode(message)
+```
