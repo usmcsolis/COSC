@@ -6270,6 +6270,11 @@ ftp> pwd
 ftp> cd ..
 /home
 ftp> get /etc/passwd (GET FILE_NAME)
+exit
+
+cat /etc/passwd
+downloads and saves it to your PWD
+
 
 
 
@@ -6328,6 +6333,25 @@ ndjakndfksa
 
 
 
+Passive Recon
+
+telnet 172.16.1.15
+hostname (COPY and MAP)
+sudo -l
+ip a (SHOWS INTERFACES) 
+ip n (MIGHT SHOW BOXES THAT HAVE SPOKEN)
+ip route (SHOWS ROUTES)
+find / -iname flag* 2>/dev/null (SEARCHES FOR A FILE NAME FLAG)
+find / -iname hint* 2>/dev/null (SEARCHES FOR A FILE NAME HINT)
+ss -ntlp (name reso, tcp ports, listening ports, ports) (LISTPORTS)
+which tcpdump wireshark nmap telnet get curl ping
+sudo !! (TELLS WHAT CMDS REQUIRE SUDO FOR)
+
+
+
+ssh student@IP_ADDR
+ssh vyos@IP_ADDR
 
 ```
+
 
