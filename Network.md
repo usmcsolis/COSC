@@ -6136,3 +6136,17 @@ hidden_msg = base64.b64encode(message)
 ## DSCP Conversion Chart
 
 https://bytesolutions.com/dscp-tos-cos-precedence-conversion-chart/
+
+
+
+
+
+DSCP = 24
+
+24 --> HEX
+
+0x18 ---> Binary
+
+00011000 --- Shift 2 for ECN Flag
+
+01100000 --- Final DSCP Value 0x60
