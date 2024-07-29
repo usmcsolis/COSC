@@ -6150,3 +6150,38 @@ DSCP = 24
 00011000 --- Shift 2 for ECN Flag
 
 01100000 --- Final DSCP Value 0x60
+
+
+
+## RAW Socket CHALLENGE 
+
+Gorgan forces, tool development cell have provided IPRAW.py for your teams use, it defines the basic structure of the desired result.
+
+    Create a raw socket and code your message into the socket.
+    Send your last name as the data.
+    The sent data is required to be encoded, with a final result of the data being in hex.
+    When viewing in Wireshark, the packet should not be malformed.
+
+
+Source IP: 10.10.0.40
+
+Target IP: 172.16.1.15
+
+DSCP: 24
+
+IP ID: 1984
+
+Protocol: CHAOS
+
+To receive the flag:
+
+    Open a netcat listener on port 1111 on the Internet_Host.
+    nc -lvp 1111
+    send your RAW Socket
+
+
+
+```
+
+
+```
