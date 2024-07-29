@@ -6181,7 +6181,153 @@ To receive the flag:
 
 
 
+# Mapping
+
+Initial Start Point
+
+Ports
+
+Credentials
+
+Student:Password
+
+
+1. First Router IP Address 172.16.20.1
+2. Net Recon Method:
+	-Host Discovery
+	-Port Discovery
+   	-Port Validation
+	-Follow On
+
+
+## NMAP
+
 ```
+nmap -Pn -T4 172.16.20.1 -p21-23,80
+
+nmap –sS 172.16.32.2
+
+nmap –sT –sV 10.16.32.23
+
+nmap -sN 10.50.1.1
+
+nmap -sF 25.50.75.100
+
+nmap -sX 7.92.5.19
+
+nmap –sU -v 10.10.100.3
+
+nmap -O 6.2.9.5 FingerPrint
+
+nmap -sV 10.30.50.70 Version Scan
+```
+
+## Steps to MAPPING
+
+```
+Creds:
+Bios or Student
+
+ssh vyos@172.16.0.0
+ssh student@172.16.0.0
+
+student:password
+vyos:password
+```
+
+```
+Find ports
+nmap -Pn -T4 172.16.20.1 -p21-23,80 --open
+22/ssh
+
+Validate ports Banner Grab
+nc 172.16.20.1 22
+SSH-2.0
+
+If port **21 or 80**
+wget -r IP_Address or
+wget -r ftp://IP_Address or
+firefox IP_Address
+
+HTML Files
+wget -r IP_Addre
+FILE SAVES WITH IP_ADDR
+cat IP_ADDR/*
+
+firefox 172.16.1.15/index.html
+
+FTP SERVER
+
+wget -r ftp://IP_ADDR
+cat 172.16.1.15/welcome
+ftp IP_ADDR
+student
+password
+ftp> passive
+ftp> ls
+ftp> pwd
+/home/student
+ftp> cd ..
+/home
+ftp> get /etc/passwd (GET FILE_NAME)
+
+
+
+NOT PORT 21 or 80
+
+wget-r http://172.16.1.15:8080
+
+
+
+
+If **22 or 23** Connect and Passive Recon
+Passive:
+hostname (SHOWS HOSTNAME)
+sudo -l
+ip a
+show interfaces (vyos) (SHOWS INTERFACES IP_Address and Description) CP to Map
+ip neigh
+ip route
+show ip route (vyos)
+
+Flags of Interest
+find / -iname "flag"
+find /
+
+
+Which
+which ping tcpdump nmap nc wireshark
+sudo -l
+sudo which ping tcpdump nmap nc wireshark
+
+Ping Sweep
+for i in {1..254} ;do (ping -c 1 172.16.20.$i 2>/dev/null | grep "bytes from" &) ;done
+
+
+Duckduckgo
+Search for IP and CIDR to change your PING command to whatever host they can have
+
+NMAP Scan the NETWORK
+
+nmap -Pn -T4 172.16.20.10/29 -p21-23,80 --open SCAN NETWORK FOR HOST
+FILTERED = closed to outside
+
+Port Validate across the PORTS
+
+PROFTP is FPT
+wget -r ftp://IP_Address
+ls
+get FILE_NAME
+
+
+Diamonds with ?? is TELNET
+
+HTTP Port
+nc 172.16.1.15 80
+ndjakndfksa
+
+
 
 
 ```
+
