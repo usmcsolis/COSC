@@ -5512,3 +5512,200 @@ https://miro.com/app/board/o9J_klSqCSY=/?moveToWidget=3074457350284827156&cot=14
 
 
 tcp[13] % 0x01 = 1
+
+
+# Socket Programming
+## String Socket TCP
+User Space - most common sockets
+
+## Datagram Socket UDP
+User Space - most common sockets
+
+## Raw Socket (Whatever)
+Kernel Space and require SUDO
+
+## User Space Applications/Sockets
+
+    Using tcpdump or wireshark to read a file
+
+    Using nmap with no switches
+
+    Using netcat to connect to a listener
+
+    Using netcat to create a listener above the well known port range (1024+)
+
+    Using /dev/tcp or /dev/udp to transmit data
+
+## Kernel Space Applications/Sockets
+
+    Using tcpdump or wireshark to capture packets on the wire
+
+    Using nmap for OS identification or to set specific flags when scanning
+
+    Using netcat to create a listener in the well known port range (0 - 1023)
+    
+    Using Scapy to craft or modify a packet for transmission
+
+    Using Python to craft or modify RAW Sockets for transmission
+
+    Network devices using routing protocols such as OSPF
+
+    Any Traffic without Transport Header (ICMP)
+
+## Understanding Python Terminology
+
+Libraries (Standard Python Library)
+
+Modules:
+
+Functions (modules.functions)
+
+Exceptions (try:)
+
+Constants (AF_INET)
+
+Objects ()
+
+List [] or Tuples ()
+
+
+## Strings, Integers
+
+    String
+
+        my_string = "Hello World"
+
+    Number
+
+        int = 1234
+
+        float = 3.14
+
+        hex = 0x45
+   
+    int()
+
+    len()
+
+    str()
+
+    sum()
+
+
+## Methods
+
+    my_string.upper()
+
+    my_string.lower()
+
+    my_string.split()
+
+    my_list.append()
+
+    my_list.insert()
+    print()
+
+
+## Import Modules
+
+    import {module}
+
+    import {module} as {name}
+
+    from {module} import *
+
+    from {module} import {function}
+
+    from {module} import {function} as {name}**
+
+## Networking Programming with PYTHON3
+
+![image](https://github.com/user-attachments/assets/5160dcf8-9d9f-4365-ad19-d0884fa23730)
+
+Network sockets primarily use the Python3 Socket library and socket.socket function.
+
+```
+import socket
+  s = socket.socket(socket.FAMILY, socket.TYPE, socket.PROTOCOL)
+```
+
+## Socket.Socket Function
+
+Inside the socket.socket. function, you have these arguments, in order:
+```
+socket.socket( *family*, *type*, *proto* )
+
+    family: AF_INET*, AF_INET6, AF_UNIX
+
+    type: SOCK_STREAM*, SOCK_DGRAM, SOCK_RAW
+
+    proto: 0*, IPPROTO_TCP, IPPROTO_UDP, IPPROTO_IP, IPPROTO_ICMP, IPPROTO_RAW
+
+Default is IPv4 Stream Socket
+
+
+```
+
+## Python Libraries
+
+Socket
+
+Struct
+
+Sys
+
+Errors
+
+Exceptions
+
+
+## Stream Socket Sender/Receiver  DEMO
+SENDER
+```
+#!/usr/bin/python3
+import socket
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
+ip_addr = '127.0.0.1'    
+port = 1111
+s.connect((ip_addr, port))
+message = b"Message"
+s.send(message)
+data, conn = s.recvfrom(1024)
+print(data.decode('utf-8'))
+s.close()
+
+```
+
+**ip_addr =  WHO WE ARE SENDING IT TO**
+**port = PORT**
+**message = MESSAGE**
+
+**s.connect((ip_addr, port))**
+**s.send(message)**
+**s.close()**
+**data, conn = s.recvfrom(1024)**
+**print(data.decode('utf-8'))**
+
+
+RECEIVER
+```
+#!/usr/bin/python3
+import socket
+import os
+port = 1111
+message = b"Connected to TCP Server on port %i\n" % port
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
+s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+s.bind(('', port))
+s.listen(1)
+os.system("clear")
+print ("Waiting for TCP connections\n")
+while 1:
+    conn, addr = s.accept()
+    connect = conn.recv(1024)
+    address, port = addr
+    print ("Message Received - '%s'" % connect.decode())
+    print ("Sent by -", address, "port -", port, "\n")
+    conn.sendall(message)
+    conn.close()
+```
