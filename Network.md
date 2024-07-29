@@ -5660,7 +5660,19 @@ Exceptions
 
 
 ## Stream Socket Sender/Receiver  DEMO
-SENDER
+
+
+vim script.py
+
+chmod +x script.py
+
+nc -lvp 1111
+
+./script.py
+
+
+
+**SENDER**
 ```
 #!/usr/bin/python3
 import socket
@@ -5677,17 +5689,25 @@ s.close()
 ```
 
 **ip_addr =  WHO WE ARE SENDING IT TO**
+
 **port = PORT**
+
 **message = MESSAGE**
 
 **s.connect((ip_addr, port))**
+
 **s.send(message)**
+
 **s.close()**
+
 **data, conn = s.recvfrom(1024)**
+
 **print(data.decode('utf-8'))**
 
 
-RECEIVER
+
+
+**RECEIVER**
 ```
 #!/usr/bin/python3
 import socket
