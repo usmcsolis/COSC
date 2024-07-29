@@ -6130,3 +6130,9 @@ import base64
 message = b'Message'
 hidden_msg = base64.b64encode(message)
 ```
+
+
+
+## DSCP Conversion Chart
+
+https://bytesolutions.com/dscp-tos-cos-precedence-conversion-chart/
