@@ -5659,7 +5659,7 @@ Errors
 Exceptions
 
 
-## Stream Socket Sender/Receiver  DEMO
+## Stream Socket S/R DEMO
 
 
 vim script.py
@@ -5687,25 +5687,11 @@ print(data.decode('utf-8'))
 s.close()
 
 ```
+**ip_addr = '127.0.0.1'**
 
-**ip_addr =  WHO WE ARE SENDING IT TO**
+**port = 1111**
 
-**port = PORT**
-
-**message = MESSAGE**
-
-**s.connect((ip_addr, port))**
-
-**s.send(message)**
-
-**s.close()**
-
-**data, conn = s.recvfrom(1024)**
-
-**print(data.decode('utf-8'))**
-
-
-
+**message = b"Message"**
 
 **RECEIVER**
 ```
@@ -5729,3 +5715,58 @@ while 1:
     conn.sendall(message)
     conn.close()
 ```
+
+
+## Datagram Sockets S/R DEMO
+
+
+vim script.py
+
+chmod +x script.py
+
+nc -luvp 1111  **UDP needs U option**
+
+./script.py
+
+
+
+**SENDER**
+```
+#!/usr/bin/python3
+import socket
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
+ip_addr = '127.0.0.1'
+port = 2222
+message = b"Message"
+s.sendto(message, (ip_addr, port))
+data, addr = s.recvfrom(1024)
+print(data.decode())
+```
+**UTF8** default
+
+
+
+
+
+**RECIEVER**
+```
+#!/usr/bin/python3
+import socket
+import os
+port = 2222
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM,0)
+s.bind(('', port))
+os.system("clear")
+print ("Awaiting UDP Messages")
+while True:
+    data, addr = s.recvfrom(1024)
+    address, port = addr
+    print ("\nMessage Received: '%s'" % data.decode())
+    print ("Sent by -", address, "port", port)
+    s.sendto(b"Message received by the UDP Message Server!", addr)
+```
+
+
+## RAW IPv4 Sockets
+
+
