@@ -6518,7 +6518,7 @@ sudo p0f -r test.pcap
 ```
 
 
-# Active External
+## Active External
 ```
 Scanning Nature : Active and Passive
 
@@ -6557,8 +6557,8 @@ Horizontal Scan - 1 or many ports on a range of boxes
 ```
 
 
-## NMAP Scan Types
-
+## NMAP Scan Types (CMD)
+MUST USE SUDO FOR 
 ```
     -PE ICMP Ping
     -Pn - no Ping
@@ -6566,8 +6566,10 @@ Horizontal Scan - 1 or many ports on a range of boxes
     Broadcast Ping/Ping sweep (-sP, -PE)
 
     SYN scan (-sS)
+	It sends a SYN and recieves and SYN/ACK but stops sending traffic
 
     Full connect scan (-sT)
+	It sends all THREE SYN, SYN/ SYN,ACK/ ACK 
 
     Null scan (-sN)
 
@@ -6576,6 +6578,7 @@ Horizontal Scan - 1 or many ports on a range of boxes
     XMAS tree scan (-sX)
 
     UDP scan (-sU)
+	
 
     Idle scan (-sI)
 
@@ -6618,7 +6621,7 @@ Horizontal Scan - 1 or many ports on a range of boxes
     --max-rate <number> - Max packets per second
 ```
 
-## Traceroute - Firewalking
+## Traceroute - Firewalking (CMD)
 ```
 traceroute 172.16.82.106
 traceroute 172.16.82.106 -p 123
@@ -6627,7 +6630,7 @@ sudo traceroute 172.16.82.106 -T
 sudo traceroute 172.16.82.106 -T -p 443
 ```
 
-## Netcat - Scanning 
+## Netcat - Scanning (CMD)
 ```
 nc [Options] [Target IP] [Target Port(s)]
 ```
@@ -6691,7 +6694,7 @@ done
 
 ```
 
-## Netcat - UDP Scan Script
+## Netcat - UDP Scan Script (CMD)
 
 ```
 #!/bin/bash
