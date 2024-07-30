@@ -6767,7 +6767,7 @@ p0f
 
 Limited to traffic in same local area of network
 
-## Native Host Tools (CMD)
+## COMMANDS (CMD)
 
 TCP/IP Network Configuration
 ```
