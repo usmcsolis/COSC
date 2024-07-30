@@ -1,8 +1,9 @@
 # Networking
-https://miro.com/app/board/o9J_klSqCSY=/
 
 
 ## Sites:
+Miroboard Networking - https://miro.com/app/board/o9J_klSqCSY=/
+
 draw.io - https://app.diagrams.net/
 
 CTFD - MASO-M-005@10.50.20.180:8000/challenges
