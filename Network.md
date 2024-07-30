@@ -6932,5 +6932,6 @@ Interfaces: ETH0
 Ports: x,x,x,x
 ```
 
+file:///home/mark.a.solis36/Desktop/Screenshot%20from%202024-07-30%2009-31-26.png
 
 
