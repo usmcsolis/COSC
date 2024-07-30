@@ -6904,5 +6904,15 @@ Creds:
 ```
 
 
+```
+
+DEVICE: ROUTER/ HOST
+OS: MICROSOFT
+MAC: xx:xx:xx:xx:xx
+Creds: student:xxxxxx
+Interfaces: ETH0
+Ports: x,x,x,x
+```
+
 
 
