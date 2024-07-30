@@ -6354,4 +6354,65 @@ ssh vyos@IP_ADDR
 
 ```
 
+# Mapping (CONT)
+
+Net Recon Methodology x-
+• Host discovery
+• Ruby ping sweep (if ping available)
+• Nmap scan if no ping
+• Port Discovery
+• nmap
+• nc scan script
+• Port Validation
+• Banner grabbing using nc
+• Follow-on actions based on ports found
+• if 21 or 80 wget -r IP_ADDRESS (or) wget -r ftp://IP_ADDRESS (or) firefox
+• if 21 FTP [IP ADDR] connects to ftp server : isve
+• get [file name]
+• If 22 or 23 CONNECT and PASSIVE RECON
+Scan Methodology
+nmap -Pn [IP Addr] -T4 -p 21-23,80
+: Specien based 23.ins/chues found
+• Well known port range
+• which tepdump wireshark map telnet get curl ping
+• • 0 - 1023 (Actually scan 1-1023)
+• Chunks of 2000 or first 10000 ports (65535)
+• Hail Mary - Scan all the ports (65535)
+Passive Recon Methodology
+Italicized/bolded words are commands
+: Permissions:
+• sudo -l
+• Interfaces and subnets
+• ip a
+• show interface {VYOS}
+• Neighbors
+• ip neigh
+• Routing Table
+• ip route
+• show ip route VYOS}
+• Files of interest
+o find / -iname flag* o find / -iname hint*
+• Other listening ports
+• ss -ntip
+• Available Tools
+• which tepdump wireshark map telnet get curl ping
+
+# Service and Network Discovery
+https://net.cybbh.io/-/public/-/jobs/874023/artifacts/modules/networking/slides-v4/07_discovery.html
+
+## Reconnaissnace Stages
+
+-Active External
+
+-Passive External
+
+-Active Internal
+
+-Active External
+
+
+![image](https://github.com/user-attachments/assets/925068c6-7c31-4136-9982-cd316be3902b)
+
+
+
 
