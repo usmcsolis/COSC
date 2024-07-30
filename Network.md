@@ -6864,6 +6864,8 @@ for i in {1..254}; do (ping -c 1 172.16.82.$i | grep "bytes from" &) ; done
 sudo nmap -sP 172.16.82.96/27
 ```
 
+
+## No NC? Use DEV (CMD)
 dev/tcp banner grabbing
 ```
 exec 3<>/dev/tcp/172.16.82.106/22; echo -e "" >&3; cat <&3
