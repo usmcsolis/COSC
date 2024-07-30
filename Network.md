@@ -6675,6 +6675,7 @@ nc -nuzvw1 172.16.82.106 1000-2000 2>&1 | grep -E 'succ|open'
 ```
 
 ## Netcat - TCP Scan Script (CMD)
+vim script.sc
 
 ```
 #!/bin/bash
@@ -6691,6 +6692,21 @@ do
     nc -nvzw1 $net.$i $ports 2>&1 | grep -E 'succ|open'
 done
 
+```
+
+```
+Enter network address (e.g. 192.168.0): 
+172.16.82
+Enter starting host range (e.g. 1): 
+106
+Enter ending host range (e.g. 254): 
+106
+Enter ports space-delimited (e.g. 21-23 80): 
+21-23 80 
+(UNKNOWN) [172.16.82.106] 23 (telnet) open
+(UNKNOWN) [172.16.82.106] 22 (ssh) open
+(UNKNOWN) [172.16.82.106] 21 (ftp) open
+(UNKNOWN) [172.16.82.106] 80 (http) open
 ```
 
 ## Netcat - UDP Scan Script (CMD)
@@ -6726,11 +6742,13 @@ nc -u 172.16.82.106 53
 
 Both can be used to interact with the HTTP, HTTPS and FTP protocols.
 
-Curl - Displays ASCII
+Curl - Displays ASCII PRINT TO TERMINAL
 ```
 curl http://172.16.82.106
 curl ftp://172.16.82.106
 ```
+
+COPIES ALL FILES AND SAVES TO SYSTEM
 
 Wget - Downloads (-r recursive)
 ```
@@ -6738,7 +6756,7 @@ wget -r http://172.16.82.106
 wget -r ftp://172.16.82.106
 ```
 
-## Passive Internal Discovery
+## Passive Internal Discovery (PACKET SNIFFERS)
 
 Wireshark 
 
