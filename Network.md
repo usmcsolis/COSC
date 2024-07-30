@@ -6402,7 +6402,7 @@ o find / -iname flag* o find / -iname hint*
 # Service and Network Discovery
 https://net.cybbh.io/-/public/-/jobs/874023/artifacts/modules/networking/slides-v4/07_discovery.html
 
-# Reconnaissnace Stages
+Reconnaissnace Stages
 
 -Active External
 
@@ -6415,7 +6415,7 @@ https://net.cybbh.io/-/public/-/jobs/874023/artifacts/modules/networking/slides-
 
 ![image](https://github.com/user-attachments/assets/925068c6-7c31-4136-9982-cd316be3902b)
 
-# Recon Steps
+Recon Steps
 
 Network Footprinting
 
@@ -6478,7 +6478,7 @@ Vulnerability Assessment
     Software/Components with Known Vulnerabilities
 
 
-# Passive External
+## Passive External
 
 OSINT 
 
@@ -6505,7 +6505,7 @@ dir axfr {@soa.server} {target-site}
 dig axfr @nsztm1.digi.ninja zonetransfer.me
 ```
 
-## Passive OS FingerPrinting (CMD)
+## Passive OS FingerPrinting P0F (CMD)
 
 ```
 more /etc/p0f/p0f.fp
@@ -6648,7 +6648,9 @@ Range of IPs for specific ports
 
     TCP
 ```
-for i in {1..254}; do nc -nvzw1 172.16.82.$i 20-23 80 2>&1 & done | grep -E 'succ|open'
+for i in {1..254}; do nc -Windows: route print
+Linux: ip route (netstat -r deprecated)
+VyOS: show ip routenvzw1 172.16.82.$i 20-23 80 2>&1 & done | grep -E 'succ|open'
 ```
     UDP
 ```
@@ -6732,7 +6734,7 @@ wget -r http://172.16.82.106
 wget -r ftp://172.16.82.106
 ```
 
-# Passive Internal Discovery
+## Passive Internal Discovery
 
 Wireshark 
 
@@ -6743,3 +6745,160 @@ p0f
 Limited to traffic in same local area of network
 
 ## Native Host Tools (CMD)
+
+TCP/IP Network Configuration
+```
+Windows: ipconfig /all
+Linux: ip address (ifconfig depreciated)
+VyOS: show interface
+```
+
+DNS Configurations
+```
+Windows: ipconfig /displaydns
+Linux: cat /etc/resolv.conf
+```
+
+Arp Cache
+```
+Windows: arp -a
+Linux: ip neighbor (arp -a depreciated)
+```
+
+Network Connections
+```
+Windows: netstat
+Linux: ss (netstat depreciated)
+
+Example options useful for both netstat and ss: -antp
+a = Displays all active connections and ports.
+n = No determination of protocol names. Shows 22 not SSH.
+t = Display only TCP connections.
+u = Display only UDP connections.
+p = Shows which processes are using which sockets.
+```
+
+Services
+```
+Windows: %SystemRoot%\system32\drivers\etc\services
+
+Linux/Unix: /etc/services
+```
+
+OS Information
+```
+Windows: systeminfo
+Linux: uname -a and /etc/os-release
+```
+
+Running Processes
+```
+Windows: tasklist
+Linux: ps or top
+
+Example options useful for ps: -elf
+e = Show all running processes
+l = Show long format view
+f = Show full format listing
+```
+
+
+Command Path
+```
+which
+whereis
+```
+
+Routing Table
+```
+Windows: route print
+Linux: ip route (netstat -r deprecated)
+VyOS: show ip route
+```
+
+File Search
+```
+find / -name hint* 2> /dev/null
+find / -iname flag* 2> /dev/null
+```
+
+## Active Internal Discovery
+
+## Commands
+Arp Scanning
+```
+arp-scan --interface=eth0 --localnet
+
+nmap -sP -PR 172.16.82.96/27
+```
+
+Ping Scanning 
+```
+ping -c 1 172.16.82.106
+
+for i in {1..254}; do (ping -c 1 172.16.82.$i | grep "bytes from" &) ; done
+
+sudo nmap -sP 172.16.82.96/27
+```
+
+dev/tcp banner grabbing
+```
+exec 3<>/dev/tcp/172.16.82.106/22; echo -e "" >&3; cat <&3
+```
+
+dev/tcp scanning
+```
+for p in {1..1023}; do(echo >/dev/tcp/172.16.82.106/$p) >/dev/null 2>&1 && echo "$p open"; done
+```
+
+
+
+## Performing Network Forensics - Mapping
+
+Diagram Devices
+
+Line Types
+
+Written Information
+
+coloring
+
+Grouping
+
+![image](https://github.com/user-attachments/assets/4597be58-bdd4-4a84-96b8-0e67185b7339)
+
+```
+    Device type (Router/host)
+
+    System Host-names
+
+    Interface names (eth0, eth1, etc)
+
+    IP address and CIDRs for all interfaces
+
+    TCP and UDP ports
+
+    MAC Address
+
+    OS type/version
+
+    Known credentials
+```
+https://app.diagrams.net/
+
+## MAP COPY AND PASTE
+
+```
+Dev:
+Hostname:
+Interfaces:
+IP:
+Ports:
+MAC:
+OS:
+Creds:
+```
+
+
+
+
