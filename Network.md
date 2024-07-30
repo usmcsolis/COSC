@@ -1,6 +1,8 @@
 # Networking
 https://miro.com/app/board/o9J_klSqCSY=/
 
+https://github.com/usmcsolis/COSC/blob/main/Screenshot%20from%202024-07-30%2009-31-26.png
+
 ## Sites:
 draw.io - https://app.diagrams.net/
 
