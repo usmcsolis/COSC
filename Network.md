@@ -6578,7 +6578,6 @@ MUST USE SUDO FOR
     XMAS tree scan (-sX)
 
     UDP scan (-sU)
-	
 
     Idle scan (-sI)
 
