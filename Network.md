@@ -1,7 +1,6 @@
 # Networking
 https://miro.com/app/board/o9J_klSqCSY=/
 
-https://github.com/usmcsolis/COSC/blob/main/Screenshot%20from%202024-07-30%2009-31-26.png
 
 ## Sites:
 draw.io - https://app.diagrams.net/
@@ -6934,6 +6933,7 @@ Interfaces: ETH0
 Ports: x,x,x,x
 ```
 
-file:///home/mark.a.solis36/Desktop/Screenshot%20from%202024-07-30%2009-31-26.png
+![image](https://github.com/user-attachments/assets/1b1b96b1-a532-40af-95ad-88abb839f268)
+
 
 
