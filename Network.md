@@ -6355,7 +6355,7 @@ ssh vyos@IP_ADDR
 ```
 
 # Mapping (CONT)
-
+```
 Net Recon Methodology x-
 • Host discovery
 • Ruby ping sweep (if ping available)
@@ -6396,11 +6396,13 @@ o find / -iname flag* o find / -iname hint*
 • ss -ntip
 • Available Tools
 • which tepdump wireshark map telnet get curl ping
+```
+
 
 # Service and Network Discovery
 https://net.cybbh.io/-/public/-/jobs/874023/artifacts/modules/networking/slides-v4/07_discovery.html
 
-## Reconnaissnace Stages
+# Reconnaissnace Stages
 
 -Active External
 
@@ -6413,6 +6415,331 @@ https://net.cybbh.io/-/public/-/jobs/874023/artifacts/modules/networking/slides-
 
 ![image](https://github.com/user-attachments/assets/925068c6-7c31-4136-9982-cd316be3902b)
 
+# Recon Steps
+
+Network Footprinting
+
+Network Scanning
+
+Network Enumeration
+
+Vulnerability Scanning
+
+Network Footprinting
+
+    Collect information relating to target
+
+        Network
+
+        Systems
+
+        Organization
+
+Network Scanning
+
+    Port Scanning
+
+    Network Scanning
+
+    Vulnerability Scanning
+
+Network Enumeration
+
+    Network Resource and shares
+
+    Users and Groups
+
+    Routing tables
+
+    Auditing and Service settings
+
+    Machine names
+
+    Applications and banners
+
+    SNMP and DNS details
+
+    Other common services and ports
+
+Vulnerability Assessment
+
+    Injection
+
+    Broken Authentication
+
+    Sensitive Data Exposure
+
+    XML External Entities
+
+    Broken Access Control
+
+    Security Misconfiguration
+
+    Software/Components with Known Vulnerabilities
 
 
+# Passive External
 
+OSINT 
+
+3rd Party Sites
+
+Not sending any information via their network
+
+## DIG and WHOIS (CMD)
+
+```
+dig zonetransfer.me (soa,mx,ns,etc)
+dig zonetransfer.me A
+dig zonetransfer.me AAAA
+dig zonetransfer.me MX
+dig zonetransfer.me TXT
+dig zonetransfer.me NS
+dig zonetransfer.me SOA
+```
+
+## Zone Transfer (CMD)
+
+```
+dir axfr {@soa.server} {target-site}
+dig axfr @nsztm1.digi.ninja zonetransfer.me
+```
+
+## Passive OS FingerPrinting (CMD)
+
+```
+more /etc/p0f/p0f.fp
+
+sudo p0f -i eth0
+
+sudo p0f -r test.pcap
+```
+
+
+# Active External
+```
+Scanning Nature : Active and Passive
+
+Scanning Strategy : Remote to Local
+
+Local to Local
+
+Local to Remote
+
+Remote to Remote
+```
+
+Scanning Approach
+```
+    Aim
+
+        Wide range target scan
+
+        Target specific scan
+
+    Method
+
+        Single source scan
+
+            1-to-1 or 1-to-many
+
+        Distributed scan
+
+            many-to-one or many-to-many
+
+Vertical Scan - Range of Ports on 1 box
+
+Horizontal Scan - 1 or many ports on a range of boxes
+
+
+```
+
+
+## NMAP Scan Types
+
+```
+    -PE ICMP Ping
+    -Pn - no Ping
+
+    Broadcast Ping/Ping sweep (-sP, -PE)
+
+    SYN scan (-sS)
+
+    Full connect scan (-sT)
+
+    Null scan (-sN)
+
+    FIN scan (-sF)
+
+    XMAS tree scan (-sX)
+
+    UDP scan (-sU)
+
+    Idle scan (-sI)
+
+    Decoy scan (-D)
+
+    ACK/Window scan (-sA)
+
+    RPC scan (-sR)
+
+    FTP scan (-b)
+
+    OS fingerprinting scan (-O)
+
+    Version scan (-sV)
+
+    Discovery probes
+```
+
+## NMAP TIME OUT -T
+
+```
+    -T0 - Paranoid - 300 Sec
+
+    -T1 - Sneaky - 15 Sec
+
+    -T2 - Polite - 1 Sec
+
+    -T3 - Normal - 1 Sec
+
+    -T4 - Aggresive - 500 ms
+
+    -T5 - Insane - 250 ms
+
+    --scan-delay <time> - Minimum delay between probes
+
+    --max-scan-delay <time> - Max delay between probes
+
+    --min-rate <number> - Minimum packets per second
+
+    --max-rate <number> - Max packets per second
+```
+
+## Traceroute - Firewalking
+```
+traceroute 172.16.82.106
+traceroute 172.16.82.106 -p 123
+sudo traceroute 172.16.82.106 -I
+sudo traceroute 172.16.82.106 -T
+sudo traceroute 172.16.82.106 -T -p 443
+```
+
+## Netcat - Scanning 
+```
+nc [Options] [Target IP] [Target Port(s)]
+```
+
+```
+    -z : Port scanning mode i.e. zero I/O mode
+
+    -v : Be verbose [use twice -vv to be more verbose]
+
+    -n : do not resolve ip addresses
+
+    -w1 : Set time out value to 1
+
+    -u : To switch to UDP
+
+```
+
+## Netcat - Scanning Horizontal Scan (CMD)
+Range of IPs for specific ports
+
+    TCP
+```
+for i in {1..254}; do nc -nvzw1 172.16.82.$i 20-23 80 2>&1 & done | grep -E 'succ|open'
+```
+    UDP
+```
+for i in {1..254}; do nc -nuvzw1 172.16.82.$i 1000-2000 2>&1 &
+```
+
+## Netcat - Scanning Vertical Scan (CMD)
+
+Range of ports on specific IP
+
+    TCP
+```
+nc -nzvw1 172.16.82.106 21-23 80 2>&1 | grep -E 'succ|open'
+```
+    UDP
+```
+nc -nuzvw1 172.16.82.106 1000-2000 2>&1 | grep -E 'succ|open'
+```
+
+## Netcat - TCP Scan Script (CMD)
+
+```
+#!/bin/bash
+echo "Enter network address (e.g. 192.168.0): "
+read net
+echo "Enter starting host range (e.g. 1): "
+read start
+echo "Enter ending host range (e.g. 254): "
+read end
+echo "Enter ports space-delimited (e.g. 21-23 80): "
+read ports
+for ((i=$start; $i<=$end; i++))
+do
+    nc -nvzw1 $net.$i $ports 2>&1 | grep -E 'succ|open'
+done
+
+```
+
+## Netcat - UDP Scan Script
+
+```
+#!/bin/bash
+echo "Enter network address (e.g. 192.168.0): "
+read net
+echo "Enter starting host range (e.g. 1): "
+read start
+echo "Enter ending host range (e.g. 254): "
+read end
+echo "Enter ports space-delimited (e.g. 21-23 80): "
+read ports
+for ((i=$start; $i<=$end; i++))
+do
+    nc -nuvzw1 $net.$i $ports 2>&1 | grep -E 'succ|open'
+done
+```
+
+## Netcat - Banner Grab (CMD)
+
+Find what is running on a particular port
+```
+nc [Target IP] [Target Port]
+nc 172.16.82.106 22
+nc -u 172.16.82.106 53
+```
+-u : To switch to UDP
+
+
+## Curl and Wget (CMD)
+
+Both can be used to interact with the HTTP, HTTPS and FTP protocols.
+
+Curl - Displays ASCII
+```
+curl http://172.16.82.106
+curl ftp://172.16.82.106
+```
+
+Wget - Downloads (-r recursive)
+```
+wget -r http://172.16.82.106
+wget -r ftp://172.16.82.106
+```
+
+# Passive Internal Discovery
+
+Wireshark 
+
+TCP DUMP
+
+p0f
+
+Limited to traffic in same local area of network
+
+## Native Host Tools (CMD)
