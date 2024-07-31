@@ -7994,3 +7994,47 @@ firefox http://localhost:5580
 
 
 
+
+
+
+
+
+
+
+
+## BRIDGING LOCAL AND REMOTE PORT FORWARDING
+
+ssh user@1.2.3.4 -L 1234:1.2.3.4:23
+
+IH> telnet localhost 1234
+
+.10: ssh user@.15 -R 8080:127.0.0.1:22
+
+
+
+
+Internet_Host:
+ssh student@172.16.1.15 -L 2223:172.16.40.10:23 -NT
+or
+ssh -L 2223:172.16.40.10:23 student@172.16.1.15 -NT
+
+Internet_Host:
+telnet localhost 2223
+Blue_INT_DMZ_Host-1~$
+
+
+Internet_Host:
+ssh student@localhost -p 2222 -D 9050
+or
+ssh -D 9050 student@localhost -p 2222
+
+
+Internet_Host:
+proxychains ./scan.sh
+proxychains nmap -Pn -sT 172.16.82.96/27 -p 21-23,80
+proxychains ssh student@172.16.82.106
+proxychains telnet 172.16.82.106
+proxychains wget -r http://172.16.82.106
+proxychains wget -r ftp://172.16.82.106
+
+
