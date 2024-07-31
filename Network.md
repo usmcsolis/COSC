@@ -7470,3 +7470,527 @@ paste, save & exit
 
 $ base64 -d b64image.png > logoCyber.png
 
+
+
+# SHH Tunneling and Covert Channels
+
+    Tunneling - Tunneling encapsulates a protocol inside another protocol.
+
+        Encapsulation
+
+        Transmission
+
+        Decapsulation
+
+
+6 in 4
+
+    Tunnel IPv6 traffic in an IPv4 Generic Routing Encapsulation (GRE) tunnel
+
+    Simple and deterministic
+
+    Must be configured manually
+
+    Commonly used for connecting IPv6 islands over an IPv4 network.
+
+    Uses IP protocol 41
+
+6 to 4
+
+    Allows for IPv6 packets to be sent over an IPv4 network
+
+    Enables automatic tunneling of IPv6 packets over an IPv4 network.
+
+    Uses 6to4 gateways that encapsulate IPv6 packets within IPv4 packets.
+
+    Allows communication between IPv6 networks across IPv4 infrastructure.
+
+    Uses IP protocol 41
+
+
+## Teredo Tunneling
+
+    RFC 4380
+
+    Allows IPv4 clients to access IPv6 clients
+
+    Encapsulates IPv6 packets within UDP
+
+    Commonly used for devices behind NAT
+
+    Uses the 2001:0000::/32 prefix
+
+
+## ISATAP
+
+    Allows IPv6 hosts to communicate over an IPv4 network within a site (local network)
+
+    Can be used over the internet for specific site-to-site communications.
+
+    Generates a Link-Local address using its IPv4 address
+
+    192.168.199.99 → FE80::0000:5EFE:c0a8:c763
+
+## Covert Channel 
+
+Taking a common and legitamate protocol to transfer data illegitimately 
+
+Common Channels
+	ICMP
+
+ 	DNS
+
+  	HTTP
+
+Type of Covert Channels
+
+    Storage
+
+        Payload
+
+        Header
+
+            IP Header (TOS, IP ID, Flags + Fragmentation, and Options)
+
+            TCP Header (Reserved, URG Pointer, and Options)
+    Timing
+
+        Modifying transmission of legitimate traffic
+
+        Delaying packets between nodes
+
+        Watch TTL changes
+
+        Watch for variances between transmissions
+
+## How to detect COVERT CHANNELS
+
+    Host Analysis
+
+        Requires knowledge of each applications expected behavior.
+
+    Network Analysis
+
+        A good understanding of your network and the common network protocols being used is the key
+
+    Baselining of what is normal to detect what is abnormal
+
+## DETECT COVERT CHANNELS ICMP
+
+    ICMP works with one request and one reply answer
+
+        Type 8 code 0 request
+
+        Type 0 code 0 answer
+
+    Check for:
+
+        Payload imbalance
+
+        Request/responce imbalance
+
+        Large payloads in response
+
+ ICMP Covert Channel Tools
+
+    ptunnel
+
+    Loki
+
+    007shell
+
+    ICMP Backdoor
+
+    B0CK
+
+    Hans
+
+
+## DETECT COVERT CHANNELS ICMP
+
+    DNS is a request/response protocol
+
+    1 request typically gets 1 response
+
+    Payloads generally do no exceed 512 bytes
+
+    Check for:
+
+        Request/response imbalances
+
+        Unusual payloads
+
+        Burstiness or continuous use
+
+
+DNS Covert Channel Tools
+
+    OzymanDNS
+
+    NSTX
+
+    dns2tcp
+
+    iodine
+
+    heyoka
+
+    dnscat2
+
+
+## DETECT COVERT CHANNELS HTTP
+
+
+
+    Request/Response protocol to pull web content
+
+    GET request may include .png, .exe, .(anything) files
+
+    Can vary in sizes of payloads
+
+    Typically "bursty" but not steady
+
+
+HTTP Covert Channel Tools
+
+    tunnelshell tools
+
+    HTTPTunnel
+
+    SirTunnel
+
+    go HTTP tunnel
+
+
+
+## STEGANOGRAPHY
+
+    Hiding messages inside legitimate information objects
+
+        Methods:
+
+            Injection
+
+            Substitution
+
+            Propagation
+
+Steganography Injection
+
+    Done by inserting message into the unused (whitespace) of the file, usually in a graphic
+
+    Second most common method
+
+    Adds size to the file
+
+    Hard to detect unless you have original file
+
+    tools:
+
+        StegHide
+
+
+Steganography Propagation
+
+    Generates a new file entirely
+
+    Needs special software to manipulate file
+
+        tools:
+
+            StegSecret
+
+            HyDEn
+
+            Spammimic
+
+
+
+## SSH 
+
+Configuration Files
+
+    Client Configuration File (/etc/ssh/ssh_config)
+
+    Server Configuration File (/etc/ssh/sshd_config)
+
+    Known Hosts File (~/.ssh/known_hosts)
+
+Client vs Server vs Session
+
+User Key Asymmetric
+
+Host Key Asymmetric
+
+Session Key Symmetric
+
+![image](https://github.com/user-attachments/assets/198f211c-8481-4dad-bbce-9b7abb3d43e3)
+
+
+SSH Host key Changed
+ 
+
+ssh student@172.16.82.106
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
+Someone could be eavesdropping on you right now (man-in-the-middle attack)!
+It is also possible that a host key has just been changed.
+The fingerprint for the ECDSA key sent by the remote host is
+SHA256:RO05vd7h1qmMmBum2IPgR8laxrkKmgPxuXPzMpfviNQ.
+Please contact your system administrator.
+Add correct host key in /home/student/.ssh/known_hosts to get rid of this message.
+Offending ECDSA key in /home/student/.ssh/known_hosts:1
+remove with:
+ssh-keygen -f "/home/student/.ssh/known_hosts" -R "172.16.82.106"
+ECDSA host key for 172.16.82.106 has changed and you have requested strict checking.
+Host key verification failed.
+
+
+SSH Key Change Fix
+
+ssh-keygen -f "/home/student/.ssh/known_hosts" -R "172.16.82.106"
+
+    Copy/Paste the ssh-geygen message to remove the Host key from the known_hosts file
+
+
+
+
+
+
+## SSH Port Forwarding 
+
+Go to a new port
+
+
+
+    -L - Creates a port on the client mapped to a ip:port via the server (LOCAL) (IM OPENING THIS PORT ON MY DEVICE)
+
+    -D - Creates a port on the client and sets up a SOCKS4 proxy tunnel where the target ip:port is specified dynamically (POINT TO A PLACE BOUND LOCALLY)
+
+    -R - Creates the port on the server mapped to a ip:port via the client (REMOTE) (OPEN PORT ON REMOTE DEVICE) 
+
+    -NT - Do not execute a remote command and disable pseudo-tty (will hang window) 
+
+
+
+## LOCAL PORT FORWARDING
+
+
+ssh -p <optional alt port> <user>@<server ip> -L <local bind port>:<tgt ip>:<tgt port> -NT
+
+ssh -L <local bind port>:<tgt ip>:<tgt port> -p <alt port> <user>@<server ip> -NT
+
+
+1. MUST SSH TO BOX
+
+2. 
+
+
+
+## Local Port Forward to localhost of server (SSH) (CMD)
+      
+Internet_Host:
+ssh student@172.16.1.15 -L 1122:localhost:22
+or
+ssh -L 1122:localhost:22 student@172.16.1.15
+
+Internet_Host:
+ssh student@localhost -p 1122
+Blue_DMZ_Host-1~$
+
+## Local Port Forward to localhost of server (TELNET) (CMD)
+
+Internet_Host:
+ssh student@172.16.1.15 -L 1123:localhost:23
+or
+ssh -L 1123:localhost:23 student@172.16.1.15
+
+Internet_Host:
+telnet localhost 1123
+Blue_DMZ_Host-1~$
+
+## Local Port Forward to localhost of server (HTTP) (CMD)
+
+Internet_Host:
+ssh student@172.16.1.15 -L 1180:localhost:80
+or
+ssh -L 1180:localhost:80 student@172.16.1.15
+
+Internet_Host:
+firefox http://localhost:1180
+{Webpage of Blue_DMZ_Host-1}
+
+## Local Port Forward to remote target via server (CMD) 
+
+Internet_Host:
+ssh student@172.16.1.15 -L 2222:172.16.40.10:22
+or
+ssh -L 2222:172.16.40.10:22 student@172.16.1.15
+
+Internet_Host:
+ssh student@localhost -p 2222
+Blue_INT_DMZ_Host-1~$
+
+## Local Port Forward to remote target via server (TELNET) (CMD) 
+
+Internet_Host:
+ssh student@172.16.1.15 -L 2223:172.16.40.10:23
+or
+ssh -L 2223:172.16.40.10:23 student@172.16.1.15
+
+Internet_Host:
+telnet localhost 2223
+Blue_INT_DMZ_Host-1~$
+
+## Local Port Forward to remote target via server (HTTP) (CMD) 
+
+Internet_Host:
+ssh student@172.16.1.15 -L 2280:172.16.40.10:80
+or
+ssh -L 2280:172.16.40.10:80 student@172.16.1.15
+
+Internet_Host:
+firefox http://localhost:2280
+{Webpage of Blue_INT_DMZ_Host-1}
+
+
+
+
+## FORWARD THROUGH TUNNEL
+
+Internet_Host:
+ssh student@172.16.1.15 -L 2222:172.16.40.10:22
+ssh student@localhost -p 2222 -L 3322:172.16.82.106:22
+
+Internet_Host:
+ssh student@localhost -p 3322
+Blue_Host-1~$
+
+
+
+Internet_Host:
+ssh student@172.16.1.15 -L 2222:172.16.40.10:22
+ssh student@localhost -p 2222 -L 3323:172.16.82.106:23
+
+Internet_Host:
+telnet localhost 3323
+Blue_Host-1~$
+
+
+
+Internet_Host:
+ssh student@172.16.1.15 -L 2222:172.16.40.10:22
+ssh student@localhost -p 2222 -L 3380:172.16.82.106:80
+
+Internet_Host:
+firefox http://localhost:3380
+{Webpage of Blue_Host-1}
+
+
+## DYNAMIC PORT FOWARDING
+
+Internet_Host:
+ssh student@172.16.1.15 -L 2222:172.16.40.10:22
+or
+ssh -L 2222:172.16.40.10:22 student@172.16.1.15
+
+Internet_Host:
+ssh student@localhost -p 2222 -D 9050
+or
+ssh -D 9050 student@localhost -p 2222
+
+
+1 Step
+
+Internet_Host:
+proxychains ./scan.sh
+proxychains nmap -Pn 172.16.82.96/27 -p 21-23,80
+proxychains ssh student@172.16.82.106
+proxychains telnet 172.16.82.106
+proxychains wget -r http://172.16.82.106
+proxychains wget -r ftp://172.16.82.106
+
+
+## REMOTE PORT FORWARDING
+
+ssh -p <optional alt port> <user>@<server ip> -R <remote bind port>:<tgt ip>:<tgt port> -NT
+
+or
+
+ssh -R <remote bind port>:<tgt ip>:<tgt port> -p <alt port> <user>@<server ip> -NT
+
+
+
+## REMOTE PORT FORWARDING FROM LOCAL HOST OF CLIENT
+
+Blue_DMZ_Host-1:
+ssh student@10.10.0.40 -R 4422:localhost:22
+or
+ssh -R 4422:localhost:22 student@10.10.0.40
+
+
+Internet_Host:
+ssh student@localhost -p 4422
+Blue_DMZ_Host-1~$
+
+
+
+
+Blue_DMZ_Host-1:
+ssh student@10.10.0.40 -R 4423:localhost:23
+or
+ssh -R 4423:localhost:23 student@10.10.0.40
+
+Internet_Host:
+telnet localhost 4423
+Blue_DMZ_Host-1~$
+
+
+
+Blue_DMZ_Host-1:
+ssh student@10.10.0.40 -R 4480:localhost:80
+or
+ssh -R 4480:localhost:80 student@10.10.0.40
+
+Internet_Host:
+firefox http://localhost:4480
+{Webpage of Blue_DMZ_Host-1}
+
+
+## REMOTE PORT FORWARDING FROM TO REMOTE TARGET VIA CLIENT
+
+Blue_DMZ_Host-1:
+ssh student@10.10.0.40 -R 5522:172.16.40.10:22
+or
+ssh -R 5522:172.16.40.10:22 student@10.10.0.40
+
+Internet_Host:
+ssh student@localhost -p 5522
+Blue_INT_DMZ_Host-1~$
+
+
+
+Blue_DMZ_Host-1:
+ssh student@10.10.0.40 -R 5523:172.16.40.10:23
+or
+ssh -R 5523:172.16.40.10:23 student@10.10.0.40
+
+Internet_Host:
+telnet localhost 5523
+Blue_INT_DMZ_Host-1~$
+
+
+
+Blue_DMZ_Host-1:
+ssh student@10.10.0.40 -R 5580:172.16.40.10:80
+or
+ssh -R 5580:172.16.40.10:80 student@10.10.0.40
+
+Internet_Host:
+firefox http://localhost:5580
+{Webpage of Blue_INT_DMZ_Host-1}
+
+
+
