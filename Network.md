@@ -7415,3 +7415,58 @@ server.close()
 Take information and pack it with different headers, formulas, and ways to obsfuscate information.
 
 
+Packers - special code added to programs to compress executables to reduces network traffic, obsfucsation, reduce time on target.
+
+Encoding and Decoding, Specialized formatting, used for trasmission and storage, HEX, BASE64, NOT COMPRESSION, ENCAPSULATION, or ENCRYPTION
+
+
+## XXD (CMD)
+```
+    echo a string of text and use xxd to convert it to a plain hex dump with the -p switch\
+
+$ echo "Hex encoding test" | xxd -p
+48657820656e636f64696e6720746573740a
+
+    echo hex string and use xxd to restore the data to its original format
+
+$ echo "48657820656e636f64696e6720746573740a" | xxd -r -p
+Hex encoding test
+```
+
+
+## BASE64 Encoding and Decoding
+
+
+    binary-to-text encoding
+
+    A-Z, a-z, 1-9, +, /
+
+    6 bits per non-final digit
+
+    (4) 6-bit groups per (3) 8-bit groups
+
+    padding used to fill in any unused space in each 24-bit group
+
+
+![image](https://github.com/user-attachments/assets/7113ac99-bdd3-4574-80e0-170d2bed1daa)
+
+
+## TRANSFER FILE USING BASE64 (CMD)
+
+    generate the base64 output of a file, with line wrapping removed
+
+$ base64 -w0 logoCyber.png
+
+    copy the output
+
+
+    create a new file on your machine
+
+$ nano b64image.png
+
+paste, save & exit
+
+    decode from base64 with -d
+
+$ base64 -d b64image.png > logoCyber.png
+
