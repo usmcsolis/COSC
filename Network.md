@@ -8038,3 +8038,443 @@ proxychains wget -r http://172.16.82.106
 proxychains wget -r ftp://172.16.82.106
 
 
+## SSH Practice (CMD)
+
+
+
+## First Pivot External Active Recon
+
+tp2
+
+internet_host$ ./scan.sh
+
+    Upon performing an active scan on the pivot system we identify and map any open TCP or UDP ports.
+
+        If HTTP ports are open we can use wget, curl, or a web-browser like firefox to interact with it. If the HTTP is running on an alternate port we can use the <ip>:<port> to interact with it.
+
+            wget -r http://10.50.x.x or wget -r port
+
+            curl http://10.50.x.x or curl port
+
+            firefox 10.50.x.x or `firefox 10.50.x.x:[port]
+
+        If FTP port is open we can use wget, curl or ftp to interact with it.
+
+            wget -r ftp://10.50.x.x
+
+            curl ftp://10.50.x.x or curl ftp://10.50.x.x/file
+
+            ftp 10.50.x.x
+
+        If SSH, Telnet, or any other ports are open we can banner grab these ports to verify the service is running on the ports.
+
+            nc 10.50.x.x [port]
+
+            telnet 10.50.x.x or telnet 10.50.x.x [port]
+
+            ssh [username]@10.50.x.x or ssh [username]@10.50.x.x -p [port]
+
+
+
+    Upon access to the remote system you can perform passive enumeration.
+
+        We can identify the hostname by examining the prompt or by running the hostname command.
+
+        ip address or ifconfig or ipconfig to gather the internal ip address and CIDR. These together will allow you to determine the usable ip range of the internal network. This will also allow us to see any additional networks the system may be connected to.
+
+        ip neighbor or arp -a to gather information about other possible devices on the network. This will only give you details about devices that the system has communicated with recently.
+
+        ss -antlp or netstat -antlp to gather information about other listening service ports on the system. This may differ from your active scans as firewalls can limit the ports you are able to view from remote.
+
+        ps -elf to check for running processes on the system. This will give you alot of information so grepping for specific services may be required.
+
+        find / -iname [filename] 2>/dev/null can be used to look for interesting files on the system.
+
+        `ls /usr/share/cctc' to determine if any artifacts of interest are in the share directory.
+
+        To pull any files found:
+
+            internet_host$ scp john@10.50.x.x:/usr/share/cctc/john.png .
+
+
+## Scan second pivot
+
+Second Pivot External Active Recon
+
+tp4
+
+internet_host$ ssh john@[float ip] -D 9050 -NT
+internet_host$ proxychains ./scan.sh
+
+    To enumerate the system beyond our first pivot we establish a Dynamic tunnel (-D) on port 9050 to John who is our first pivot and proxy.
+
+    We use proxychains to send our TCP scans thru the Dynamic tunnel and will enumerate thru our proxy.
+
+    Thru the scans we find other systems on the network by their IP address and the service ports on them.
+
+    Here we discover the host Jack (104.16.181.15) and it has SSH running on port 22.
+
+    Upon performing an active scan on the pivot system we identify and map any open TCP or UDP ports.
+
+        If HTTP ports are open we can use wget or curl. If the HTTP is running on an alternate port we can use the <ip>:<port> to interact with it.
+
+            proxychains wget -r http://104.16.181.15 or proxychains wget -r port
+
+            proxychains curl http://104.16.181.15` or `proxychains curl port
+
+        If FTP port is open we can use wget, curl or ftp to interact with it.
+
+            proxychains wget -r ftp://104.16.181.15
+
+            proxychains curl ftp://104.16.181.15 or proxychains curl ftp://104.16.181.15/file
+
+            proxychains ftp 104.16.181.15 and switch to passive mode.
+
+        If SSH, Telnet, or any other ports are open we can banner grab these ports to verify the service is running on the ports.
+
+            proxychains nc 104.16.181.15 [port]
+
+            proxychains telnet 104.16.181.15 or proxychains telnet 104.16.181.15 [port]
+
+            proxychains ssh [username]@104.16.181.15 or proxychains ssh [username]@104.16.181.15 -p [port]
+
+
+
+
+internet_host$ proxychains ssh jack@104.16.181.15
+
+    Here you can perform the same passive recon steps as before.
+
+    To pull any files from Jack:
+
+        internet_host$ proxychains scp jack@104.16.181.15:/usr/share/cctc/jack.png .
+
+
+
+##  Scan third pivot
+
+Third Pivot External Active Recon
+
+tp6
+
+<close the previous dynamic tunnel>
+internet_host$ ssh john@[float ip] -L 1111:104.16.181.15:22 -NT
+internet_host$ ssh jack@localhost -p 1111 -D 9050 -NT
+internet_host$ proxychains ./scan.sh
+
+    To enumerate beyond Jack we must close the dynamic tunnel to John.
+
+    We use John as our pivot to setup a local-port-forward (1111) to Jack targeting Jack’s ssh port (22).
+
+    We then setup a new dynamic tunnel to Jack (1111).
+
+        We are able to authenticate to Jack by calling the localhost -p 1111 which is the tunnel we setup that targets Jack’s ssh port.
+
+    We use proxychains to send our TCP scans thru the Dynamic tunnel and will enumerate thru our proxy.
+
+    Thru the scans we find other systems on the network by their IP address and the service ports on them.
+
+    Upon performing an active scan on the pivot system we identify and map any open TCP or UDP ports.
+
+        If HTTP ports are open we can use wget or curl. If the HTTP is running on an alternate port we can use the [ip]:[port] to interact with it.
+
+            proxychains wget -r http://142.16.8.32 or proxychains wget -r port
+
+            proxychains curl http://142.16.8.32 or proxychains curl port
+
+        If FTP port is open we can use wget, curl or ftp to interact with it.
+
+            proxychains wget -r ftp://142.16.8.32
+
+            proxychains curl ftp://142.16.8.32 or proxychains curl ftp://142.16.8.32/file
+
+            proxychains ftp 142.16.8.32 and switch to passive mode.
+
+        If SSH, Telnet, or any other ports are open we can banner grab these ports to verify the service is running on the ports.
+
+            proxychains nc 142.16.8.32 [port]
+
+            proxychains telnet 142.16.8.32 or proxychains telnet 142.16.8.32 [port]
+
+            proxychains ssh [username]@142.16.8.32 or proxychains ssh [username]@142.16.8.32 -p [port]
+
+    Here we discover the host Bill (142.16.8.32) and it has SSH running on port 4567.
+
+
+
+
+internet_host$ proxychains ssh bill@142.16.8.32 -p 4567
+
+    Here you can perform the same passive recon steps as before.
+
+    To pull any files from Bill:
+
+        internet_host$ proxychains scp -P 4567 bill@142.16.8.32:/usr/share/cctc/bill.png .
+
+
+
+## Scan forth pivot
+
+Forth Pivot External Active Recon
+
+tp8
+
+<close the previous dynamic tunnel>
+internet_host$ ssh jack@localhost -p 1111 -L 2222:142.16.8.32:4567 -NT
+internet_host$ ssh bill@localhost -p 2222 -D 9050 -NT
+internet_host$ proxychains ./scan.sh
+
+    To enumerate beyond Bill we must close the dynamic tunnel to Jack.
+
+    We use Jack as our pivot (1111) to setup a local-port-forward (2222) to Bill targeting Bill’s ssh port (4567).
+
+    We then setup a new dynamic tunnel to Bill (2222).
+
+        We are able to authenticate to Bill by calling the localhost -p 2222 which is the tunnel we setup that targets Bill’s ssh port.
+
+    We use proxychains to send our TCP scans thru the Dynamic tunnel and will enumerate thru our proxy.
+
+    Thru the scans we find other systems on the network by their IP address and the service ports on them.
+
+    Upon performing an active scan on the pivot system we identify and map any open TCP or UDP ports.
+
+        If HTTP ports are open we can use wget or curl. If the HTTP is running on an alternate port we can use the <ip>:<port> to interact with it.
+
+            proxychains wget -r http://155.39.88.21 or proxychains wget -r port
+
+            proxychains curl http://155.39.88.21 or proxychains curl port
+
+        If FTP port is open we can use wget, curl or ftp to interact with it.
+
+            proxychains wget -r ftp://155.39.88.21
+
+            proxychains curl ftp://155.39.88.21 or proxychains curl ftp://155.39.88.21/file
+
+            proxychains ftp 155.39.88.21 and switch to passive mode.
+
+        If SSH, Telnet, or any other ports are open we can banner grab these ports to verify the service is running on the ports.
+
+            proxychains nc 155.39.88.21 [port]
+
+            proxychains telnet 155.39.88.21 or proxychains telnet 155.39.88.21 [port]
+
+            proxychains ssh [username]@155.39.88.21 or proxychains ssh [username]@155.39.88.21 -p [port]
+
+    Here we discover the host Brian (155.39.88.21) and it does NOT seem to have an SSH port but it does have Telnet open on port 23.
+
+
+
+
+internet_host$ proxychains telnet 155.39.88.21
+
+    Here you can perform the same passive recon steps as before.
+
+    We are not able to extract any files thru our telnet connection. We need to determine if we can establish an remote ssh connection first by determining if SSH is running on the system
+
+
+
+## Scan fifth pivot
+
+Fifth Pivot External Active Recon
+
+tp9
+
+<close the previous dynamic tunnel>
+internet_host$ ssh bill@localhost -p 2222 -L 3333:155.39.88.21:23 -NT
+internet_host$ telnet localhost 3333
+brian$ ssh bill@155.39.88.17 -p 4567 -R 4444:localhost:22 -NT
+internet_host$ ssh bill@localhost -p 2222 -L 5555:localhost:4444 -NT
+internet_host$ ssh brian@localhost -p 5555 -D 9050 -NT
+internet_host$ proxychains ./scan.sh
+
+    To enumerate beyond Brian we must close the dynamic tunnel to Bill.
+
+    We use Bill as our pivot (2222) to setup a local-port-forward (3333) to Brian targeting Brian’s telnet port (23).
+
+    We then telnet to the local port 3333. This will allow us to telnet to Brian.
+
+    On Brian we ssh to Bill on his ssh port (4567) and setup a remote-port-forward by creating (4444) on Bill that is mapped to Brian’s localhost:22.
+
+    We then use Bill as our pivot (2222) to setup a local-port-forward (5555) to Bill’s own localhost:4444. 4444 is the port we create on Bill using the remote-port-forward from Brian.
+
+    We then setup a new dynamic tunnel to Brian (5555).
+
+        We are able to authenticate to Brian by calling the localhost -p 5555 which is the tunnel we setup that targets Brian’s ssh port.
+
+    We use proxychains to send our TCP scans thru the Dynamic tunnel and will enumerate thru our proxy.
+
+    Thru the scans we find other systems on the network by their IP address and the service ports on them.
+
+    Upon performing an active scan on the pivot system we identify and map any open TCP or UDP ports.
+
+        If HTTP ports are open we can use wget or curl. If the HTTP is running on an alternate port we can use the <ip>:<port> to interact with it.
+
+            proxychains wget -r http://150.21.99.8 or proxychains wget -r port
+
+            proxychains curl http://150.21.99.8 or proxychains curl port
+
+        If FTP port is open we can use wget, curl or ftp to interact with it.
+
+            proxychains wget -r ftp://150.21.99.8
+
+            proxychains curl ftp://150.21.99.8 or proxychains curl ftp://150.21.99.8/file
+
+            proxychains ftp 150.21.99.8 and switch to passive mode.
+
+        If SSH, Telnet, or any other ports are open we can banner grab these ports to verify the service is running on the ports.
+
+            proxychains nc 150.21.99.8 [port]
+
+            proxychains telnet 150.21.99.8 or proxychains telnet 150.21.99.8 [port]
+
+            proxychains ssh [username]@150.21.99.8 or proxychains ssh [username]@150.21.99.8 -p [port]
+
+    To pull any files from Brian:
+
+        internet_host$ proxychains scp brian@localhost:/usr/share/cctc/brian.png .
+
+            We use localhost because our proxy is Brian himself.
+
+    Here we discover the host Bob (150.21.99.8) and it has SSH running on port 6789.
+
+
+
+
+
+internet_host$ proxychains ssh bob@@150.21.99.8 -p 6789
+
+    Here you can perform the same passive recon steps as before.
+
+    To pull any files from Bob:
+
+        internet_host$ proxychains scp -P 6789 bob@150.21.99.8:/usr/share/cctc/bob.png .
+
+
+## Scan sixth pivot
+
+Sixth Pivot External Active Recon
+
+tp12
+
+<close the previous dynamic tunnel>
+internet_host$ ssh ssh brian@localhost -p 5555 -L 6666:150.21.99.8:6789 -NT
+internet_host$ ssh bob@localhost -p 6666 -D 9050 -NT
+internet_host$ proxychains ./scan.sh
+
+    To enumerate beyond Bob we must close the dynamic tunnel to Brian.
+
+    We use Brian as our pivot (5555) to setup a local-port-forward (6666) to Bob targeting Bob’s ssh port (6789).
+
+    We then setup a new dynamic tunnel to Bob (6666).
+
+        We are able to authenticate to Bob by calling the localhost -p 6666 which is the tunnel we setup that targets Bob’s ssh port.
+
+    We use proxychains to send our TCP scans thru the Dynamic tunnel and will enumerate thru our proxy.
+
+    Thru the scans we find other systems on the network by their IP address and the service ports on them.
+
+    Upon performing an active scan on the pivot system we identify and map any open TCP or UDP ports.
+
+        If HTTP ports are open we can use wget or curl. If the HTTP is running on an alternate port we can use the <ip>:<port> to interact with it.
+
+            proxychains wget -r http://201.10.101.11 or proxychains wget -r port
+
+            proxychains curl http://201.10.101.11 or proxychains curl port
+
+        If FTP port is open we can use wget, curl or ftp to interact with it.
+
+            proxychains wget -r ftp://201.10.101.11
+
+            proxychains curl ftp://201.10.101.11 or proxychains curl ftp://201.10.101.11/file
+
+            proxychains ftp 201.10.101.11 and switch to passive mode.
+
+        If SSH, Telnet, or any other ports are open we can banner grab these ports to verify the service is running on the ports.
+
+            proxychains nc 201.10.101.11 [port]
+
+            proxychains telnet 201.10.101.11 or proxychains telnet 201.10.101.11 [port]
+
+            proxychains ssh [username]@201.10.101.11 or proxychains ssh [username]@201.10.101.11 -p [port]
+
+    Here we discover the host Jill (201.10.101.11) and it does NOT seem to have an SSH port but it does have Telnet open on port 23.
+
+
+
+
+
+internet_host$ proxychains telnet 201.10.101.11
+
+    Here you can perform the same passive recon steps as before.
+
+    We are not able to extract any files thru our telnet connection. We need to determine if we can establish an remote ssh connection first by determining if SSH is running on the system.
+
+
+
+## Scan seventh pivot
+
+Seventh Pivot External Active Recon
+
+tp14
+
+<close the previous dynamic tunnel>
+internet_host$ ssh bob@localhost -p 6666 -L 7777:201.10.101.11:23 -NT
+internet_host$ telnet localhost 7777
+jill$ ssh bob@201.10.101.10 -p 6789 -R 8888:localhost:9876 -NT
+internet_host$ ssh bob@localhost -p 6666 -L 9999:localhost:8888 -NT
+internet_host$ ssh jill@localhost -p 9999 -D 9050 -NT
+internet_host$ proxychains ./scan.sh
+
+    To enumerate beyond Jill we must close the dynamic tunnel to Bob.
+
+    We use Bob as our pivot (6666) to setup a local-port-forward (7777) to Brian targeting Jill’s telnet port (23).
+
+    We then telnet to the local port 7777. This will allow us to telnet to Jill.
+
+    On Jill we ssh to Bob on his ssh port (6789) and setup a remote-port-forward by creating (8888) on Bob that is mapped to Jill’s localhost:9876.
+
+    We then use Bob as our pivot (6666) to setup a local-port-forward (9999) to Bob’s own localhost:8888. 8888 is the port we create on Bob using the remote-port-forward from Jill.
+
+    We then setup a new dynamic tunnel to Jill (9999).
+
+        We are able to authenticate to Jill by calling the localhost -p 9999 which is the tunnel we setup that targets Jill’s ssh port.
+
+    We use proxychains to send our TCP scans thru the Dynamic tunnel and will enumerate thru our proxy.
+
+    Thru the scans we find other systems on the network by their IP address and the service ports on them.
+
+    Upon performing an active scan on the pivot system we identify and map any open TCP or UDP ports.
+
+        If HTTP ports are open we can use wget or curl. If the HTTP is running on an alternate port we can use the <ip>:<port> to interact with it
+
+            proxychains wget -r http://52.20.180.148 or proxychains wget -r port
+
+            proxychains curl http://52.20.180.148 or proxychains curl port
+
+        If FTP port is open we can use wget, curl or ftp to interact with it.
+
+            proxychains wget -r ftp://52.20.180.148
+
+            proxychains curl ftp://52.20.180.148 or proxychains curl ftp://52.20.180.148/file
+
+            proxychains ftp 52.20.180.148 and switch to passive mode.
+
+        If SSH, Telnet, or any other ports are open we can banner grab these ports to verify the service is running on the ports.
+
+            proxychains nc 52.20.180.148 [port]
+
+            proxychains telnet 52.20.180.148 or proxychains telnet 52.20.180.148 [port]
+
+            proxychains ssh [username]@52.20.180.148 or proxychains ssh [username]@52.20.180.148 -p [port]
+
+    To pull any files from Jill:
+
+        internet_host$ proxychains scp jill@localhost:/usr/share/cctc/jill.png .
+
+            We use localhost because our proxy is Jill herself.
+
+    Here we discover the host espn (52.20.180.148) and it has no ssh or telnet service running.
+
+
+
+
