@@ -8038,7 +8038,7 @@ proxychains wget -r http://172.16.82.106
 proxychains wget -r ftp://172.16.82.106
 
 
-## SSH Practice (CMD)
+# SSH Practice (CMD)
 
 
 
