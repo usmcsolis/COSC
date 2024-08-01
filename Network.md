@@ -8476,6 +8476,7 @@ internet_host$ proxychains ./scan.sh
     Here we discover the host espn (52.20.180.148) and it has no ssh or telnet service running.
 
 
+![image](https://github.com/user-attachments/assets/af54d498-7805-4d28-a52f-da2c9608ad89)
 
 
 # Tunnels
@@ -8499,14 +8500,31 @@ LOCAL
 [A]:> ssh student@[B] -L 1111:[C]:23 -NT
 
 [A] ssh to [B] using RHP 1111 to reach [C] on port 23
+
+[A] > telnet 172.0.0.1 1111
 ```
 
 
 REMOTE 
 ```
-[C]:> ssh student@[b] -R 2222:[c]:23 -NT
+[C]:> ssh student@[b] -R 2222:[c]:22 -NT
 
-[C] has a service that is being opened via [2222] that goes to [C] port 23
+[C] has a service that is being opened via [2222] that goes to [C] port 22
+
+[A]:> ssh@[B] -L 3333:127.0.0.1:2222
+
+[A]:> ssh student@localhost -p 3333 -D 9050 -NT
+
 ```
 
+WHO YOU RUN THE COMMAND ON IS WHO OPENS RHP.
 
+WHO YOU AUTH TO HAS THE SERVICE
+
+
+
+DYNAMIC TUNNEL
+
+A:> ssh student@localhost -p 3333 -D 9050 -NT
+
+DO NOT PROXYCHAINS telnet or SSH
