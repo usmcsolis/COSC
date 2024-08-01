@@ -8478,3 +8478,35 @@ internet_host$ proxychains ./scan.sh
 
 
 
+# Tunnels
+## Tunnel Syntax (CMD)
+
+L/D - ALWAYS FROM IH [A] going deeper
+R - ALWAYS OFF BOX w/ HIDDEN SERVICE coming back
+
+1. target
+2. who can see target
+3. tunnel type
+4. RHP
+
+2 COMMANDS For Tunnels
+1. Authentication
+2. Tunnel
+
+
+LOCAL 
+```
+[A]:> ssh student@[B] -L 1111:[C]:23 -NT
+
+[A] ssh to [B] using RHP 1111 to reach [C] on port 23
+```
+
+
+REMOTE 
+```
+[C]:> ssh student@[b] -R 2222:[c]:23 -NT
+
+[C] has a service that is being opened via [2222] that goes to [C] port 23
+```
+
+
