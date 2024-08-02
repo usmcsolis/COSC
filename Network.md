@@ -8532,7 +8532,34 @@ DO NOT PROXYCHAINS telnet or SSH
 
 
 ![image](https://github.com/user-attachments/assets/8b3a135d-31e6-40c6-9c44-eafdd7d4aade)
+
+
 ![image](https://github.com/user-attachments/assets/9da1aaa7-7e0b-4041-b174-e4a24a8e836d)
 
+
+
+
+
+## RICK AND MORTY
+
+IH --> TELNET TO A (DOESNT HAVE 22 open since firewall)
+telnet 10.50.25.56
+
+A:> ssh student@[IH IP] -R 10901:127.0.0.1:22 
+will allow use to ssh to [A] pass firewall using
+ssh net1_student9@127.0.0.1 -p 10901
+
+ IH 10901 ---> [A] 22
+
+ Using tunnel we SSH from [A] to [B] using SSHD -p 2222
+ A:> ssh net1_student9@10.1.2.18 -p 2222
+
+ IH 10901 ---> [A] 22 -----> [B] 2222
+
+ ssh net1_student9@127.0.0.1 -p 10901 -L 10903:10.1.2.18:2222
+
+ 
+
+![image](https://github.com/user-attachments/assets/e7991bcc-508a-426e-b260-b3338a168607)
 
 
