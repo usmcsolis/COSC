@@ -8558,8 +8558,12 @@ ssh net1_student9@127.0.0.1 -p 10901
 
  ssh net1_student9@127.0.0.1 -p 10901 -L 10903:10.1.2.18:2222
 
- 
+ ssh net1_student9@127.0.0.1 -p 10930 -D 9050
+ proxychains nc 127.0.0.1 54321 
 
 ![image](https://github.com/user-attachments/assets/e7991bcc-508a-426e-b260-b3338a168607)
+
+
+
 
 
