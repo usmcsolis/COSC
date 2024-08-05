@@ -8567,3 +8567,79 @@ ssh net1_student9@127.0.0.1 -p 10901
 
 
 
+
+# Network Analysis
+https://net.cybbh.io/-/public/-/jobs/874023/artifacts/modules/networking/slides-v4/10_analysis.html
+
+## TOOLS
+
+Sensors
+
+Inline 
+
+TAP or MiTM Device
+
+Test Access Point and Man in the Middle 
+
+OutofBand (PASSIVE)
+
+Switched Port Analyzer (SPAN)
+
+
+## In-Line Sensors
+
+    Placed between communicating devices to stop attacks
+
+        Intrusion Prevention System (IPS)
+
+        Firewall
+
+    Impacts network latency
+
+
+## Passive Sensor
+
+    Monitors network segments
+
+    Can detect attacks but cannot stop them
+
+    Gets copies of network traffic
+
+        Intrusion Detection System (IDS)
+
+    Does not impact network latency 
+
+
+## TAP
+
+    Appliance placed between 2 network devices
+
+    Best for packet collection with no data loss
+
+    Must be placed "in line" of network traffic
+
+    Not Scalable
+
+    Will need several installed to capture traffic for other network segments
+
+## MitM
+
+    Attacker can use ARP or some other method/protocol
+
+    Attackers can sniff or manipulate traffic that flows through them
+
+    Typically must be on the same network as the victim
+
+    Traffic capture is dependent on the attacker’s system and bandwidth
+
+## SPAN
+
+    Configured on the network Switch
+
+    Best for packet collection of traffic from several switch ports at once
+
+    Scalable
+
+    Can have a high degree of packet loss
+
+    Places burden on the network Switch
