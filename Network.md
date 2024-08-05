@@ -8643,3 +8643,436 @@ Switched Port Analyzer (SPAN)
     Can have a high degree of packet loss
 
     Places burden on the network Switch
+
+
+## Fingerprinting and Host Identification
+
+    Variances in the RFC implementation for different OS’s and systems enables the capability for fingerprinting
+
+    Tools used for fingerprinting and host identification can be used passively(sniffing/fingerprinting) or actively(scanning)
+
+
+Fingerprinting
+
+Active OS fingerprinting
+
+        Easier
+
+        Send packets to the target and monitor response
+
+        Tools:
+
+            Nmap
+
+            Xprobe2
+
+
+Passive OS fingerprinting
+
+        More difficult
+
+        Rely on sniffing packets
+
+        Tools:
+
+            p0f
+
+            Ettercap
+
+            PRADS
+
+            sinfp3
+
+P0F (Passive OS Fingerprinting)
+
+    Looks at variations in initial TTL, fragmentation flag, default IP header packet length, window size, and TCP options
+
+    Configuration stored in:
+
+ /etc/p0f/p0f.fp
+
+
+## Open Ports and Protocols
+
+    Known Windows/Linux ports
+
+    Known Windows/Linux protocols
+
+    Banner grab service ports
+
+
+Known Windows and Linux Ports
+
+    Windows
+
+        88 - Kerberos / Domain Controller
+
+        137/138/139 - NetBIOS
+
+        445 - SMB
+
+    Linux
+
+        22 - SSH
+
+        111 - SUN RPC
+
+
+ Ephemeral Ports
+
+    IANA 49152–65535
+
+    Linux 32768–60999
+
+    Windows XP 1025–5000
+
+    Win 7/8/10 use IANA
+
+    Win Server 2008 1025–60000
+
+    Sun Solaris 32768–65535
+
+
+
+## Protocol specific identifiers
+
+    HTTP: User-agent strings
+
+    SSH: Initial connection
+
+    NetBIOS Name Service
+
+
+
+
+## Hacker Methodologies
+
+    Footprinting
+
+    Network scanning
+
+    Network Enumeration
+
+    Vulnerability Assessment
+
+	CYBER KILL CHAIN
+    ![image](https://github.com/user-attachments/assets/3e397f10-24d4-4bbf-9c9b-cd54de1fd0c2)
+	MITRE ATT&CK
+    ![image](https://github.com/user-attachments/assets/e99db0bf-460e-479c-a1ee-7c17635c2e14)
+	MITRE D3FEND
+    ![image](https://github.com/user-attachments/assets/24c333e8-3c58-4676-b4e9-73bdcf262454)
+	THE DIAMOND MODEL
+    ![image](https://github.com/user-attachments/assets/92e4ca91-203c-4d5b-bbaf-28dc9cca4f24)
+	NIST CYBER SECURITY FRAMEWORK
+    ![image](https://github.com/user-attachments/assets/d1708e89-1f78-4394-b03f-b75466cdde20)
+
+
+
+## INDICATORS
+
+    Indicator of Attack (IOA)
+
+        Proactive
+
+        A series of actions that are suspicious together
+
+        Focus on Intent
+
+        Looks for what must happen
+
+            Code execution. persistence, lateral movement, etc.
+
+
+Anomaly Detection
+
+    Indicator of Compromise (IOC)
+
+        Reactive
+
+        Forensic Evidence
+
+        Provides Information that can change
+
+            Malware, IP addresses, exploits, signatures
+
+
+
+Some Indicators
+
+    .exe/executable files
+
+    NOP sled
+
+    Repeated Letters
+
+    Well Known Signatures
+
+    Mismatched Protocols
+
+    Unusual traffic
+
+    Large amounts of traffic/ unusual times
+
+
+
+Signs of IOA
+
+    Destination IP/Ports
+
+    Public Servers/DMZs
+
+    Off-Hours
+
+    Network Scans
+
+    Alarm Events
+
+    Malware Reinfection
+
+    Remote logins
+
+    High amounts of some protocols
+
+Signs of IOC
+
+    Unusual traffic outbound
+
+    Anomalous user login or account use
+
+    Size of responses for HTML
+
+    High number of requests for the same files
+
+    Using non-standard ports/ application-port mismatch
+
+    Writing changes to the registry/system files
+
+    Unexpected/unusual patching or tasks
+
+
+## Malware
+
+
+
+Adware/Spyware
+
+    large amounts of traffic/ unusual traffic
+
+    IOA
+
+        Destinations
+
+    IOC
+
+        Unusual traffic outbound
+
+ Virus
+
+    phishing/ watering hole
+
+    IOA
+
+        Alarm Events, Email protocols
+
+    IOC
+
+        Changes to the registry/ system files
+
+ Worm
+
+    phishing/ watering hole
+
+    IOA
+
+        Alarm events
+
+    IOC
+
+        changes to registry/ system files
+
+ Trojan
+
+    beaconing
+
+    IOA
+
+        Destinations
+
+    IOC
+
+        Unusual traffic outbound, unusual tasks, changes to registry/ system files
+
+ Rootkit
+
+    IOA
+
+        Malware reinfection
+
+    IOC
+
+        Anomalous user login/ account use
+
+ Backdoor
+
+    IOA
+
+        Remote logins
+
+    IOC
+
+        Anomalous user login/ account use
+
+ Botnets
+
+    large amounts of IPs
+
+    IOA
+
+        Destinations, remote logins
+
+    IOC
+
+        Unusual tasks, anomalous user login/ account use
+
+     Anomalous user login or account use
+
+    Size of responses for HTML
+
+    High number of requests for the same files
+
+    Using non-standard ports/ application-port mismatch
+
+    Writing changes to the registry/system files
+
+    Unexpected/unusual patching or tasks
+
+Backdoor
+
+    IOA
+
+        Remote logins
+
+    IOC
+
+        Anomalous user login/ account use
+
+Botnets
+
+    large amounts of IPs
+
+    IOA
+
+        Destinations, remote logins
+
+    IOC
+
+        Unusual tasks, anomalous user login/ account use
+
+Polymorphic/Metamorphic Malware
+
+    Depends on the malware type/class
+
+Ransomware
+
+    IOA
+
+        Destinations, Ports, Malware reinfection
+
+    IOC
+
+        Unusual traffic outbound, non-standard ports, unusual tasks
+
+ Mobile Code
+
+    IOA
+
+        Depends on the malware type/class
+
+ BIOS/Firmware Malware
+
+    IOA
+
+        Malware reinfection
+
+    IOC
+
+        Depends on the malware type/class
+
+ # Determine Network Anomalies through Traffic Analysis
+
+ ## ICMP Tunneling
+ ![image](https://github.com/user-attachments/assets/ae578f2f-c85a-4e83-9239-6bb1f4d9408f)
+ICMP Tunneling
+
+    ICMP PING uses Type 8 and Type 0
+
+    Both should be:
+
+        1 for 1
+
+        Same size and payload
+
+    Look out for:
+
+        Request/Reply imbalances
+
+        Abnormal/different payloads
+
+## DNS Tunneling
+
+![image](https://github.com/user-attachments/assets/7ddd7475-98de-4992-b6d8-b75f821188d8)
+DNS Tunneling
+
+    DNS uses Query/Response
+
+        1 Query typically gets 1 response
+
+    Look out for:
+
+        Query/Response imbalances
+
+        Abnormal/different payloads
+
+        Continuous Queries
+
+## HTTP(S) Tunneling
+
+    HTTP is "bursty" in nature
+
+    Client issues request and the server responds
+
+    Look out for:
+
+        Steady connections
+
+        HTTPs you will need to check session establishment for abnormalities
+
+
+## Beaconing
+
+![image](https://github.com/user-attachments/assets/a42a37ee-cfc4-4300-a292-fd39921b3e6b)
+
+    Call back to the C&C server
+
+    Gets/sends commands from/to C&C
+
+    Look out for:
+
+        Beacon Timing
+
+            Commonly at regular intervals
+
+        Beacon Size
+
+            Check-Ins may not have any payloads
+
+            Orders will have payloads
+
+
+
+
+
+
+     
+
+
