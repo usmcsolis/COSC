@@ -186,6 +186,11 @@ Using nikto to perform a vulnerability scan on your opstation:
 
 /usr/share/nmap/scripts
 
+ls -l /usr/share/nmap/script | grep rdp
+
+nmap --script-help "ftp-* and discovery"
+
+
 
 
 USAGE AND EXAMPLES
