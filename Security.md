@@ -301,9 +301,10 @@ Authors:  ['Albert Einstein', 'J.K. Rowling', 'Albert Einstein', 'Jane Austen', 
 
 
 
+# Vulnerability and EXploitation Research
 
-
-
+https://sec.cybbh.io/public/security/latest/lessons/lesson-3-research_sg.html
+https://sec.cybbh.io/-/public/-/jobs/872115/artifacts/slides/03-exploitation-research-slides.html
 
 
 
