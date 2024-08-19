@@ -1650,5 +1650,10 @@ Double CLick Function from Main window
 Find Success and work backwards
 
 
+## Commands
 
+C:\Users\student>pscp student@10.50.37.42:/home/student/Downloads/* C:\Users\student\Desktop                            
+student@10.50.37.42's password:                                                                                        
+entry.exe                 | 110 kB | 110.5 kB/s | ETA: 00:00:00 | 100%                                                  
+ntry.c                   | 0 kB |   0.3 kB/s | ETA: 00:00:00 | 100% 
 
