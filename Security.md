@@ -1490,6 +1490,94 @@ Execute Patched Binary
 
 
 
+## Windows Ops (DEMO)
+
+xfreerdp /u:student /v:10.50.21.242 -dynamic-resolution +glyph-cache +clipboard
+
+https://learn.microsoft.com/en-us/sysinternals/downloads/
+
+Static Analysis :
+strings.exe
+
+
+```
+#include <windows.h>			## INCLUDE LINES 
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+int firstKey(key1)
+{
+    int key2 = atoi(key1);		## Creating key 2 and atoi(key1) will take ASCII to integar
+	int p2 = 29;			## Creating p2 = 29 integar
+    if ((key2-123)==0)			## if key2 -123 ==0 then return 13555 to the main function
+    {
+        return 13555;			
+    }
+    return 12;     
+}
+
+int main(void)				## START
+{
+    char key1[20];			## Creates character array of 20 bytes
+    printf("Enter Key: ");		## Prints Enter Key: to stdout
+    fgets(key1,20,stdin);		## takes user input and storuying 20bytes of it into key1
+    strtok(key1, "\n");			## create a string token using key1 broking into tokens seperated by new line
+    if (firstKey(key1)==13555)		## if firstkey(key1) == 13555 then Succes else Failed
+    {
+        printf("Success!!.\n");
+	    Sleep(5000);
+		return 0;
+    }
+    else
+    {
+        printf("Failed!!.\n", key1);	## Else print failed, sleep for 5 seconds and return 0
+	    Sleep(5000);
+		return 0;
+    }
+}
+
+```
+
+Strings
+.\Downloads\SysinternalsSuite\streams.exe '.\Downloads\demo1_new.exe'
+
+
+View Contents of EXE
+Get-Content '.\Downloads\demo1_new.exe'
+
+Run Demo1.exe
+```
+PS C:\Users\student> .\Downloads\demo1_new.exe                                                                          
+Enter Key: 1                                                                                                            
+Failed!!.                                                                                                               
+PS C:\Users\student> .\Downloads\demo1_new.exe                                                                          
+Enter Key: 123   					## We know this because we read source code                                                                                                       
+Success!!.     
+```
+
+
+Ghidra
+Create new project
+Drag exe into window importing it into Project Window
+Double Click executable in window
+Select Yes to analyze and then Analyse Button
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
