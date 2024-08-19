@@ -1490,7 +1490,7 @@ Execute Patched Binary
 
 
 
-## Windows Ops (DEMO)
+## Windows Ops Executable (DEMO 1)
 
 xfreerdp /u:student /v:10.50.21.242 -dynamic-resolution +glyph-cache +clipboard
 
@@ -1562,22 +1562,92 @@ Create new project
 Drag exe into window importing it into Project Window
 Double Click executable in window
 Select Yes to analyze and then Analyse Button
+Search For Strings: Filter on Word
+```
+{
+  FILE *pFVar1;
+  int iVar2;
+  char local_1c [20];
+  uint local_8;
+  
+  local_8 = DAT_0041a02c ^ (uint)&stack0xfffffffc;
+  FUN_00401130((wchar_t *)s_Enter_Key:_0041a000);
+  pFVar1 = (FILE *)___acrt_iob_func(0);
+  FUN_00403308(local_1c,0x14,pFVar1);
+  _strtok(local_1c,&DAT_0041a00c);
+  iVar2 = FUN_00401000(local_1c);
+  if (iVar2 == 13555) {
+    FUN_00401130((wchar_t *)s_Success!!._0041a010);
+    Sleep(5000);
+  }
+  else {
+    FUN_00401130((wchar_t *)s_Failed!!._0041a01c);
+    Sleep(5000);
+  }
+  FUN_0040116a(local_8 ^ (uint)&stack0xfffffffc);
+  return;
+}
+
+```
 
 
+## Windows Executable Analysis (DEMO 2)
+
+Strings.exe against executable
+Get-Contents demo2.exe
+Open and look at source code
+
+```
+#include <windows.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+int firstKey(key1)
+{
+    if (strcmp(key1,"key")==0)			## IF KEY1 == string "key" return 65664
+    {
+        return 65664;
+    }
+    return 12;     
+}
+
+int main(void) 
+{
+    char key1[20];
+    printf("Enter Key: ");
+    fgets(key1,20,stdin);
+    strtok(key1, "\n");
+    if (firstKey(key1)==65664)			## IF 65664 is equal to 65664 then return success
+    {
+        printf("Success.\n");
+	    Sleep(5000);
+		return 0;
+    }
+    else
+    {
+        printf("%s is not the key.\n", key1);
+	    Sleep(5000);
+		return 0;
+    }
+}
 
 
+```
+```
+PS C:\Users\student> & '.\Downloads\demo2_new (1).exe'                                                                
+Enter Key: Key                                                                                                          
+Key is not the key.                                                                                                     
+PS C:\Users\student> & '.\Downloads\demo2_new (1).exe'                                                                  
+Enter Key: key            				## key was the correct key                                                                                              
+Success. 
+```
 
 
-
-
-
-
-
-
-
-
-
-
+OPEN WITH GHIDRA and ANALYZE IT
+Search for string Success found within running the EXE in powershell
+Double CLick Function from Main window
+Find Success and work backwards
 
 
 
