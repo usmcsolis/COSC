@@ -1251,32 +1251,242 @@ UNION SELECT id,quantity,product from sqlinjection.orderlines where id = "1337"
 
 
 
+# Reverse Engineering
+https://sec.cybbh.io/public/security/latest/lessons/lesson-6-reverse_sg.html
+https://sec.cybbh.io/-/public/-/jobs/872115/artifacts/slides/06-reverse-engineering.html
+
+
+## x86_64 Assembly Registers 
+
+General Register - A multipurpose register that can be used by either programmer or user to store data or a memory location address
+There are 16 general purpose 64 bit registers. These registers can be broken down into smaller sections. Take %rbx for example. To call its entire 64 bits, you would use %rbx. However, to call its lower 32 bits, you would call %ebx. It can then be broken down further into the lower 16 and 8 bits as bx and bl, respectively.
+x86 was originally a 32 bit architecture. It originally had eight 32 bit general purpose registers: EAX, ECX, EDX, EBX, ESP, EBP, ESI, and EDI.
+
+## x86_64 Arguments
+
+[%ebp-0x8]
+
+## x86_64 Common Terms
+
+Heap
+Memory that can be allocated and deallocated
+
+Stack
+A contiguous section of memory used for passing arguments
+
+General Register
+A multipurpose register that can be used by either programmer or user to store data or a memory location address
+
+Control Register
+A processor register that changes or controls the behavior of a CPU
+Control Register - A processor register that changes or controls the behavior of a CPU. Control Registers do common tasks like interrupt control, switching the addressing mode, paging control, and co-processor control.
+* There are 16 64-bit control registers: %CR0-%CR15. Only %CR0 can be written to or read from. These are generally used in things like Kernel development.
+
+Flags Register
+Contains the current state of the processor
+Flags Register - Contains the current state of the processor. FLAGS is 16 bits wide, EFLAGS is 32 bits and RFLAGS is 64 bits wide. The wider flag registers are compatible with the smaller registers.
+* There is one 64-bit flags register: %RFLAGS.
+Flags are set via specific bits in the register. The most important to take note of below are the Carry Flag, Zero Flag, and Sign Flag as these are used by common instructions like JE.
+Its bits are labeled as:
+
+
+
+
+## x86 Intel Instructions
+
+
+
+
+MOV: move source to destination
+mov r15,#n  <- r15 = #n
+mov rax,m   <- move contents of 64bit address to %rax
+mov m,rax   <- move contents of %rax to 64 bit memory address
+
+
+PUSH: push source onto stack
+push r15    <-push r15 onto stack
+
+
+POP: Pop top of stack to destination
+pop r8      <-move value on top of stack to r8
+
+
+INC: Increment source by 1
+inc r8      <-increment value in r8 by 1
+
+
+DEC: Decrement source by 1
+dec r8      <-decrement value in r8 by 1
+
+
+ADD: Add source to destination
+add r13,#n  <-add #n to %r13, store result in %r13
+
+
+SUB: Subtract source from destination
+sub r13,#n  <-subtract #n from %r13, store result in %r13
+
+
+CMP: Compare 2 values by subtracting them and setting the %RFLAGS register. 
+ZeroFlag set means they are the same.
+cmp r8, r9  <- compare value of r8 to r9. Set flags as appropriate.
+
+
+JMP: Jump to specified location
+jmp MEM1    <-jump to memory label MEM1
+
+
+JLE: Jump if less than or equal
+jle MEM1    <-jump to memory label MEM1 if less than or equal
+
+
+JE: Jump if equal
+je MEM1     <-jump to memory label MEM1 if equal
+
+
+## Reverse Engineering Workflow Software
+
+
+    Static
+
+    Behavioral
+
+    Dynamic
+
+    Disassembly
+
+    Document Findings
+
+## Initial Static Analysis (KEY)
+Initial static analysis of a binary gives an analyst, or team of analysts, several clues as to what the binary is designed to do and how it really works.
+
+1. Determine file type - Is it an executable? What environment is it designed to run in? (OS,cpu architecture, etc)   FILE COMMAND
+
+2. Determine if file is packed/compressed (UPX)
+
+3. Find plain text ascii and unicode strings
+
+4. View imports/exports to get a hint of functionality/calls (is it importing a library that can open a socket, etc?)
+
+5. Look for encrypted sections of the binary
+
+
+## Behavioral Analysis (KEY)
+Behavioral Analysis is the fastest way to gain insight into how a binary works.
+
+1. Take a snapshot of the analysis environment - Important! Taking a snapshot on an OpenStack
+VM takes a substantial amount of time.
+
+2. Take a snapshot of critical configurations of the analysis environment. (Things like the registry, important directories, etc)
+
+3. Launch realtime analysis tools (Things like procmon and fakenet)
+
+4. Execute and interact with the object/binary while taking note of observations.
+
+5. Stop the binary and view how it affected critical configurations (registry, files, etc) by
+comparing to previous snapshots
+
+6. Analyze results of realtime analysis tools (did fakenet catch network calls, did procmon show it writing to a file, etc)
+
+
+## Dynamic Analysis (KEY)
+Dynamic analysis is similar to behavioral, except the analyst is attaching the process to a debugger
+
+1. Execute binary in a debugger
+
+2. Step through binary, setting breakpoints as approriate
+
+3. Continuously rerun the binary and edit it’s parameters through the debugger, as you learn
+more about how it works
+
+4. Document all observations and modifications
+
+
+## Disassembly
+An analyst will eventually get to a point where they need to disassemble a binary to learn more about how it runs
+
+1. Disassemble binary in IDA, Ghidra, or other disassembler
+
+2. Use notes to find artifacts within the disassembly
+
+3. Find a good spot to work from within the binary. Then quickly browse from the top to the
+bottom of the disassembly to view the overall flow of the disassembly
+
+4. Rename variables and functions as appropriate when quickly scanning top to bottom of the
+disassembly.
+
+5. Work your way from the bottom to the top - if there are two outcomes choose the one you want to end at, then work your way up from there to determine what needs to happen for the
+program to flow to the desired outcome.
+
+
+## Document findings
+Analysts must document their findings after performing reverse engineering or software analysis.
+
+1. Document all discovered binary traits, capabilities, and behaviors to include the conditions they must run under.
+
+2. Document potential uses for the binary.
+
+3. Create mitigations for the binary if it is malicious.
+
+4. Create signatures and indicators of compromise to detect the binary in the future.
+
+5. Document and save the tools, scripts, code, methods used to analyze the software to better
+analyze related software in the future.
+
+6. Document proof of concept for exploitation of the binary if it is found to be vulnerable and a potential target. For example, if the binary is running on an adversary network, or if a friendly network may be using the binary.
+
+
+## x86_64 Stack (DEMO)
+```
+main:
+    mov rax, 16     //16 moved into rax
+    push rax        //push value of rax (16) onto stack. RSP is pushed up 8 bytes (x86 is 64 bits)
+    jmp mem2        //jmp to mem2 memory location
+
+mem1:
+    mov rax, 0      //move 0 (error free) exit code to rax
+    ret             //return out of code (ax is the ret default registry)
+			64bit rax 32bit eax and 16bit ax
+
+mem2:
+    pop r8          //pop value on the stack (16) into r8. RSP falls 8 bytes
+    cmp rax, r8     //compare rax register value (16) to r8 register value (16) they are equal so the zero flag is set
+    je mem1         //jump if comparison has zero bit set to mem1
+
+```
+
+```
+main:
+    mov rcx, 25     //store the value 25 in rcx register
+    mov rbx, 62     //store the value 62 in rbx register
+    jmp mem1        //jumps to mem1 location
+
+mem1:
+    sub rbx, 40     //subtract 40 from rbx 62-40+22  rbx = 22
+    mov rsi, rbx    //copy rbx value to rsi
+    cmp rcx, rsi    //compare the values in rcx and rsi ZeroFlag is not set Sign Flag is set Overflow Flag is not set
+    jle mem2      //jumps to mem2 location if value is less than or equal
+
+mem2:
+    mov rax, 0      //store 0 in rax
+    ret             //return out of code
+```
 
 
 
 
 
+## Portable Executable Patching/ Software Anaylsis
 
+Perform Debugging and Disassembly
 
+Find the Success/Failure
 
+Adjust Instructions
 
+Apply Patch and Save
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Execute Patched Binary
 
 
 
