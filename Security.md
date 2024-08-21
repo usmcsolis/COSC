@@ -2334,3 +2334,15 @@ Code
  20 
  21 print(buffer+eip+nop+buff)
 ```
+
+
+
+
+## INVENTORY2.exe (FLAG)
+
+1. ssh to 192.168.28.105 and find file
+2. scp from 105 to your LinOps
+proxychains scp -P2222 comrade@192.168.28.105:/.hidden/inventory2.exe .
+
+3. scp from winops to your linops to get inventory2.exe on GHIDRA
+4.  
