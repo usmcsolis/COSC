@@ -1829,13 +1829,50 @@ PIE is set by compiling the program with using the -fPIE option. Many modern Lin
 by default, but it can be forced by using the option -no-pie.
 
 
+## GDB Uses (INSTALL)
+
+```
+Installation of Peda Plugin
+
+git clone https://github.com/longld/peda.git ~/peda
+echo "source ~/peda/peda.py" >> ~/.gdbinit
+
+Common Commands
+
+disass <FUNCTION>   #   Disassemble portion of the program
+info <...>  #   Supply info for specific stack areas
+x/256c $<REGISTER>  #   Read characters from specific register
+break <address>  #   Establish a break point
+```
 
 
+## BUFFER OVERFLOW "Func" (DEMO)
+
+1. Static Analysis
+	- GHIDRA Drag and Open "Func" in GHIDRA
+   		- String Search to find function (We find a get() function as our Vulnerability ## Same as fgets() but it has a limit)
+	- STRINGS.EXE Powershell > .\Downloads\SysinternalsSuite\strings.exe .\Downloads\func (RUN STRINGS ON FUNC With this try and see what system its made for ELF (LINUX) PE (MICROSOFT))
+	- Get-Content .\Downloads\Func (Gives more information about executable) 
+	- ELF so we need to transfer from WinOPS to LinOPS via:
+  		- scp student@10.50.21.242:C:/Users/student/Downloads/func .
 
 
-
-
-
+2. Dynamic Analysis
+	- run ls -l on the "func" (If its not executable make it executable with "chmod 744 func")
+	- student@lin-ops:~$ file func (Run the FILE command to see what Func is)
+	- Execute the program calling it "./func"
+	- Try and pass ./func a argument ./func $(echo"aaaaaaaaaaaaaa") It doesnt take arguments
+	- Try ./func <<<$(echo"aaaaaaaaaa") this is saying that after ./func is running pass it this command in $()
+	- gdb ./func	(Run the GDB)
+		- peda is already installed no need to install peda
+		- run command is how to start program
+		- Since we know vulnerable function is get() we can run "info functions" to find it
+		- To disassemble a function we run "disass getuserinput" and for color code we "pdisass getuserinput"
+		- call 0x565553d0 <gets@plt> is highlighted in red
+		- shell command gives you a shell from GDB and exit to go back to GDB
+		- run <<<$(echo "aafdafdvcjadsbkhjbfhjdbasjfhjdbabfdkbfkjdbsafkdkfajbahfkdasjcndlkjanlkdlcdlncadbscldbsalhj") is how to pass information into GDB program to break it
+		- Make a .py script that will generate a string to perform the buffer overflow for us against the program.
+			- vim 
 
 
 
