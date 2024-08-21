@@ -1744,3 +1744,105 @@ http://127.0.0.1:2500/cases/productsCategory.php?category=1 UNION SELECT usernam
 
 
 
+
+# Exploit Developement
+https://sec.cybbh.io/public/security/latest/lessons/lesson-7-exploit_sg.html
+https://sec.cybbh.io/-/public/-/jobs/872115/artifacts/slides/07-exploit-development.html
+
+## Buffer Overflow common Terms
+```
+HEAP
+STACK
+REGISTER
+INSTRUCTION POINTER IP
+STACK POINTER SP
+BASE POINTER BP
+FUNCTION
+SHELL CODE
+```
+
+## Buffer Overflow Defenses 
+
+Non executable (NX) stack
+
+For this buffer overflow example to work requires that the shellcode be placed on the stack. There should 
+never be executable code on the stack, so marking the allocated memory for the stack as non-executable is 
+prudent. Typically, by default, the compiler ensures that the code is compiled to prevent execution of 
+code on the stack. If your desire is to override this behavior, for example to create code to demonstrate 
+a buffer overflow, then, on Linux, pass the execstack option to the linker. This can be done by using -z 
+execstack in gcc.
+
+
+Address Space Layout Randomization (ASLR)
+
+ASLR is a mechanism that pseudo-randomizes the memory addresses of the stack, running processes and
+shared objects in memory. Addresses are subject to change each time the program is executed and since the
+buffer overflow example above relies predicting the value of the IP, implementing ASLR will reduce the
+reliability of the buffer overflow exploit so that is is very likely that it will fail.
+
+Unlike other protections that part of the executable and are implemented at compile time, ASLR is a 
+function of the kernel and it can be viewed or manipulated by this pseudo file in proc:
+
+/proc/sys/kernel/randomize_va_space
+
+The following values are supported:
+
+   0 – No randomization. Everything is static. (needed for the above demo)
+   1 – Conservative randomization. Shared libraries, stack, mmap(), VDSO and heap are randomized.
+   2 – Full randomization. In addition to elements listed in the previous point, memory managed through
+   brk() is also randomized.
+
+You can view its current value by using cat to display its contents:
+
+cat /proc/sys/kernel/randomize_va_space
+
+You can set its value by using echo and redirection to overwrite its previous contents:
+
+echo 0 > /proc/sys/kernel/randomize_va_space
+
+
+Data Execution Prevention (DEP)
+
+Data is data, and not code and should never execute. The stack is designed to hold data. Code should
+never execute within the region allocated for the stack. The stack is meant to maintain the contents of 
+variables, registers, etc. and perform general housekeeping for the program. The stack should never be 
+used to place or execute code. The -z noexecstack option with gcc passes this option to the linker which 
+marks the area of memory occupied by the stack as non-executable and an attempt to change the IP to that 
+area will result in a segmentation fault.
+
+
+Stack Canaries
+
+When performing a buffer overflow, you are writing over areas of the stack that has been allocated and . 
+The gcc option -fstack-protector, enabled by default on modern distributions, adds extra code which 
+interleaves values within stack without affecting the items on the stack so if any of these interleaved 
+items are overwritten, the program will halt and you will see a stack smashing error. Stack Canaries 
+create these interleaved values at run-time so they change each time the program is executed which adds 
+to the complexity of subverting them.
+
+
+Position Independent Executable (PIE)
+
+PIE code pseudo-randomizes all sections of the code to maximize protections against buffer overflows.
+
+PIE is set by compiling the program with using the -fPIE option. Many modern Linux distributions set this 
+by default, but it can be forced by using the option -no-pie.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
