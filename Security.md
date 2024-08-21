@@ -1872,7 +1872,16 @@ break <address>  #   Establish a break point
 		- shell command gives you a shell from GDB and exit to go back to GDB
 		- run <<<$(echo "aafdafdvcjadsbkhjbfhjdbasjfhjdbabfdkbfkjdbsafkdkfajbahfkdasjcndlkjanlkdlcdlncadbscldbsalhj") is how to pass information into GDB program to break it
 		- Make a .py script that will generate a string to perform the buffer overflow for us against the program.
-			- vim 
+			- vim exploit.py
+```
+buffer = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+
+EIP = "BBBB"
+
+nop = '\x90' * 5
+
+print(buffer + eip + nop)
+```
 
 
 
