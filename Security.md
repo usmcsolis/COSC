@@ -1891,6 +1891,8 @@ print(buffer)
 		- When we run the run <<<$(./bufferoverflow.py) with the changes we can verify if BBBB is written into the EIP register
    		- Open new window and Open GDB inside a clean environment with "env -gdb ./func"
       		- "show env" will show us env variables and we will unset ALL values using "unset env {VARIABLE}"
+
+ 		GET EIP ON TARGET MACHINE
 	 	- NORMAL GDB ASSEMBLY LOCATIONS inside (gdb) "run" to see memory location
     		- NORMAL GDB run "info proc map" and COPY the START of next memory address down from the [HEAP] and the END of [STACK] Line
        		- PASTE noth  into your python script as "find /b {address1}, {address2}, 0xff, 0xe4" COPY THIS AND PASTE IN NORMAL GDB
@@ -1946,7 +1948,16 @@ student
 [Inferior 2 (process 3115) exited normally]
 
 ```
-			
+
+
+LAST STEP - Verify if it work run the code with the script as input
+
+
+```
+student@lin-ops:~$ ./func <<<$(./bufferoverflow.py)
+Enter a string: 
+student
+```
 
 
 
