@@ -2728,7 +2728,7 @@ ssh -S /tmp/jump jump -O forward -L 8888:192.168.28.105:2222
 ssh -MS /tmp/T2 comrade@127.0.0.1 -p 8888
 ssh -S /tmp/T2 jump -O forward -L 45678:192.168.150.245:9999
 s = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
-s.connect(("127.0.0.1", 45678))
+s.connect(("127.0.0.1", 45678)) inside shellcode
 
 
 1. Using the same shellcode for SECURESEVER Exploit changing your s.connect(("192.168.150.245", 9999)) to
