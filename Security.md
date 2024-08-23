@@ -3145,6 +3145,7 @@ cat /etc/rkhunter.conf
 
 
 sudo su
+brootkit
 
 135/tcp  open  msrpc
 139/tcp  open  netbios-ssn
