@@ -3145,3 +3145,28 @@ cat /etc/rkhunter.conf
 
 
 sudo su
+
+135/tcp  open  msrpc
+139/tcp  open  netbios-ssn
+445/tcp  open  microsoft-ds
+3389/tcp open  ms-wbt-server
+5040/tcp open  unknown
+5985/tcp open  wsman
+5986/tcp open  wsmans
+
+
+
+
+ssh -S /tmp/key1 key -O forward -L 4557:192.168.28.9:3389
+comrade:StudentMidwayPassword
+
+
+
+Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
+
+
+critical to os 
+
+system32
+
+
