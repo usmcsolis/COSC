@@ -3171,3 +3171,129 @@ critical to os
 system32
 
 
+
+# Windows Privilege Escalation
+https://sec.cybbh.io/-/public/-/jobs/872115/artifacts/slides/09-windows-priv-persist-cover.html
+https://sec.cybbh.io/public/security/latest/lessons/lesson-9-windows-exploit_sg.html
+
+
+## DLL Search Order
+
+Executables check the following locations (in successive order):
+
+
+    HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\KnownDLLs
+
+    The directory the the Application was run from
+
+    The directory specified in in the C+ function GetSystemDirectory()
+
+    The directory specified in the C+ function GetWindowsDirectory()
+
+    The current directory
+
+
+## Windows Integrity Mechanism
+
+Integrity Levels
+
+Untrusted
+Anonymous SID access tokens
+
+Low
+Everyone SID access token (World)
+
+Medium
+Authenticated Users
+
+High
+Administrators
+
+System
+System services (LocalSystem, LocalService, NetworkService)
+
+
+## User Account Control (UAC)
+
+    Always Notify
+
+    Notify me only when programs try to make changes to my computer
+
+    Notify me only when programs try to make changes to my computer (do not dim my desktop)
+
+    Never notify
+
+
+## DEMO: Checking UAC Settings
+
+reg query HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System
+
+.\sigcheck.exe -m -accepteula c:\windows\system32\calc.exe
+
+
+
+## AutoElevate Executables
+
+Requested Execution Levels:
+
+    asInvoker
+
+    highestAvailable
+
+
+
+## Scheduled Tasks & Services
+
+Items to evaluate include:
+
+
+    Write Permissions
+
+    Non-Standard Locations
+
+    Unquoted Executable Paths
+
+    Vulnerabilities in Executables
+
+    Permissions to Run As SYSTEM
+
+
+## DEMO: Finding vulnerable Scheduled Tasks
+
+schtasks /query /fo LIST /v
+
+
+
+
+## DEMO: DLL Hijacking (CMD)
+
+    Identify Vulnerability
+
+    Take advantage of the default search order for DLLs
+
+    NAME_NOT_FOUND present in executable’s system calls
+
+    Validate permissions
+
+    Create and transfer Malicious DLL
+
+
+
+1. RDP to WINOPS and Download PUTTY http://the.earth.li/~sgtatham/putty/latest/x86/putty.exe
+
+2. Move into Program Files x86 and then create a service with Putty
+```
+sc.exe create puttyService binPath='C:\Program Files (x86)\Putty\putty.exe' displayname='puttyService' start=auto
+
+PS C:\windows\system32> sc.exe create puttyService binPath='C:\Program Files (x86)\Putty\putty.exe' displayname='puttyService' start=auto                                                                                           [SC] CreateService SUCCESS                                                                                              
+PS C:\windows\system32> 
+```
+
+3. Open Task Scheduler
+Action -->
+Create Task 
+--> Name = Putty
+--> Triggers --> Begin the Task: At Startup
+--> Action --> Stasrt a program
+
+
