@@ -3408,15 +3408,122 @@ DLL need Write Privileges
 
 EXE needs to be able to rename the executable
 
+1. FIND SERVICE 
+
+2. SEE PRIVILEGES
+
+3. EXPLOIT
+
+
+
+## Persistance
+
+System changes or binary uploads that provide the adversary continued access to system
+
+
+Survives:
+
+    Reboots
+    Credential changes
+    DHCP IP reassignment
+    Etc.
+
+
+Considerations include:
+
+    File naming
+    File location
+    Timestomping
+    Port selection
+
+
+## Registry PERSISTANCE
+
+    HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\
+        Run
+        RunOnce
+
+    HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\
+        Run
+        RunOnce
+
+    What are the differences?
+    Do you need to blend in?
+
+
+
+## DEMO: Audit Logging LOCAL AUDIT POLICY
+
+Show all audit category settings
+
+auditpol /get /category:*
 
 
 
 
+What does the below command show?
+
+auditpol /get /category:* | findstr /i "success failure"
+
+## Important Microsoft Event IDs
+
+4624/4625
+Successful/failed login
+
+4720
+Account created
+
+4672
+Administrative user logged on
+
+7045
+Service created
 
 
 
+## DEMO: Event Logging
+
+Storage: c:\windows\system32\config\
+File-Type: .evtx/.evt
+
+wevtutil el
+wmic ntevent where "logfile="<LOGNAME>" list full
+Get-Eventlog -List
+
+Eventviewer
 
 
+## POWERSHELL Logging
+
+Determine PS version (bunch of ways)
+reg query hklm\software\microsoft\powershell\3\powershellengine\
+powershell -command "$psversiontable"
+
+
+Determine if logging is set (PowerShell and WMIC)
+reg query [hklm or hkcu]\software\policies\microsoft\windows\powershell
+reg query hklm\software\microsoft\wbem\cimom \| findstr /i logging
+# 0 = no | 1 = errors | 2 = verbose
+
+
+WMIC Log Storage
+%systemroot%\system32\wbem\Logs\
+
+
+
+## DEMO: Manipulating Logs and Files
+
+Find Files and Alter File attributes
+
+forfiles /P c:\windows\system32 /S /D +05/14/2019
+wmic datafile where name='c:\\windows\\system32\\notepad.exe' get CreationDate, LastAccessed, LastModified
+copy /b filename.ext +,,
+
+$(Get-Item file.ext).lastaccesstime=$(date) |$(Get-Item test.txt).lastaccesstime=$(Get-Date "07/07/2004")
+
+Clear Event Logs (produces logging!):
+wevtutil clear-log Application
+Clear-Eventlog -Log Application, System
 
 
 
