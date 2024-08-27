@@ -4056,6 +4056,11 @@ ubuntu
 wendy
 
 
+ROOT ACCESS
+find / -perm 6000 2>/dev/null
+
+
+
 ## Useful Steps
 
 	Log Cleaning
