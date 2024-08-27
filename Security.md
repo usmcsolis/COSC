@@ -4061,6 +4061,10 @@ find / -perm 6000 2>/dev/null
 
 
 
+john --wordlist={10million...wordlist} {cat /etc/shadow}
+
+
+
 ## Useful Steps
 
 	Log Cleaning
