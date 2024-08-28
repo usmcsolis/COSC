@@ -190,6 +190,8 @@ print s.recv(1024)
 s.close()
 ```
 
+ssh -S -O forward -L 49999:<Vuln HOST>:9999
+
 STEP TWO
 
 MSFCONSOLE PAYLAOD
