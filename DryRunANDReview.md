@@ -563,8 +563,49 @@ ssh -S /tmp/TG2 dynamic -O forward -L 10007:192.168.150.253:3201
 comrade::StudentMidwayPassword
 
 
+## INTERNAL WINDOWS BOX
+1. RDP
 
 
+
+
+# Class REVIEW
+
+## RECON
+ip a
+ip n
+nmap 
+nmap --script http-enum
+
+## WEBEX
+sql injection
+UNION SELECT injection
+
+## Reverse Engineering
+GHIDRA Executable
+
+
+## EXPLOIT DEV
+Linux and Windows
+
+
+## POST EX
+cat /etc/passwd
+cat /etc/shadow
+cat /etc/hosts
+cat /etc/crontab
+cat rsyslog
+
+## WIN EX
+
+
+## LIN EX
+
+
+## Reverse Engineering
+
+
+## MULTIPLE FIELD TESTING
 
 
 
