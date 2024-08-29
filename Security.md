@@ -3812,7 +3812,6 @@ echo "$(tail -n 50 /var/log/auth.log)" > /var/log/auth.log
 Can be used with head/tail to keep the desired portions of the log file and remove the rest. In this case, the most recent 50 entries are saved and the rest are removed.
 
 unset HISTFILE
-If bash is configured to save its log upon exit, then this will ensure that the current bash sessions' history is not saved.
 
 
 
