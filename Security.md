@@ -3175,6 +3175,28 @@ critical to os
 system32
 
 
+```
+
+comrade@lin:~$ sudo tcpdump -i ens3 not src host 192.168.150.253 and not port 3201 -n
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on ens3, link-type EN10MB (Ethernet), capture size 262144 bytes
+13:23:59.651001 IP 192.168.28.135.34130 > 192.168.150.253.12353: Flags [S], seq 1305123570, win 64860, options [mss 1410,sackOK,TS val 663089608 ecr 0,nop,wscale 7], length 0
+13:24:01.654461 IP 192.168.28.135.34400 > 192.168.150.253.12354: Flags [S], seq 681517271, win 64860, options [mss 1410,sackOK,TS val 663091611 ecr 0,nop,wscale 7], length 0
+13:24:03.657939 IP 192.168.28.135.44950 > 192.168.150.253.12355: Flags [S], seq 3713426139, win 64860, options [mss 1410,sackOK,TS val 663093615 ecr 0,nop,wscale 7], length 0
+13:24:05.661346 IP 192.168.28.135.60518 > 192.168.150.253.12356: Flags [S], seq 1727687649, win 64860, options [mss 1410,sackOK,TS val 663095618 ecr 0,nop,wscale 7], length 0
+^C
+4 packets captured
+4 packets received by filter
+0 packets dropped by kernel
+comrade@lin:~$ sudo /bin/nc.openbsd -lvp 12310
+Listening on [0.0.0.0] (family 0, port 12310)
+Connection from 192.168.28.135 60058 received!
+NnVlVXR4bDVyTTk1Y2VTZjVBbkYK
+comrade@lin:~$ 
+
+
+```
+
 
 # Windows Privilege Escalation
 https://sec.cybbh.io/-/public/-/jobs/872115/artifacts/slides/09-windows-priv-persist-cover.html
