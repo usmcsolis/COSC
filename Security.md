@@ -1484,6 +1484,8 @@ mem2:
 
 xfreerdp /u:student /v:10.50.21.242 -dynamic-resolution +glyph-cache +clipboard
 
+xfreerdp /u:student /v: -dynamic-resolution +glyph-cache +clipboard
+
 https://learn.microsoft.com/en-us/sysinternals/downloads/
 
 Static Analysis :
@@ -1870,13 +1872,13 @@ break <address>  #   Establish a break point
 	- Execute the program calling it "./func"
 	- Try and pass ./func a argument ./func $(echo"aaaaaaaaaaaaaa") It doesnt take arguments
 	- Try ./func <<<$(echo"aaaaaaaaaa") this is saying that after ./func is running pass it this command in $()
-	- gdb ./func	(Run the GDB)
+	-  ./func	(Run the )
 		- peda is already installed no need to install peda
 		- run command is how to start program
 		- Since we know vulnerable function is get() we can run "info functions" to find it
 		- To disassemble a function we run "disass getuserinput" and for color code we "pdisass getuserinput"
 		- call 0x565553d0 <gets@plt> is highlighted in red
-		- shell command gives you a shell from GDB and exit to go back to GDB
+		- shell command gives you a shell from  and exit to go back to 
 		- run <<<$(echo "aafdafdvcjadsbkhjbfhjdbasjfhjdbabfdkbfkjdbsafkdkfajbahfkdasjcndlkjanlkdlcdlncadbscldbsalhj") is how to pass information into GDB program to break it
 		- Make a .py script that will generate a string to perform the buffer overflow for us against the program.
 			- vim bufferoverflow.py and chmod 755
